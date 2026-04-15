@@ -1,0 +1,141 @@
+{
+  "mission": "coach-list-2026-04",
+  "respondent_name": "Marilyn Nelson",
+  "sections": {
+    "pending-new": [
+      {
+        "aca": 43913,
+        "name": "Lenton, Jill",
+        "club": "Bribie Island",
+        "disciplines": "Golf:1"
+      },
+      {
+        "aca": 43066,
+        "name": "Rees, Janette (Jan)",
+        "club": "Bribie Island",
+        "disciplines": "Golf:1,2"
+      },
+      {
+        "aca": 100080,
+        "name": "Taylor, Neville",
+        "club": "Bribie Island",
+        "disciplines": "Golf:1"
+      },
+      {
+        "aca": 1935,
+        "name": "Brooks, Ann",
+        "club": "East Brisbane",
+        "disciplines": "Golf:1"
+      },
+      {
+        "aca": 43323,
+        "name": "Trask, Hedi",
+        "club": "Eildon",
+        "disciplines": "AC:1,2 Golf:1,2"
+      }
+    ],
+    "pending-include": [
+      {
+        "aca": 42070,
+        "name": "Brooks, Ann",
+        "club": "East Brisbane",
+        "disciplines": "Golf:1"
+      },
+      {
+        "aca": 42082,
+        "name": "Browne, Paula",
+        "club": "Eildon",
+        "disciplines": "(no levels recorded)"
+      },
+      {
+        "aca": 43546,
+        "name": "Stephens, Mark",
+        "club": "Gladstone",
+        "disciplines": "Golf:1,2 Ric:1"
+      },
+      {
+        "aca": 43629,
+        "name": "Stephens, Penny",
+        "club": "Gladstone",
+        "disciplines": "Golf:1,2 Ric:1"
+      },
+      {
+        "aca": 42794,
+        "name": "Matthews, Gordon",
+        "club": "Headland-Buderim",
+        "disciplines": "Golf:1,2,3 GB:1,2"
+      },
+      {
+        "aca": 43606,
+        "name": "Pool, Janet",
+        "club": "Hervey Bay",
+        "disciplines": "(no levels recorded)"
+      },
+      {
+        "aca": 42620,
+        "name": "Jolly, Colin",
+        "club": "Southport Croquet Club Inc.",
+        "disciplines": "Golf:1,2,3"
+      },
+      {
+        "aca": 42621,
+        "name": "Jolly, Colleen",
+        "club": "Southport Croquet Club Inc.",
+        "disciplines": "Golf:1,2"
+      },
+      {
+        "aca": 43338,
+        "name": "Turner, Beryl",
+        "club": "Southport Croquet Club Inc.",
+        "disciplines": "AC:1,2,Presenter Golf:1,2,3,Presenter Ric:1,Presenter"
+      },
+      {
+        "aca": 43192,
+        "name": "Sloane, Gail",
+        "club": "Windsor",
+        "disciplines": "Golf:1,2"
+      },
+      {
+        "aca": 42304,
+        "name": "Eames, Robert",
+        "club": "Noosa",
+        "disciplines": "Golf:1"
+      },
+      {
+        "aca": 100080,
+        "name": "Taylor, Neville",
+        "club": "Noosa",
+        "disciplines": "Golf:1",
+        "note": "RevSport has Neville Taylor at Bribie Island with Golf:1 flag active — is this the same person, or a second Neville Taylor at Noosa?"
+      },
+      {
+        "aca": 43126,
+        "name": "Roy, Wallace",
+        "club": "The Range-Maleny",
+        "disciplines": "AC:1 Golf:1 Ric:1"
+      },
+      {
+        "aca": 43474,
+        "name": "Young, Michael",
+        "club": "Nambour",
+        "disciplines": "Golf:1"
+      },
+      {
+        "aca": 43730,
+        "name": "Tulk, Rhonda",
+        "club": "Nambour",
+        "disciplines": "Golf:1"
+      }
+    ],
+    "pending-no-aca": [
+      {
+        "aca": null,
+        "name": "Becker, Colin",
+        "club": "Headland-Buderim",
+        "region": "Sunshine",
+        "disciplines": "Golf:1",
+        "note": "Not found in RevSport at all. New coach pending registration, or wrong name/club on the spreadsheet?"
+      }
+    ]
+  }
+}
