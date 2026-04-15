@@ -145,6 +145,22 @@ body {
     color: var(--lawn-dark);
 }
 
+.opener .opener-note {
+    margin-top: 0.9rem;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--border);
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.opener .opener-note-icon {
+    color: var(--accent-warm);
+    font-style: normal;
+    margin-right: 0.3rem;
+    font-size: 1rem;
+}
+
 /* ---- Section divider ---- */
 
 .section-divider {

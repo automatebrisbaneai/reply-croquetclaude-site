@@ -225,7 +225,8 @@
         opener.innerHTML =
             '<p>Hi ' + firstName + ' — I cross-checked your February spreadsheet against the live RevSport records and the CAQ website.</p>' +
             '<p><strong>101 coaches appear on all sources</strong> — those are confirmed on the master list, no action needed from you.</p>' +
-            '<p><strong>The ' + totalCount + ' below are the gaps</strong> — each appears on one source but not the other. For each one, tell me whether to <em>Include</em> them on the master list or <em>Drop</em> them.</p>';
+            '<p><strong>The ' + totalCount + ' below are the gaps</strong> — each appears on one source but not the other. For each one, tell me whether to <em>Include</em> them on the master list or <em>Drop</em> them.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">\u270e</span> Your answers save automatically as you go. Close the tab and come back any time \u2014 the link picks up where you left off until you press <em>Send my answers</em>.</p>';
         container.appendChild(opener);
 
         // Section graphic — animated arrow from the source list (RevSport or Your list)
