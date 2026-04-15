@@ -217,10 +217,66 @@
         container.className = 'container';
 
         // Opener
-        const opener = document.createElement('p');
+        const opener = document.createElement('div');
         opener.className = 'opener';
-        opener.textContent = 'Hi ' + firstName + ' — I\'ve pulled the coaching records from RevSport, your February spreadsheet, and the CAQ website. 101 coaches line up cleanly. The ' + totalCount + ' below don\'t match between sources. A one-click answer per record tells me which to keep.';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + ' — I cross-checked your February spreadsheet against the live RevSport records and the CAQ website.</p>' +
+            '<p><strong>101 coaches appear on all sources</strong> — those are confirmed on the master list, no action needed from you.</p>' +
+            '<p><strong>The ' + totalCount + ' below are the gaps</strong> — each appears on one source but not the other. For each one, tell me whether to <em>Include</em> them on the master list or <em>Drop</em> them.</p>';
         container.appendChild(opener);
+
+        // Section graphic builder — animated arrow showing which list has the coach
+        // and which list is missing them.
+        function buildSectionGraphic(direction) {
+            // direction: 'revsport-to-list' | 'list-to-revsport' | 'list-only'
+            const wrap = document.createElement('div');
+            wrap.className = 'section-graphic';
+            wrap.setAttribute('aria-hidden', 'true');
+
+            function docEl(label, state) {
+                // state: 'present' | 'missing'
+                const d = document.createElement('div');
+                d.className = 'doc doc-' + state;
+                d.innerHTML =
+                    '<svg viewBox="0 0 28 34" width="22" height="28" aria-hidden="true">' +
+                    '<path d="M3 1 H19 L25 7 V31 a2 2 0 0 1 -2 2 H3 a2 2 0 0 1 -2 -2 V3 a2 2 0 0 1 2 -2 z" ' +
+                    'fill="none" stroke="currentColor" stroke-width="1.6" ' +
+                    (state === 'missing' ? 'stroke-dasharray="3 2"' : '') + '/>' +
+                    '<path d="M19 1 V7 H25" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+                    (state === 'missing' ? '<text x="13" y="22" font-size="11" text-anchor="middle" fill="currentColor" font-family="serif">?</text>' : '<line x1="6" y1="14" x2="20" y2="14" stroke="currentColor" stroke-width="1.4"/><line x1="6" y1="19" x2="20" y2="19" stroke="currentColor" stroke-width="1.4"/><line x1="6" y1="24" x2="16" y2="24" stroke="currentColor" stroke-width="1.4"/>') +
+                    '</svg>' +
+                    '<span class="doc-label">' + label + '</span>';
+                return d;
+            }
+
+            function arrowEl() {
+                const a = document.createElement('div');
+                a.className = 'doc-arrow';
+                a.innerHTML =
+                    '<svg viewBox="0 0 60 16" width="60" height="16" aria-hidden="true">' +
+                    '<line x1="2" y1="8" x2="52" y2="8" stroke="currentColor" stroke-width="2" ' +
+                    'stroke-dasharray="4 4" stroke-linecap="round" class="doc-arrow-line"/>' +
+                    '<polyline points="46,3 54,8 46,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+                    '</svg>';
+                return a;
+            }
+
+            if (direction === 'revsport-to-list') {
+                wrap.appendChild(docEl('RevSport', 'present'));
+                wrap.appendChild(arrowEl());
+                wrap.appendChild(docEl('Your list', 'missing'));
+            } else if (direction === 'list-to-revsport') {
+                wrap.appendChild(docEl('Your list', 'present'));
+                wrap.appendChild(arrowEl());
+                wrap.appendChild(docEl('RevSport', 'missing'));
+            } else {
+                // list-only: single doc with a question mark
+                wrap.appendChild(docEl('Your list', 'present'));
+                wrap.appendChild(arrowEl());
+                wrap.appendChild(docEl('No ACA', 'missing'));
+            }
+            return wrap;
+        }
 
         // ---- Section A ----
         if (sectionA.length > 0) {
@@ -228,10 +284,17 @@
             divA.className = 'section-divider';
             container.appendChild(divA);
 
+            container.appendChild(buildSectionGraphic('revsport-to-list'));
+
             const headA = document.createElement('h2');
             headA.className = 'section-heading';
-            headA.textContent = 'Section A — Active in RevSport but missing from your February list (' + sectionA.length + ')';
+            headA.textContent = 'Section A — In RevSport, not on your February list (' + sectionA.length + ')';
             container.appendChild(headA);
+
+            const subA = document.createElement('p');
+            subA.className = 'section-subtitle';
+            subA.textContent = 'RevSport flags these ' + sectionA.length + ' as active coaches, but they didn\u2019t make it onto your February list. Should they be on the master list?';
+            container.appendChild(subA);
 
             const gridA = document.createElement('div');
             gridA.className = 'cards-grid';
@@ -247,14 +310,16 @@
             divB.className = 'section-divider';
             container.appendChild(divB);
 
+            container.appendChild(buildSectionGraphic('list-to-revsport'));
+
             const headB = document.createElement('h2');
             headB.className = 'section-heading';
-            headB.textContent = 'Section B — On your February list but RevSport no longer flags them as coaches (' + sectionB.length + ')';
+            headB.textContent = 'Section B — On your February list, not in RevSport (' + sectionB.length + ')';
             container.appendChild(headB);
 
             const subB = document.createElement('p');
             subB.className = 'section-subtitle';
-            subB.textContent = 'Did the RevSport flag get cleared in error?';
+            subB.textContent = 'These ' + sectionB.length + ' are on your February list but RevSport no longer flags them as coaches. Was the flag cleared in error, or have they actually stopped coaching?';
             container.appendChild(subB);
 
             const gridB = document.createElement('div');
@@ -273,12 +338,14 @@
 
             const headC = document.createElement('h2');
             headC.className = 'section-heading';
+            container.appendChild(buildSectionGraphic('list-only'));
+
             headC.textContent = 'Section C — On your list with no ACA number (' + sectionC.length + ')';
             container.appendChild(headC);
 
             const subC = document.createElement('p');
             subC.className = 'section-subtitle';
-            subC.textContent = 'These ' + sectionC.length + ' don\'t have ACA numbers in the spreadsheet. Are they current CAQ members we can look up? New coaches pending registration? Or something else?';
+            subC.textContent = 'These ' + sectionC.length + ' are on your February list but don\u2019t have ACA numbers, so I couldn\u2019t match them against RevSport. Are they current CAQ members under a different name? New coaches pending registration? Or something else?';
             container.appendChild(subC);
 
             const gridC = document.createElement('div');

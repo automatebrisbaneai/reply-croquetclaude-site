@@ -128,6 +128,14 @@ body {
     line-height: 1.65;
 }
 
+.opener p + p {
+    margin-top: 0.6rem;
+}
+
+.opener strong {
+    color: var(--lawn-dark);
+}
+
 /* ---- Section divider ---- */
 
 .section-divider {
@@ -558,4 +566,61 @@ body {
     font-size: var(--font-size-small);
     margin-bottom: var(--space-md);
     font-style: italic;
+}
+
+/* ---- Section graphic — animated arrow showing list-to-list direction ---- */
+
+.section-graphic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 0 0 0.6rem;
+    flex-wrap: nowrap;
+}
+
+.section-graphic .doc {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    min-width: 64px;
+}
+
+.section-graphic .doc.doc-present {
+    color: var(--lawn-green);
+}
+
+.section-graphic .doc.doc-missing {
+    color: #999;
+    opacity: 0.75;
+}
+
+.section-graphic .doc-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.section-graphic .doc-arrow {
+    color: var(--accent-warm);
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 1.1rem; /* nudge up to align with doc icons (labels live below) */
+}
+
+.section-graphic .doc-arrow-line {
+    animation: arrow-flow 1.6s linear infinite;
+}
+
+@keyframes arrow-flow {
+    from { stroke-dashoffset: 8; }
+    to   { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-graphic .doc-arrow-line {
+        animation: none;
+    }
 }
