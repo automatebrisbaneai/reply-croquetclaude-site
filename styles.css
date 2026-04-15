@@ -478,6 +478,20 @@ body {
     margin-bottom: var(--space-sm);
 }
 
+.thankyou-screen .thankyou-claude {
+    width: 220px;
+    max-width: 70%;
+    height: auto;
+    display: block;
+    margin: 0 auto var(--space-sm);
+}
+
+@media (min-width: 600px) {
+    .thankyou-screen .thankyou-claude {
+        width: 280px;
+    }
+}
+
 .thankyou-screen h1 {
     font-family: var(--font-heading);
     font-size: var(--font-size-h2);

@@ -246,7 +246,7 @@ async function submitMission(tokenRecord, responsePayload, respondentName) {
     if (app) {
         app.innerHTML = `
             <div class="thankyou-screen visible">
-                <div class="tick">&#10003;</div>
+                <img src="/assets/party-claude.png" alt="" class="thankyou-claude">
                 <h1>Thanks ${firstName} — Wade will see your answers right away.</h1>
                 <p>You don't need to do anything else.</p>
             </div>
