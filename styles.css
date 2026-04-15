@@ -75,6 +75,15 @@ body {
     color: var(--lawn-light);
     letter-spacing: 0.03em;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.site-header .wordmark-avatar {
+    height: 36px;
+    width: auto;
+    display: block;
 }
 
 .site-header .mission-title {
