@@ -41,11 +41,13 @@ function getTokenParam() {
 
 /**
  * Fetch and validate the token record from PocketBase.
+ * The collection listRule requires ?t=<token> as a query param (not a filter).
  * Returns the record object, or null if invalid/expired/submitted.
  */
 async function fetchToken(tokenValue) {
-    const filter = encodeURIComponent(`token="${tokenValue}"`);
-    const url = `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records?filter=${filter}&perPage=1&skipTotal=1`;
+    // Pass token as ?t= query param — the PB listRule is:
+    //   token = @request.query.t && revoked = false && submitted_at = null
+    const url = `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records?t=${encodeURIComponent(tokenValue)}&perPage=1&skipTotal=1`;
 
     let data;
     try {
@@ -63,8 +65,8 @@ async function fetchToken(tokenValue) {
     // Revoked?
     if (record.revoked) return null;
 
-    // Already submitted?
-    if (record.submitted_at) return null;
+    // Already submitted? (PB returns "" for null datetime)
+    if (record.submitted_at && record.submitted_at !== '') return null;
 
     // Expired?
     if (record.expires_at) {
