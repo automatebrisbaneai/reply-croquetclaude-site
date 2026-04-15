@@ -103,6 +103,100 @@ async function initMission() {
 }
 
 /**
+ * Format a past date as a human-readable relative time string.
+ * e.g. "2 hours ago", "just now", "3 days ago"
+ */
+function relativeTime(dateStr) {
+    if (!dateStr) return null;
+    const then = new Date(dateStr);
+    if (isNaN(then.getTime())) return null;
+    const diffMs = Date.now() - then.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return diffMins + ' minute' + (diffMins === 1 ? '' : 's') + ' ago';
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return diffHours + ' hour' + (diffHours === 1 ? '' : 's') + ' ago';
+    const diffDays = Math.floor(diffHours / 24);
+    return diffDays + ' day' + (diffDays === 1 ? '' : 's') + ' ago';
+}
+
+/**
+ * Create a draft autosave controller bound to a specific token record.
+ *
+ * Returns { save(payloadFn), showSavedIndicator() }
+ *
+ * @param {object} tokenRecord - the full PB token record (needs .id)
+ * @param {Function} buildPayload - called with no args, returns the current partial payload
+ * @returns {{ save: Function }}
+ */
+function createAutosave(tokenRecord, buildPayload) {
+    let debounceTimer = null;
+    let lastSaveFailed = false;
+
+    async function _doSave() {
+        const payload = buildPayload();
+        try {
+            const res = await fetch(
+                `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`,
+                {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ draft_payload: payload })
+                }
+            );
+            if (!res.ok) {
+                console.warn('[autosave] PATCH returned', res.status);
+                lastSaveFailed = true;
+                return;
+            }
+            lastSaveFailed = false;
+            _showSavedIndicator();
+        } catch (err) {
+            console.warn('[autosave] Network error:', err);
+            lastSaveFailed = true;
+        }
+    }
+
+    function _showSavedIndicator() {
+        const el = document.getElementById('draft-saved-indicator');
+        if (!el) return;
+        el.classList.add('visible');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function() {
+            el.classList.remove('visible');
+        }, 2500);
+    }
+
+    function save() {
+        // If last save failed, attempt immediately (silent retry on next interaction)
+        if (lastSaveFailed) {
+            lastSaveFailed = false;
+            _doSave();
+            return;
+        }
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(_doSave, 400);
+    }
+
+    return { save: save };
+}
+
+/**
+ * Show the draft-restored notice above the form.
+ * Inserts a small banner into the container.
+ *
+ * @param {HTMLElement} container - the container element to prepend the notice to
+ * @param {string} savedAt - ISO date string of when the draft was last saved
+ */
+function showDraftRestoredNotice(container, savedAt) {
+    const rel = relativeTime(savedAt) || 'earlier';
+    const notice = document.createElement('div');
+    notice.className = 'draft-restored-notice';
+    notice.textContent = 'Draft from ' + rel + ' restored.';
+    container.insertBefore(notice, container.firstChild);
+}
+
+/**
  * Submit the mission response.
  *
  * @param {object} tokenRecord  — the full PB token record (needs .id and .token and .mission)
@@ -165,3 +259,5 @@ async function submitMission(tokenRecord, responsePayload, respondentName) {
 // Expose for inline scripts
 window.initMission = initMission;
 window.submitMission = submitMission;
+window.createAutosave = createAutosave;
+window.showDraftRestoredNotice = showDraftRestoredNotice;
