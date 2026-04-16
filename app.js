@@ -4,6 +4,49 @@ const PB_BASE = 'https://pb.croquetwade.com';
 const TOKENS_COLLECTION = 'reply_mission_tokens';
 const RESPONSES_COLLECTION = 'reply_mission_responses';
 
+/* ---------- localStorage draft backup helpers ---------- */
+
+const LOCAL_DRAFT_PREFIX = 'replyDraft:';
+
+function _writeLocalDraft(token, blob) {
+    try {
+        localStorage.setItem(LOCAL_DRAFT_PREFIX + token, JSON.stringify(blob));
+    } catch { /* quota exceeded or private mode — silently skip */ }
+}
+
+function _readLocalDraft(token) {
+    try {
+        const raw = localStorage.getItem(LOCAL_DRAFT_PREFIX + token);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.savedAt) return null;
+        return parsed;
+    } catch { return null; }
+}
+
+function _clearLocalDraft(token) {
+    try { localStorage.removeItem(LOCAL_DRAFT_PREFIX + token); }
+    catch { /* ignore */ }
+}
+
+function _mergeLocalDraft(record) {
+    const local = _readLocalDraft(record.token);
+    if (!local) return;
+    // Compare local.savedAt against the _savedAt embedded in draft_payload.
+    // PocketBase does not return updated/created on this collection, so we
+    // embed the timestamp in the payload itself when PATCHing (see createAutosave).
+    const serverSavedAt = record.draft_payload && record.draft_payload._savedAt
+        ? record.draft_payload._savedAt
+        : null;
+    const serverTime = serverSavedAt ? new Date(serverSavedAt).getTime() : 0;
+    const localTime = new Date(local.savedAt).getTime();
+    if (localTime > serverTime) {
+        record.draft_payload = local.payload;
+    }
+}
+
+/* ------------------------------------------------------- */
+
 /**
  * Show the link-expired / invalid screen.
  * Replaces #app content with the standard expired message.
@@ -97,6 +140,9 @@ async function initMission() {
         return;
     }
 
+    // Merge in newer local draft if present
+    _mergeLocalDraft(record);
+
     if (typeof window.renderMission === 'function') {
         window.renderMission(record);
     }
@@ -135,13 +181,24 @@ function createAutosave(tokenRecord, buildPayload) {
 
     async function _doSave() {
         const payload = buildPayload();
+        const savedAt = new Date().toISOString();
+
+        // Local backup first — survives network failures
+        _writeLocalDraft(tokenRecord.token, { payload, savedAt });
+
+        // Embed savedAt inside draft_payload so the server copy carries a
+        // freshness timestamp. _mergeLocalDraft compares against this field.
+        // renderMission only reads .cards and .general_notes so the extra
+        // _savedAt field is harmless there.
+        const patchPayload = Object.assign({}, payload, { _savedAt: savedAt });
+
         try {
             const res = await fetch(
                 `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ draft_payload: payload })
+                    body: JSON.stringify({ draft_payload: patchPayload })
                 }
             );
             if (!res.ok) {
@@ -230,6 +287,9 @@ async function submitMission(tokenRecord, responsePayload, respondentName) {
         return false;
     }
 
+    // Clear local backup — response is safely on the server
+    _clearLocalDraft(tokenRecord.token);
+
     // 2. PATCH the token to mark as submitted
     try {
         await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
@@ -248,7 +308,7 @@ async function submitMission(tokenRecord, responsePayload, respondentName) {
         app.innerHTML = `
             <div class="thankyou-screen visible">
                 <img src="/assets/party-claude.png" alt="" class="thankyou-claude">
-                <h1>Thanks ${firstName} — Wade will see your answers right away.</h1>
+                <h1>Thanks ${firstName} — I'll get your reply right away.</h1>
                 <p>You don't need to do anything else.</p>
             </div>
         `;
