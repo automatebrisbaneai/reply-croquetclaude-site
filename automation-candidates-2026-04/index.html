@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Candidates — April 2026 — CroquetClaude</title>
+    <meta name="description" content="Triage 8 automation candidates flagged from the last 10 sessions.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* ---- Mission-specific styles — automation-candidates-2026-04 ---- */
+
+    /* Card title: slightly larger than default */
+    .cand-card .card-name {
+        font-size: 1.075rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Badge pill row */
+    .cand-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.85rem;
+    }
+
+    .cand-badge {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.22rem 0.65rem;
+        border-radius: 999px;
+        line-height: 1.4;
+    }
+
+    .cand-badge-engineer {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .cand-badge-token-policeman {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .cand-badge-pattern {
+        background: #ede9fe;
+        color: #4c1d95;
+    }
+
+    .cand-occurrences {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+
+    /* Sequence + fix body fields */
+    .cand-field {
+        margin-bottom: 0.7rem;
+    }
+
+    .cand-field-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-secondary);
+        margin-bottom: 0.2rem;
+    }
+
+    .cand-field-value {
+        font-size: 0.85rem;
+        line-height: 1.55;
+        color: var(--text-primary);
+    }
+
+    .cand-field-value.monospace {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.8rem;
+        background: #f5f3ea;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.4rem 0.6rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    /* Three-way triage button colours */
+    .btn-answer[data-value="approve"] {
+        border-color: var(--lawn-green);
+        color: var(--lawn-dark);
+    }
+    .btn-answer[data-value="approve"]:hover {
+        background: #f0f8f4;
+    }
+    .btn-answer[data-value="approve"].selected {
+        background: var(--lawn-green);
+        border-color: var(--lawn-dark);
+        color: var(--white);
+        font-weight: 700;
+    }
+
+    .btn-answer[data-value="defer"] {
+        border-color: var(--accent-warm);
+        color: var(--accent-warm-hover);
+    }
+    .btn-answer[data-value="defer"]:hover {
+        background: #fdf5ec;
+    }
+    .btn-answer[data-value="defer"].selected {
+        background: var(--accent-warm);
+        border-color: var(--accent-warm-hover);
+        color: var(--white);
+        font-weight: 700;
+    }
+
+    .btn-answer[data-value="skip"] {
+        border-color: var(--drop-red);
+        color: var(--drop-red-dark);
+    }
+    .btn-answer[data-value="skip"]:hover {
+        background: var(--drop-red-bg);
+    }
+    .btn-answer[data-value="skip"].selected {
+        background: var(--drop-red);
+        border-color: var(--drop-red-dark);
+        color: var(--white);
+        font-weight: 700;
+    }
+
+    /* Routing override dropdown (Approve only) */
+    .routing-override-wrap {
+        display: none;
+        margin-top: 0.65rem;
+    }
+    .routing-override-wrap.visible {
+        display: block;
+    }
+    .routing-override-wrap label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0.3rem;
+    }
+    .routing-override-select {
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        padding: 0.45rem 0.65rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--cream);
+        color: var(--text-primary);
+        cursor: pointer;
+        min-width: 260px;
+        max-width: 100%;
+    }
+    .routing-override-select:focus {
+        outline: 3px solid var(--lawn-green);
+        outline-offset: 2px;
+        border-color: var(--lawn-green);
+    }
+
+    /* "Add comment" toggle link */
+    .comment-toggle {
+        display: inline-block;
+        margin-top: 0.5rem;
+        font-size: 0.82rem;
+        color: var(--lawn-green);
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: var(--font-body);
+    }
+    .comment-toggle:focus-visible {
+        outline: 3px solid var(--lawn-green);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    /* Summary line below opener */
+    .summary-line {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin: 0.6rem 0 0.9rem;
+    }
+    .summary-line strong {
+        color: var(--text-primary);
+    }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Automation Candidates — April 2026</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — automation-candidates-2026-04
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        const seed = tokenRecord.payload_seed;
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+
+        const candidates = (seed && seed.sections && seed.sections.candidates) || [];
+        const summary = (seed && seed.summary) || {};
+        const byRouting = summary.by_routing || {};
+
+        // answers keyed by candidate id
+        const answers = {};
+        candidates.forEach(function(c) {
+            answers[c.id] = { action: null, routing_override: null, comment: '' };
+        });
+
+        // Pre-load from draft if present
+        if (draft && Array.isArray(draft.candidates)) {
+            draft.candidates.forEach(function(entry) {
+                if (entry.id && answers.hasOwnProperty(entry.id)) {
+                    answers[entry.id].action = entry.action || null;
+                    answers[entry.id].routing_override = entry.routing_override || null;
+                    answers[entry.id].comment = entry.comment || '';
+                }
+            });
+        }
+
+        // ---- Helpers ----
+
+        function badgeClass(routing) {
+            if (routing === 'Engineer') return 'cand-badge-engineer';
+            if (routing === 'Token Policeman') return 'cand-badge-token-policeman';
+            if (routing === 'Pattern') return 'cand-badge-pattern';
+            return 'cand-badge-engineer';
+        }
+
+        function updateValidationState() {
+            return candidates.filter(function(c) {
+                return answers[c.id].action === null;
+            });
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            return {
+                candidates: candidates.map(function(c) {
+                    return {
+                        id: c.id,
+                        action: answers[c.id].action,
+                        routing_override: answers[c.id].routing_override,
+                        comment: answers[c.id].comment || ''
+                    };
+                })
+            };
+        }
+
+        // ---- Build a single candidate card ----
+
+        function buildCard(candidate) {
+            const id = candidate.id;
+            const card = document.createElement('div');
+            card.className = 'card cand-card';
+            card.dataset.key = id;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', candidate.title);
+
+            // Title
+            const nameEl = document.createElement('div');
+            nameEl.className = 'card-name';
+            nameEl.textContent = candidate.title;
+            card.appendChild(nameEl);
+
+            // Badge + occurrences row
+            const badgeRow = document.createElement('div');
+            badgeRow.className = 'cand-badge-row';
+
+            const badge = document.createElement('span');
+            badge.className = 'cand-badge ' + badgeClass(candidate.routing);
+            badge.textContent = candidate.routing;
+            badgeRow.appendChild(badge);
+
+            const occ = document.createElement('span');
+            occ.className = 'cand-occurrences';
+            occ.textContent = candidate.occurrences;
+            badgeRow.appendChild(occ);
+
+            card.appendChild(badgeRow);
+
+            // Sequence field (monospace)
+            const seqWrap = document.createElement('div');
+            seqWrap.className = 'cand-field';
+            const seqLabel = document.createElement('div');
+            seqLabel.className = 'cand-field-label';
+            seqLabel.textContent = 'Sequence:';
+            const seqValue = document.createElement('div');
+            seqValue.className = 'cand-field-value monospace';
+            seqValue.textContent = candidate.sequence;
+            seqWrap.appendChild(seqLabel);
+            seqWrap.appendChild(seqValue);
+            card.appendChild(seqWrap);
+
+            // Suggested fix field
+            const fixWrap = document.createElement('div');
+            fixWrap.className = 'cand-field';
+            const fixLabel = document.createElement('div');
+            fixLabel.className = 'cand-field-label';
+            fixLabel.textContent = 'Suggested fix:';
+            const fixValue = document.createElement('div');
+            fixValue.className = 'cand-field-value';
+            fixValue.textContent = candidate.fix;
+            fixWrap.appendChild(fixLabel);
+            fixWrap.appendChild(fixValue);
+            card.appendChild(fixWrap);
+
+            // Answer buttons (Approve / Defer / Skip)
+            const btnRow = document.createElement('div');
+            btnRow.className = 'answer-buttons';
+
+            var routingWrap = null;
+            var routingSelect = null;
+
+            [
+                { label: 'Approve', value: 'approve' },
+                { label: 'Defer',   value: 'defer'   },
+                { label: 'Skip',    value: 'skip'     }
+            ].forEach(function(btn) {
+                const b = document.createElement('button');
+                b.className = 'btn-answer';
+                b.textContent = btn.label;
+                b.dataset.value = btn.value;
+                b.setAttribute('type', 'button');
+
+                b.addEventListener('click', function() {
+                    // Deselect all buttons in this card
+                    btnRow.querySelectorAll('.btn-answer').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers[id].action = btn.value;
+
+                    // Show/hide routing override
+                    if (routingWrap) {
+                        if (btn.value === 'approve') {
+                            routingWrap.classList.add('visible');
+                        } else {
+                            routingWrap.classList.remove('visible');
+                            if (routingSelect) routingSelect.value = 'default';
+                            answers[id].routing_override = null;
+                        }
+                    }
+
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+                    updateValidationState();
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            card.appendChild(btnRow);
+
+            // Routing override dropdown (hidden until Approve is selected)
+            routingWrap = document.createElement('div');
+            routingWrap.className = 'routing-override-wrap';
+
+            const routingLabel = document.createElement('label');
+            routingLabel.textContent = 'Override routing? (optional)';
+            routingLabel.setAttribute('for', 'routing-override-' + id);
+            routingWrap.appendChild(routingLabel);
+
+            routingSelect = document.createElement('select');
+            routingSelect.className = 'routing-override-select';
+            routingSelect.id = 'routing-override-' + id;
+
+            [
+                { value: 'default',          label: "Use Haiku's suggestion (default)" },
+                { value: 'engineer',         label: 'Engineer' },
+                { value: 'token-policeman',  label: 'Token Policeman' },
+                { value: 'hr',               label: 'HR' },
+                { value: 'pattern',          label: 'Pattern' },
+                { value: 'none',             label: 'None' }
+            ].forEach(function(opt) {
+                const o = document.createElement('option');
+                o.value = opt.value;
+                o.textContent = opt.label;
+                routingSelect.appendChild(o);
+            });
+
+            routingSelect.addEventListener('change', function() {
+                var val = routingSelect.value;
+                answers[id].routing_override = (val === 'default') ? null : val;
+                if (autosave) autosave.save();
+            });
+
+            routingWrap.appendChild(routingSelect);
+            card.appendChild(routingWrap);
+
+            // "Add comment" toggle link + collapsible textarea
+            const commentToggle = document.createElement('button');
+            commentToggle.className = 'comment-toggle';
+            commentToggle.setAttribute('type', 'button');
+            commentToggle.textContent = 'Add comment (optional)';
+
+            const notesArea = document.createElement('div');
+            notesArea.className = 'notes-area';
+
+            const notesTA = document.createElement('textarea');
+            notesTA.placeholder = 'Any context or note for CroquetClaude\u2026';
+            notesTA.setAttribute('aria-label', 'Comment for candidate ' + id);
+
+            notesTA.addEventListener('input', function() {
+                answers[id].comment = notesTA.value;
+                if (autosave) autosave.save();
+            });
+
+            notesArea.appendChild(notesTA);
+
+            commentToggle.addEventListener('click', function() {
+                notesArea.classList.add('visible');
+                commentToggle.style.display = 'none';
+                notesTA.focus();
+            });
+
+            card.appendChild(commentToggle);
+            card.appendChild(notesArea);
+
+            return card;
+        }
+
+        // ---- Assemble page ----
+
+        const app = document.getElementById('app');
+        const container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener callout
+        const opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + '. Haiku scanned the last 10 sessions (88 dispatches) and flagged 8 places where manual sequences could be scripted. For each one, choose Approve, Defer, or Skip. Optionally override the routing if you disagree with Haiku\'s suggestion, or add a comment.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">\u270e</span> Your answers save automatically as you go. Close the tab and come back any time \u2014 the link picks up where you left off until you press <em>Send my triage</em>.</p>';
+        container.appendChild(opener);
+
+        // Summary line
+        const summaryLine = document.createElement('p');
+        summaryLine.className = 'summary-line';
+        summaryLine.innerHTML =
+            '<strong>' + (summary.total || candidates.length) + ' candidates</strong>' +
+            ' &middot; Engineer: <strong>' + (byRouting['Engineer'] || 0) + '</strong>' +
+            ' &middot; Token Policeman: <strong>' + (byRouting['Token Policeman'] || 0) + '</strong>' +
+            ' &middot; Pattern: <strong>' + (byRouting['Pattern'] || 0) + '</strong>';
+        container.appendChild(summaryLine);
+
+        // Section divider + heading
+        const divider = document.createElement('hr');
+        divider.className = 'section-divider';
+        container.appendChild(divider);
+
+        const sectionHead = document.createElement('h2');
+        sectionHead.className = 'section-heading';
+        sectionHead.textContent = 'Candidates (' + candidates.length + ')';
+        container.appendChild(sectionHead);
+
+        // Cards grid
+        const grid = document.createElement('div');
+        grid.className = 'cards-grid';
+        candidates.forEach(function(c) {
+            grid.appendChild(buildCard(c));
+        });
+        container.appendChild(grid);
+
+        // Validation error
+        const validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit area
+        const submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        const draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '\u2022 Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my triage';
+
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong \u2014 please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            const unanswered = updateValidationState();
+
+            document.querySelectorAll('.card').forEach(function(card) {
+                const k = card.dataset.key;
+                if (k && answers[k] && answers[k].action === null) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (unanswered.length > 0) {
+                const ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One candidate still needs an answer \u2014 it\'s highlighted above.'
+                    : unanswered.length + ' candidates still need answers \u2014 they\'re highlighted above.';
+                ve.classList.add('visible');
+                const firstMissing = document.querySelector('.card.missing');
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            document.getElementById('validation-error').classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
+
+            const responsePayload = buildPayload();
+            const ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my triage';
+                document.getElementById('error-message').classList.add('visible');
+            }
+            // On success, app.js replaces #app with the thank-you screen automatically
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Autosave init (must happen after DOM mount so #draft-saved-indicator exists)
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft state into rendered DOM
+        if (draft && Array.isArray(draft.candidates)) {
+            draft.candidates.forEach(function(entry) {
+                if (!entry.id || !entry.action) return;
+                var card = container.querySelector('[data-key="' + entry.id + '"]');
+                if (!card) return;
+
+                // Restore action button
+                var btnRow = card.querySelector('.answer-buttons');
+                if (btnRow) {
+                    var btn = btnRow.querySelector('[data-value="' + entry.action + '"]');
+                    if (btn) {
+                        btn.classList.add('selected');
+                        card.classList.add('answered');
+                    }
+                }
+
+                // Show routing override if action was approve
+                if (entry.action === 'approve') {
+                    var rWrap = card.querySelector('.routing-override-wrap');
+                    if (rWrap) rWrap.classList.add('visible');
+                    if (entry.routing_override) {
+                        var rSel = card.querySelector('.routing-override-select');
+                        if (rSel) rSel.value = entry.routing_override;
+                    }
+                }
+
+                // Restore comment
+                if (entry.comment) {
+                    var commentToggle = card.querySelector('.comment-toggle');
+                    var notesArea = card.querySelector('.notes-area');
+                    var notesTA = notesArea && notesArea.querySelector('textarea');
+                    if (notesTA) {
+                        notesTA.value = entry.comment;
+                        if (notesArea) notesArea.classList.add('visible');
+                        if (commentToggle) commentToggle.style.display = 'none';
+                    }
+                }
+            });
+
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
