@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triage the 129 orphan emails — CroquetClaude</title>
+    <meta name="description" content="Bulk triage for orphan emails recovered in the April 2026 backfill.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* --- Orphan triage additions (group cards + drill-down) --- */
+
+        .group-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: var(--space-sm);
+            transition: border-color 0.15s;
+        }
+
+        .group-card.decided {
+            border-color: var(--lawn-green);
+            background: #f5faf7;
+        }
+
+        .group-card.decided-keep {
+            border-color: var(--accent-warm);
+            background: #fdf9f4;
+        }
+
+        .group-card.decided-drilldown {
+            border-color: var(--lawn-green);
+            background: #f5faf7;
+        }
+
+        .group-card.missing {
+            border-color: var(--error);
+            background: var(--error-bg);
+        }
+
+        .group-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .group-name {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: var(--font-size-h3);
+            color: var(--lawn-dark);
+        }
+
+        .group-count {
+            font-size: var(--font-size-small);
+            color: var(--text-secondary);
+            font-style: italic;
+            white-space: nowrap;
+        }
+
+        .group-description {
+            color: var(--text-secondary);
+            font-size: var(--font-size-small);
+            margin-bottom: var(--space-sm);
+        }
+
+        .group-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Group-level noise button */
+        .btn-answer[data-value="noise"] {
+            border-color: var(--drop-red);
+            color: var(--drop-red-dark);
+        }
+        .btn-answer[data-value="noise"]:hover {
+            background: var(--drop-red-bg);
+        }
+        .btn-answer[data-value="noise"].selected {
+            background: var(--drop-red);
+            border-color: var(--drop-red-dark);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Keep button */
+        .btn-answer[data-value="keep"] {
+            border-color: var(--accent-warm);
+            color: var(--accent-warm-hover);
+        }
+        .btn-answer[data-value="keep"]:hover {
+            background: #fdf5ec;
+        }
+        .btn-answer[data-value="keep"].selected {
+            background: var(--accent-warm);
+            border-color: var(--accent-warm-hover);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Show each button — neutral */
+        .btn-show-each {
+            font-family: var(--font-heading);
+            font-size: 0.875rem;
+            padding: 0.55rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--cream);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            min-height: 44px;
+            line-height: 1.2;
+        }
+        .btn-show-each:hover {
+            border-color: var(--lawn-green);
+            color: var(--lawn-dark);
+            background: #f0f8f4;
+        }
+        .btn-show-each:focus-visible {
+            outline: 3px solid var(--lawn-green);
+            outline-offset: 2px;
+        }
+
+        /* Group notes */
+        .group-notes-wrap {
+            margin-top: 0.5rem;
+        }
+        .group-notes-wrap label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        .group-notes-wrap textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.4rem 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: var(--font-size-small);
+            color: var(--text-primary);
+            background: var(--cream);
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .group-notes-wrap textarea:focus {
+            outline: 3px solid var(--lawn-green);
+            outline-offset: 2px;
+            border-color: var(--lawn-green);
+        }
+
+        /* Drill-down sub-cards */
+        .drilldown-section {
+            margin-top: 0.75rem;
+            border-top: 1px dashed var(--border);
+            padding-top: 0.75rem;
+            display: none;
+        }
+        .drilldown-section.open {
+            display: block;
+        }
+
+        .drilldown-heading {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub-card {
+            background: var(--cream-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .sub-card.answered {
+            border-color: var(--lawn-green);
+            background: #f2f8f5;
+        }
+
+        .sub-card-subject {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--lawn-dark);
+            margin-bottom: 0.15rem;
+        }
+
+        .sub-card-meta {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .sub-card-meta span + span::before {
+            content: ' · ';
+            opacity: 0.45;
+        }
+
+        .sub-card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        /* Per-item buttons — smaller */
+        .btn-item {
+            font-family: var(--font-heading);
+            font-size: 0.78rem;
+            padding: 0.3rem 0.65rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--white);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            min-height: 34px;
+            line-height: 1.2;
+        }
+        .btn-item:focus-visible {
+            outline: 3px solid var(--lawn-green);
+            outline-offset: 2px;
+        }
+        .btn-item[data-value="file"] {
+            border-color: var(--drop-red);
+            color: var(--drop-red-dark);
+        }
+        .btn-item[data-value="file"]:hover { background: var(--drop-red-bg); }
+        .btn-item[data-value="file"].selected {
+            background: var(--drop-red);
+            border-color: var(--drop-red-dark);
+            color: var(--white);
+            font-weight: 700;
+        }
+        .btn-item[data-value="keep"] {
+            border-color: var(--accent-warm);
+            color: var(--accent-warm-hover);
+        }
+        .btn-item[data-value="keep"]:hover { background: #fdf5ec; }
+        .btn-item[data-value="keep"].selected {
+            background: var(--accent-warm);
+            border-color: var(--accent-warm-hover);
+            color: var(--white);
+            font-weight: 700;
+        }
+        .btn-item[data-value="needs-reply"] {
+            border-color: var(--lawn-green);
+            color: var(--lawn-dark);
+        }
+        .btn-item[data-value="needs-reply"]:hover { background: #f0f8f4; }
+        .btn-item[data-value="needs-reply"].selected {
+            background: var(--lawn-green);
+            border-color: var(--lawn-dark);
+            color: var(--white);
+            font-weight: 700;
+        }
+        .btn-item[data-value="already-handled"] {
+            border-color: var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-item[data-value="already-handled"]:hover {
+            border-color: var(--lawn-green);
+            color: var(--lawn-dark);
+        }
+        .btn-item[data-value="already-handled"].selected {
+            background: #dde8e3;
+            border-color: var(--lawn-green);
+            color: var(--lawn-dark);
+            font-weight: 700;
+        }
+
+        /* Progress bar */
+        .progress-bar-wrap {
+            background: var(--cream-dark);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            height: 8px;
+            margin: var(--space-sm) 0 var(--space-md);
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: var(--lawn-green);
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+        .progress-label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 0.2rem;
+            margin-bottom: var(--space-md);
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Orphan email triage — April 2026</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — wade-orphan-triage-2026-04
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed;
+        var respondentName = tokenRecord.respondent_name || 'Wade';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var groups = (seed && seed.groups) || [];
+
+        // ---- Decision state ----
+        // groupDecisions[key] = { bulk: 'noise'|'keep'|'drilldown'|null, notes: '', items: { email_id: value } }
+        var groupDecisions = {};
+        groups.forEach(function(g) {
+            groupDecisions[g.key] = { bulk: null, notes: '', items: {} };
+            (g.emails || []).forEach(function(e) {
+                groupDecisions[g.key].items[e.email_id] = null;
+            });
+        });
+
+        // Pre-load from draft
+        if (draft && draft.groups) {
+            draft.groups.forEach(function(dg) {
+                if (groupDecisions[dg.key]) {
+                    groupDecisions[dg.key].bulk = dg.bulk || null;
+                    groupDecisions[dg.key].notes = dg.notes || '';
+                    if (dg.items) {
+                        Object.keys(dg.items).forEach(function(eid) {
+                            if (groupDecisions[dg.key].items.hasOwnProperty(eid)) {
+                                groupDecisions[dg.key].items[eid] = dg.items[eid];
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            var result = { groups: [], general_notes: '' };
+            groups.forEach(function(g) {
+                var dec = groupDecisions[g.key];
+                result.groups.push({
+                    key: g.key,
+                    name: g.name,
+                    bulk: dec.bulk,
+                    notes: dec.notes,
+                    items: dec.items
+                });
+            });
+            var gnTA = document.getElementById('general-notes');
+            result.general_notes = gnTA ? gnTA.value : '';
+            return result;
+        }
+
+        // ---- Validation ----
+        function getUndecidedGroups() {
+            return groups.filter(function(g) {
+                var dec = groupDecisions[g.key];
+                if (!dec.bulk) return true;
+                if (dec.bulk === 'drilldown') {
+                    // All items must have a decision
+                    return Object.values(dec.items).some(function(v) { return v === null; });
+                }
+                return false;
+            });
+        }
+
+        function updateProgress() {
+            var total = groups.length;
+            var done = groups.filter(function(g) {
+                var dec = groupDecisions[g.key];
+                if (!dec.bulk) return false;
+                if (dec.bulk === 'drilldown') {
+                    return Object.values(dec.items).every(function(v) { return v !== null; });
+                }
+                return true;
+            }).length;
+            var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+            var fill = document.getElementById('progress-fill');
+            var label = document.getElementById('progress-label');
+            if (fill) fill.style.width = pct + '%';
+            if (label) label.textContent = done + ' of ' + total + ' groups decided';
+        }
+
+        // ---- Build a group card ----
+        function buildGroupCard(group) {
+            var key = group.key;
+            var dec = groupDecisions[key];
+            var emails = group.emails || [];
+            var hasDrilldown = emails.length > 0;
+
+            var card = document.createElement('div');
+            card.className = 'group-card';
+            card.dataset.key = key;
+
+            // Header
+            var header = document.createElement('div');
+            header.className = 'group-header';
+            var nameEl = document.createElement('div');
+            nameEl.className = 'group-name';
+            nameEl.textContent = group.name;
+            var countEl = document.createElement('div');
+            countEl.className = 'group-count';
+            countEl.textContent = group.count + (group.count === 1 ? ' email' : ' emails');
+            header.appendChild(nameEl);
+            header.appendChild(countEl);
+            card.appendChild(header);
+
+            // Description
+            var descEl = document.createElement('div');
+            descEl.className = 'group-description';
+            descEl.textContent = group.description || '';
+            card.appendChild(descEl);
+
+            // Action buttons
+            var actions = document.createElement('div');
+            actions.className = 'group-actions';
+
+            var btnNoise = document.createElement('button');
+            btnNoise.className = 'btn-answer';
+            btnNoise.setAttribute('type', 'button');
+            btnNoise.dataset.value = 'noise';
+            btnNoise.textContent = 'File all as noise';
+
+            var btnKeep = document.createElement('button');
+            btnKeep.className = 'btn-answer';
+            btnKeep.setAttribute('type', 'button');
+            btnKeep.dataset.value = 'keep';
+            btnKeep.textContent = 'Keep all for triage';
+
+            actions.appendChild(btnNoise);
+            actions.appendChild(btnKeep);
+
+            // Drilldown toggle — only if there are emails with data
+            var drillSection = null;
+            if (hasDrilldown) {
+                var btnEach = document.createElement('button');
+                btnEach.className = 'btn-show-each';
+                btnEach.setAttribute('type', 'button');
+                btnEach.textContent = 'Show me each';
+                actions.appendChild(btnEach);
+
+                drillSection = buildDrilldown(group, dec);
+                card.appendChild(actions);
+                card.appendChild(drillSection);
+
+                btnEach.addEventListener('click', function() {
+                    // Toggle the drill-down section
+                    var isOpen = drillSection.classList.contains('open');
+                    drillSection.classList.toggle('open', !isOpen);
+                    btnEach.textContent = isOpen ? 'Show me each' : 'Hide individual emails';
+                    // Mark bulk as drilldown if no other bulk decision made
+                    if (!dec.bulk || dec.bulk === 'drilldown') {
+                        dec.bulk = 'drilldown';
+                        updateCardState(card, dec, btnNoise, btnKeep, btnEach);
+                        updateProgress();
+                    }
+                    if (autosave) autosave.save();
+                });
+            } else {
+                card.appendChild(actions);
+            }
+
+            // Notes field
+            var notesWrap = document.createElement('div');
+            notesWrap.className = 'group-notes-wrap';
+            var notesLabel = document.createElement('label');
+            notesLabel.textContent = 'Notes (optional):';
+            var notesTA = document.createElement('textarea');
+            notesTA.placeholder = 'Any context or flags for this group...';
+            notesTA.value = dec.notes || '';
+            notesTA.addEventListener('input', function() {
+                dec.notes = notesTA.value;
+                if (autosave) autosave.save();
+            });
+            notesWrap.appendChild(notesLabel);
+            notesWrap.appendChild(notesTA);
+            card.appendChild(notesWrap);
+
+            // Button handlers
+            function setBulk(value) {
+                dec.bulk = value;
+                updateCardState(card, dec, btnNoise, btnKeep, hasDrilldown ? card.querySelector('.btn-show-each') : null);
+                updateProgress();
+                if (autosave) autosave.save();
+            }
+
+            btnNoise.addEventListener('click', function() { setBulk('noise'); });
+            btnKeep.addEventListener('click', function() { setBulk('keep'); });
+
+            // Restore draft state
+            if (dec.bulk) {
+                updateCardState(card, dec, btnNoise, btnKeep,
+                    hasDrilldown ? card.querySelector('.btn-show-each') : null);
+                if (dec.bulk === 'drilldown' && drillSection) {
+                    drillSection.classList.add('open');
+                    var bse = card.querySelector('.btn-show-each');
+                    if (bse) bse.textContent = 'Hide individual emails';
+                }
+            }
+
+            return card;
+        }
+
+        function updateCardState(card, dec, btnNoise, btnKeep, btnEach) {
+            // Clear all selection states
+            [btnNoise, btnKeep].forEach(function(b) {
+                if (b) b.classList.remove('selected');
+            });
+            card.classList.remove('decided', 'decided-keep', 'decided-drilldown', 'missing');
+
+            if (dec.bulk === 'noise') {
+                btnNoise.classList.add('selected');
+                card.classList.add('decided');
+            } else if (dec.bulk === 'keep') {
+                btnKeep.classList.add('selected');
+                card.classList.add('decided-keep');
+            } else if (dec.bulk === 'drilldown') {
+                // Check if all items are decided
+                var allItemsDone = Object.values(dec.items).every(function(v) { return v !== null; });
+                if (allItemsDone && Object.keys(dec.items).length > 0) {
+                    card.classList.add('decided-drilldown');
+                }
+            }
+        }
+
+        // ---- Drill-down sub-cards ----
+        function buildDrilldown(group, dec) {
+            var section = document.createElement('div');
+            section.className = 'drilldown-section';
+
+            var heading = document.createElement('div');
+            heading.className = 'drilldown-heading';
+            heading.textContent = 'Individual emails — click to decide each one';
+            section.appendChild(heading);
+
+            var emails = group.emails || [];
+            if (emails.length === 0) {
+                var none = document.createElement('p');
+                none.style.cssText = 'font-size:0.85rem;color:var(--text-secondary);font-style:italic;';
+                none.textContent = 'No individual email data available for this group.';
+                section.appendChild(none);
+                return section;
+            }
+
+            emails.forEach(function(email) {
+                var subCard = document.createElement('div');
+                subCard.className = 'sub-card';
+
+                var subjEl = document.createElement('div');
+                subjEl.className = 'sub-card-subject';
+                subjEl.textContent = email.subject || '(no subject)';
+                subCard.appendChild(subjEl);
+
+                var metaEl = document.createElement('div');
+                metaEl.className = 'sub-card-meta';
+                var fromSpan = document.createElement('span');
+                fromSpan.textContent = email.from || 'unknown sender';
+                var dateSpan = document.createElement('span');
+                dateSpan.textContent = email.date || '';
+                metaEl.appendChild(fromSpan);
+                metaEl.appendChild(dateSpan);
+                subCard.appendChild(metaEl);
+
+                var itemActions = document.createElement('div');
+                itemActions.className = 'sub-card-actions';
+
+                var itemButtons = [
+                    { value: 'file', label: 'File as noise' },
+                    { value: 'keep', label: 'Keep for triage' },
+                    { value: 'needs-reply', label: 'Needs a reply' },
+                    { value: 'already-handled', label: 'Already handled' }
+                ];
+
+                itemButtons.forEach(function(btnCfg) {
+                    var b = document.createElement('button');
+                    b.className = 'btn-item';
+                    b.setAttribute('type', 'button');
+                    b.dataset.value = btnCfg.value;
+                    b.textContent = btnCfg.label;
+
+                    b.addEventListener('click', function() {
+                        itemActions.querySelectorAll('.btn-item').forEach(function(x) {
+                            x.classList.remove('selected');
+                        });
+                        b.classList.add('selected');
+                        dec.items[email.email_id] = btnCfg.value;
+                        subCard.classList.add('answered');
+
+                        // Check if all items done — update group card state
+                        var parentCard = document.querySelector('.group-card[data-key="' + group.key + '"]');
+                        if (parentCard) {
+                            var allDone = Object.values(dec.items).every(function(v) { return v !== null; });
+                            if (allDone) {
+                                parentCard.classList.add('decided-drilldown');
+                            }
+                        }
+                        updateProgress();
+                        if (autosave) autosave.save();
+                    });
+
+                    // Restore draft state
+                    if (dec.items[email.email_id] === btnCfg.value) {
+                        b.classList.add('selected');
+                        subCard.classList.add('answered');
+                    }
+
+                    itemActions.appendChild(b);
+                });
+
+                subCard.appendChild(itemActions);
+                section.appendChild(subCard);
+            });
+
+            return section;
+        }
+
+        // ---- Build the full page ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + ' — earlier today I ran a backfill that recovered <strong>129 emails</strong> from before the poller was set up. They came in between March and April, but never got classified because the inbox watcher wasn\'t running yet.</p>' +
+            '<p>Most are probably noise — SES setup confirmations, login codes, infra tests. A few might be real. Rather than paste a list in chat, I\'ve grouped them into seven buckets below.</p>' +
+            '<p>For each group: one click to file everything, one click to flag everything for later, or click <em>Show me each</em> to decide per email. You can do a mix — bulk-file the obvious ones and drill in where it matters.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">\u270e</span> Your decisions save automatically. Close and come back any time — the link picks up where you left off until you press <em>Send my decisions</em>.</p>';
+        container.appendChild(opener);
+
+        // Progress bar
+        var progressWrap = document.createElement('div');
+        progressWrap.className = 'progress-bar-wrap';
+        var progressFill = document.createElement('div');
+        progressFill.className = 'progress-bar-fill';
+        progressFill.id = 'progress-fill';
+        progressWrap.appendChild(progressFill);
+        container.appendChild(progressWrap);
+
+        var progressLabel = document.createElement('div');
+        progressLabel.className = 'progress-label';
+        progressLabel.id = 'progress-label';
+        progressLabel.textContent = '0 of ' + groups.length + ' groups decided';
+        container.appendChild(progressLabel);
+
+        // Group cards
+        if (groups.length === 0) {
+            var noData = document.createElement('p');
+            noData.style.cssText = 'color:var(--text-secondary);font-style:italic;';
+            noData.textContent = 'No group data found in seed. Please let Claude know at hello@croquetclaude.com.';
+            container.appendChild(noData);
+        } else {
+            groups.forEach(function(group) {
+                container.appendChild(buildGroupCard(group));
+            });
+        }
+
+        // General notes
+        var divFinal = document.createElement('hr');
+        divFinal.className = 'section-divider';
+        container.appendChild(divFinal);
+
+        var generalWrap = document.createElement('div');
+        generalWrap.className = 'general-notes-wrap';
+        var generalLabel = document.createElement('label');
+        generalLabel.setAttribute('for', 'general-notes');
+        generalLabel.textContent = 'Anything else to flag?';
+        generalWrap.appendChild(generalLabel);
+        var generalTA = document.createElement('textarea');
+        generalTA.id = 'general-notes';
+        generalTA.placeholder = 'Optional — any patterns, questions, or surprises across the whole batch.';
+        if (draft && draft.general_notes) generalTA.value = draft.general_notes;
+        generalTA.addEventListener('input', function() {
+            if (autosave) autosave.save();
+        });
+        generalWrap.appendChild(generalTA);
+        container.appendChild(generalWrap);
+
+        // Validation error
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit area
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my decisions';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong \u2014 please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var undecided = getUndecidedGroups();
+
+            // Highlight missing
+            document.querySelectorAll('.group-card').forEach(function(card) {
+                var k = card.dataset.key;
+                var dec = groupDecisions[k];
+                var isUndecided = !dec || !dec.bulk;
+                var isDrillIncomplete = dec && dec.bulk === 'drilldown' &&
+                    Object.values(dec.items).some(function(v) { return v === null; });
+                if (isUndecided || isDrillIncomplete) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (undecided.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = undecided.length === 1
+                    ? '1 group still needs a decision \u2014 it\'s highlighted above.'
+                    : undecided.length + ' groups still need decisions \u2014 they\'re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.group-card.missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            document.getElementById('validation-error').classList.remove('visible');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
+
+            var responsePayload = buildPayload();
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my decisions';
+                document.getElementById('error-message').classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Initialise autosave
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft notice
+        if (draft && (draft.groups || draft.general_notes)) {
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+
+        // Restore progress bar
+        updateProgress();
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
