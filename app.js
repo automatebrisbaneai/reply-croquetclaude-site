@@ -210,7 +210,8 @@ async function submitMission(tokenRecord, responsePayload, respondentName) {
         token: tokenRecord.token,
         mission: tokenRecord.mission,
         payload: responsePayload,
-        user_agent: navigator.userAgent
+        user_agent: navigator.userAgent,
+        submitted_at: new Date().toISOString()
     });
 
     let postOk = false;
