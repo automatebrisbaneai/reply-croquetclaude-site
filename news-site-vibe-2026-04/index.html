@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News site direction — CroquetClaude</title>
+    <meta name="description" content="Four news-site layouts re-skinned with the CAQ brand. Pick the direction that fits croquet news.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <!-- Reply site shared styles (token gate, expired screen, loading screen) -->
+    <link rel="stylesheet" href="/styles.css">
+    <!-- Google Fonts from source document -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+
+/* =====================================================================
+   CAQ Brand Tokens — extracted from aims.png + croquet_ideals.png
+   ===================================================================== */
+:root {
+  --qld-maroon:   #73182C;   /* oxblood headline + border */
+  --maroon-ink:   #4f1020;   /* darker for deep accents */
+  --lawn-green:   #82b25e;   /* flat mid-sat green */
+  --lawn-shadow:  #6b9a49;   /* deeper green for rules */
+  --cream:        #FCF6DA;   /* warm cream backgrounds */
+  --cream-edge:   #f1ead0;   /* slightly darker for cards */
+  --ink:          #141414;   /* illustrations + body */
+  --ink-soft:     #3a3633;   /* secondary body */
+  --ink-mute:     #7a7166;   /* captions / metadata */
+  --rule:         #2a1a1c;   /* hairline rules */
+
+  --serif-display: "Abril Fatface", "DM Serif Display", serif;
+  --serif-heavy:   "Playfair Display", "DM Serif Display", serif;
+  --serif-body:    "Source Serif 4", "EB Garamond", Georgia, serif;
+  --serif-mag:     "EB Garamond", Georgia, serif;
+  --sans-tab:      "Oswald", "Source Sans Pro", sans-serif;
+}
+
+/* =====================================================================
+   Base
+   ===================================================================== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #e9e2c7;
+  color: var(--ink);
+  font-family: var(--serif-body);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; text-decoration: none; }
+
+/* =====================================================================
+   Page frame
+   ===================================================================== */
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0;
+  background: var(--cream);
+  box-shadow: 0 0 60px rgba(20,20,20,.08);
+}
+
+.doc-intro {
+  padding: 64px 72px 40px;
+  border-bottom: 2px solid var(--rule);
+}
+.doc-intro .eyebrow {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 12px;
+  color: var(--qld-maroon);
+  font-weight: 600;
+}
+.doc-intro h1 {
+  font-family: var(--serif-display);
+  font-size: clamp(48px, 6vw, 84px);
+  line-height: .95;
+  color: var(--qld-maroon);
+  margin: 14px 0 18px;
+  letter-spacing: -.01em;
+}
+.doc-intro .deck {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  max-width: 760px;
+  margin: 0;
+}
+
+/* =====================================================================
+   Header band — brand anchor
+   ===================================================================== */
+.brand-band {
+  padding: 56px 72px 72px;
+  border-bottom: 14px solid var(--qld-maroon);
+  background: var(--cream);
+}
+.brand-band .label {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .3em;
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-bottom: 8px;
+}
+.brand-band h2 {
+  font-family: var(--serif-display);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--qld-maroon);
+  margin: 0 0 8px;
+}
+.brand-band .note {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--ink-soft);
+  max-width: 720px;
+  margin: 0 0 36px;
+}
+.posters {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 28px;
+  align-items: start;
+}
+.posters figure { margin: 0; }
+.posters img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--rule);
+  box-shadow: 8px 8px 0 var(--qld-maroon);
+}
+.posters figcaption {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--ink-mute);
+  margin-top: 10px;
+}
+
+.tokens {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.swatch {
+  border: 1px solid var(--rule);
+  padding: 18px 16px;
+  background: var(--cream-edge);
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.swatch .chip {
+  width: 56px; height: 56px;
+  border: 1px solid var(--rule);
+}
+.swatch .name {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 8px;
+}
+.swatch .hex {
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+/* =====================================================================
+   Section wrappers (one per re-skinned site)
+   ===================================================================== */
+.skin-section {
+  padding: 72px 0 56px;
+  border-top: 2px solid var(--rule);
+  background: var(--cream);
+}
+.skin-intro {
+  padding: 0 72px 36px;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 48px;
+  align-items: end;
+}
+.skin-intro .meta .num {
+  font-family: var(--serif-display);
+  font-size: 120px;
+  line-height: .85;
+  color: var(--qld-maroon);
+  margin: 0;
+}
+.skin-intro .meta .source {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .24em;
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 4px;
+}
+.skin-intro h3 {
+  font-family: var(--serif-display);
+  font-size: 46px;
+  line-height: 1;
+  color: var(--qld-maroon);
+  margin: 0 0 14px;
+}
+.skin-intro .oneliner {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.skin-notes {
+  padding: 32px 72px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  font-family: var(--serif-body);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+.skin-notes p { margin: 0; }
+.skin-notes strong {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--qld-maroon);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Mockup shell — each one sits in a framed viewport */
+.mock {
+  margin: 40px 24px 0;
+  border: 1px solid var(--rule);
+  background: #fff;
+  box-shadow: 12px 12px 0 var(--qld-maroon);
+  overflow: hidden;
+}
+
+/* =====================================================================
+   SHARED INK ILLUSTRATION (SVG) — reused, colour-tinted per skin
+   ===================================================================== */
+.ink-hero svg { display: block; width: 100%; height: auto; }
+
+/* SVG fills container (responsive preserveAspectRatio meet means letterbox).
+   For SVGs with cream sky (handshake, lawn), the outer container needs a
+   cream background so letterbox bars match the sky rather than clashing. */
+.art.has-cream-sky, .ph.has-cream-sky, .frame.has-cream-sky {
+  background: var(--cream) !important;
+}
+
+/* =====================================================================
+   SKIN 1 — REASONS TO BE CHEERFUL (card curation, moderate density)
+   ===================================================================== */
+.skin-cheerful {
+  font-family: var(--serif-body);
+  background: var(--cream);
+  color: var(--ink);
+  padding: 0 0 48px;
+}
+.sc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 48px;
+  border-bottom: 1px solid var(--rule);
+}
+.sc-nav .brand {
+  font-family: var(--serif-display);
+  font-size: 30px;
+  color: var(--qld-maroon);
+  letter-spacing: -.01em;
+}
+.sc-nav .brand span { font-style: italic; }
+.sc-nav ul {
+  list-style: none; display: flex; gap: 28px; padding: 0; margin: 0;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+}
+.sc-nav .join {
+  background: var(--qld-maroon);
+  color: var(--cream);
+  padding: 10px 18px;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+}
+
+.sc-tagline {
+  text-align: center;
+  padding: 28px 48px 8px;
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--rule);
+}
+
+.sc-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+}
+.sc-hero .art { background: var(--lawn-green); padding: 24px 24px 0; }
+.sc-hero .copy {
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--cream);
+}
+.sc-hero .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--qld-maroon);
+  margin-bottom: 16px;
+}
+.sc-hero h1 {
+  font-family: var(--serif-display);
+  font-size: clamp(40px, 4vw, 56px);
+  line-height: 1;
+  color: var(--qld-maroon);
+  margin: 0 0 18px;
+  letter-spacing: -.01em;
+}
+.sc-hero .dek {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  margin: 0 0 22px;
+}
+.sc-hero .byline {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+
+.sc-section-head {
+  padding: 40px 48px 16px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+}
+.sc-section-head h2 {
+  font-family: var(--serif-display);
+  font-size: 34px;
+  color: var(--qld-maroon);
+  margin: 0;
+}
+.sc-section-head a {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+
+.sc-cards {
+  padding: 0 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.sc-card .ph {
+  background: var(--lawn-green);
+  aspect-ratio: 3 / 2;
+  border: 1px solid var(--rule);
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.sc-card .ph svg { width: 100%; height: 100%; }
+.sc-card .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--qld-maroon);
+  margin-bottom: 6px;
+}
+.sc-card h3 {
+  font-family: var(--serif-heavy);
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.sc-card .meta {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-mute);
+}
+
+.sc-collection {
+  margin: 48px 48px 0;
+  padding: 36px 36px;
+  background: var(--qld-maroon);
+  color: var(--cream);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 36px;
+  align-items: center;
+}
+.sc-collection h2 {
+  font-family: var(--serif-display);
+  font-size: 42px;
+  line-height: 1;
+  margin: 0;
+  color: var(--cream);
+}
+.sc-collection .label {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--lawn-green);
+  margin-bottom: 10px;
+}
+.sc-collection p {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  color: var(--cream);
+}
+.sc-collection a {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--cream);
+  border-bottom: 1px solid var(--cream);
+  padding-bottom: 2px;
+}
+
+/* =====================================================================
+   SKIN 2 — BITTER SOUTHERNER (long single-column, full-bleed lyric)
+   ===================================================================== */
+.skin-bs {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--serif-body);
+  padding: 0 0 64px;
+}
+.bs-nav {
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 72px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+}
+.bs-nav .left ul, .bs-nav .right ul {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; gap: 22px;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+.bs-nav .right ul { justify-content: flex-end; }
+.bs-nav .mast {
+  font-family: var(--serif-display);
+  font-size: 34px;
+  text-align: center;
+  color: var(--qld-maroon);
+  letter-spacing: -.01em;
+  line-height: 1;
+}
+.bs-nav .mast small {
+  display: block;
+  font-family: var(--sans-tab);
+  font-size: 10px;
+  letter-spacing: .4em;
+  color: var(--ink-mute);
+  margin-top: 6px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.bs-feature {
+  padding: 72px 72px 56px;
+}
+.bs-feature .date {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-bottom: 18px;
+}
+.bs-feature h1 {
+  font-family: var(--serif-display);
+  font-size: clamp(54px, 6vw, 88px);
+  line-height: .92;
+  color: var(--qld-maroon);
+  margin: 0 0 22px;
+  letter-spacing: -.01em;
+  max-width: 16ch;
+}
+.bs-feature .subhead {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  max-width: 620px;
+  margin: 0 0 28px;
+}
+.bs-feature .byline {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+
+.bs-hero-art {
+  padding: 0 72px;
+}
+.bs-hero-art .frame {
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.bs-hero-art .frame svg { width: 100%; height: 100%; }
+.bs-hero-art .caption {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-mute);
+  margin-top: 10px;
+  max-width: 620px;
+}
+
+.bs-intro-mission {
+  padding: 80px 72px 64px;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.bs-intro-mission .mark {
+  font-family: var(--serif-display);
+  color: var(--qld-maroon);
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.bs-intro-mission p {
+  font-family: var(--serif-mag);
+  font-size: 22px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0;
+}
+
+.bs-stack {
+  padding: 0 72px;
+  border-top: 1px solid var(--rule);
+}
+.bs-stack .entry {
+  padding: 56px 0;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.bs-stack .entry:nth-child(even) {
+  grid-template-columns: 1fr 1.3fr;
+}
+.bs-stack .entry:nth-child(even) .text { order: 2; }
+.bs-stack .entry:nth-child(even) .art  { order: 1; }
+.bs-stack .art {
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+}
+.bs-stack .art svg { width: 100%; height: 100%; }
+.bs-stack .date {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-bottom: 14px;
+}
+.bs-stack h2 {
+  font-family: var(--serif-display);
+  font-size: clamp(32px, 3.4vw, 46px);
+  line-height: .98;
+  color: var(--qld-maroon);
+  margin: 0 0 16px;
+  letter-spacing: -.005em;
+}
+.bs-stack .dek {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+.bs-stack .byline {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+
+/* =====================================================================
+   SKIN 3 — DEFECTOR (magazine grid, opinionated voice, comment counts)
+   ===================================================================== */
+.skin-defector {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--serif-body);
+  padding: 0 0 56px;
+}
+.df-top {
+  background: var(--qld-maroon);
+  color: var(--cream);
+  padding: 14px 48px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10.5px;
+}
+.df-mast {
+  padding: 28px 48px 20px;
+  border-bottom: 3px solid var(--qld-maroon);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+}
+.df-mast .left, .df-mast .right {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+.df-mast .right { text-align: right; }
+.df-mast .name {
+  font-family: var(--serif-display);
+  font-size: 46px;
+  line-height: 1;
+  color: var(--qld-maroon);
+  text-align: center;
+  letter-spacing: -.01em;
+}
+.df-mast .name small {
+  display: block;
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-mute);
+  margin-top: 4px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+}
+.df-catbar {
+  padding: 12px 48px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  gap: 26px;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--ink-soft);
+  overflow-x: auto;
+}
+
+.df-lead {
+  padding: 48px 48px 40px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 48px;
+}
+.df-lead .art {
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+.df-lead .art svg { width: 100%; height: 100%; }
+.df-lead .copy { display: flex; flex-direction: column; justify-content: center; }
+.df-lead .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--qld-maroon);
+  margin-bottom: 14px;
+}
+.df-lead h1 {
+  font-family: var(--serif-display);
+  font-size: clamp(40px, 4.2vw, 58px);
+  line-height: .98;
+  color: var(--qld-maroon);
+  margin: 0 0 18px;
+  letter-spacing: -.01em;
+}
+.df-lead .dek {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0 0 20px;
+}
+.df-lead .meta {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+.df-lead .meta .avatar {
+  width: 32px; height: 32px;
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  overflow: hidden;
+}
+.df-lead .meta .avatar svg { width: 100%; height: 100%; }
+.df-lead .comments {
+  margin-left: auto;
+  background: var(--qld-maroon);
+  color: var(--cream);
+  padding: 6px 10px;
+  font-size: 10.5px;
+  letter-spacing: .22em;
+}
+
+.df-grid {
+  padding: 40px 48px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px 32px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 48px;
+}
+.df-grid .item .art {
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 5 / 3;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.df-grid .item .art svg { width: 100%; height: 100%; }
+.df-grid .item .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--qld-maroon);
+  margin-bottom: 4px;
+}
+.df-grid .item h3 {
+  font-family: var(--serif-heavy);
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.12;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+.df-grid .item .meta {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: 10.5px;
+  color: var(--ink-mute);
+}
+.df-grid .item .avatar {
+  width: 22px; height: 22px;
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+}
+.df-grid .item .comments {
+  margin-left: auto;
+  color: var(--qld-maroon);
+  font-weight: 600;
+}
+
+.df-section-head {
+  padding: 36px 48px 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+.df-section-head h2 {
+  font-family: var(--serif-display);
+  font-size: 30px;
+  color: var(--qld-maroon);
+  margin: 0;
+  line-height: 1;
+}
+.df-section-head .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.df-section-head .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+
+.df-blogs {
+  padding: 0 48px 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 40px;
+}
+.df-blogs .row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.df-blogs .row .art {
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+.df-blogs .row .art svg { width: 100%; height: 100%; }
+.df-blogs .row .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--qld-maroon);
+  margin-bottom: 4px;
+}
+.df-blogs .row h4 {
+  font-family: var(--serif-heavy);
+  font-weight: 700;
+  font-size: 16.5px;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+.df-blogs .row .meta {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: 10px;
+  color: var(--ink-mute);
+}
+
+/* =====================================================================
+   SKIN 4 — THE NEW YORKER (thin masthead, 3-col dense, hairline rules)
+   ===================================================================== */
+.skin-ny {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--serif-mag);
+  padding: 0 0 64px;
+}
+.ny-promo {
+  background: var(--qld-maroon);
+  color: var(--cream);
+  text-align: center;
+  padding: 10px 24px;
+  font-family: var(--sans-tab);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  font-size: 10.5px;
+}
+.ny-mast {
+  padding: 18px 56px 10px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.ny-mast .date {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-mute);
+}
+.ny-mast .tools {
+  text-align: right;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10.5px;
+  color: var(--ink-mute);
+}
+.ny-mast .mast {
+  font-family: var(--serif-display);
+  font-size: 54px;
+  line-height: 1;
+  color: var(--qld-maroon);
+  letter-spacing: -.015em;
+  text-align: center;
+}
+.ny-mast .mast small {
+  display: block;
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-mute);
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+.ny-cats {
+  padding: 10px 56px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .26em;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.ny-hero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ny-hero .left {
+  padding: 32px 36px 32px 56px;
+  border-right: 1px solid var(--rule);
+}
+.ny-hero .left .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 10.5px;
+  color: var(--qld-maroon);
+  margin-bottom: 12px;
+}
+.ny-hero .left h1 {
+  font-family: var(--serif-display);
+  font-size: clamp(40px, 4.2vw, 56px);
+  line-height: 1.02;
+  color: var(--ink);
+  margin: 0 0 14px;
+  letter-spacing: -.005em;
+}
+.ny-hero .left .dek {
+  font-family: var(--serif-mag);
+  font-size: 17.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 16px;
+}
+.ny-hero .left .byline {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .26em;
+  font-size: 10.5px;
+  color: var(--ink-mute);
+}
+.ny-hero .left .art {
+  margin-top: 26px;
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.ny-hero .left .art svg { width: 100%; height: 100%; }
+.ny-hero .right {
+  padding: 32px 36px 32px 36px;
+  background: var(--cream);
+}
+.ny-hero .right h2 {
+  font-family: var(--sans-tab);
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--qld-maroon);
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--qld-maroon);
+}
+.ny-hero .right .item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ny-hero .right .item:last-child { border-bottom: 0; }
+.ny-hero .right .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--qld-maroon);
+  margin-bottom: 4px;
+}
+.ny-hero .right h3 {
+  font-family: var(--serif-display);
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.ny-hero .right .byline {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--ink-mute);
+}
+
+.ny-threecol {
+  padding: 36px 56px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ny-threecol .col {
+  padding: 0 24px;
+  border-right: 1px solid var(--rule);
+}
+.ny-threecol .col:last-child { border-right: 0; }
+.ny-threecol .col:first-child { padding-left: 0; }
+.ny-threecol .col:last-child { padding-right: 0; }
+.ny-threecol h2 {
+  font-family: var(--serif-display);
+  font-size: 24px;
+  color: var(--qld-maroon);
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--qld-maroon);
+}
+.ny-threecol .tag {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--qld-maroon);
+  margin-bottom: 4px;
+}
+.ny-threecol h3 {
+  font-family: var(--serif-display);
+  font-size: 22px;
+  line-height: 1.12;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.ny-threecol .dek {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0 0 8px;
+}
+.ny-threecol .byline {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 10px;
+  color: var(--ink-mute);
+}
+.ny-threecol .item {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.ny-threecol .item:last-child { border-bottom: 0; margin-bottom: 0; }
+.ny-threecol .item .art {
+  background: var(--lawn-green);
+  border: 1px solid var(--rule);
+  aspect-ratio: 5 / 3;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.ny-threecol .item .art svg { width: 100%; height: 100%; }
+
+.ny-cartoon {
+  padding: 36px 56px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+}
+.ny-cartoon .frame {
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--rule);
+  background: var(--cream);
+  overflow: hidden;
+}
+.ny-cartoon .frame svg { width: 100%; height: 100%; }
+.ny-cartoon .cap {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.ny-cartoon .lab {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .28em;
+  font-size: 11px;
+  color: var(--qld-maroon);
+  margin-bottom: 10px;
+}
+
+/* =====================================================================
+   Footnote
+   ===================================================================== */
+.doc-outro {
+  padding: 56px 72px 72px;
+  border-top: 14px solid var(--qld-maroon);
+  background: var(--cream);
+  text-align: center;
+}
+.doc-outro p {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* =====================================================================
+   Responsive — keep mockups readable without breaking layout DNA
+   ===================================================================== */
+@media (max-width: 900px) {
+  .doc-intro, .brand-band, .skin-intro, .skin-notes, .doc-outro { padding-left: 28px; padding-right: 28px; }
+  .skin-intro { grid-template-columns: 1fr; gap: 12px; }
+  .skin-intro .meta .num { font-size: 84px; }
+  .skin-notes { grid-template-columns: 1fr; gap: 24px; }
+  .posters { grid-template-columns: 1fr; }
+  .tokens { grid-template-columns: repeat(2, 1fr); }
+  .sc-hero { grid-template-columns: 1fr; }
+  .sc-hero .copy { padding: 32px 24px; }
+  .sc-cards { grid-template-columns: 1fr; padding: 0 24px; }
+  .sc-collection { grid-template-columns: 1fr; margin: 32px 24px 0; }
+  .bs-nav { grid-template-columns: 1fr; gap: 12px; }
+  .bs-nav .right ul { justify-content: flex-start; }
+  .bs-stack .entry, .bs-stack .entry:nth-child(even) { grid-template-columns: 1fr; gap: 24px; }
+  .bs-stack .entry:nth-child(even) .text { order: 1; }
+  .bs-stack .entry:nth-child(even) .art  { order: 2; }
+  .df-mast { grid-template-columns: 1fr; text-align: center; }
+  .df-lead { grid-template-columns: 1fr; padding: 32px 20px; gap: 28px; }
+  .df-grid { padding: 32px 20px; gap: 28px 20px; }
+  .df-blogs { padding: 0 20px; grid-template-columns: 1fr; }
+  .ny-hero { grid-template-columns: 1fr; }
+  .ny-hero .left, .ny-hero .right { padding: 24px 20px; }
+  .ny-hero .left { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .ny-threecol { padding: 28px 20px; grid-template-columns: 1fr; }
+  .ny-threecol .col { border-right: 0; border-bottom: 1px solid var(--rule); padding: 20px 0; }
+  .ny-cartoon { padding: 28px 20px; grid-template-columns: 1fr; }
+  .bs-feature, .bs-hero-art, .bs-intro-mission, .bs-stack { padding-left: 24px; padding-right: 24px; }
+  .mock { margin: 32px 12px 0; }
+
+  /* Nav + masthead — stack at mobile so nothing overflows */
+  .sc-nav { flex-wrap: wrap; gap: 14px; }
+  .sc-section-head { padding: 28px 24px 12px; }
+  .df-catbar { padding: 12px 20px; }
+  .ny-cats { padding: 10px 20px; flex-wrap: wrap; gap: 14px; }
+  .ny-mast { grid-template-columns: 1fr; text-align: center; padding: 16px 20px; }
+  .ny-mast .tools { text-align: center; margin-top: 4px; }
+}
+
+/* =====================================================================
+   Decision panel — pick-the-winner
+   ===================================================================== */
+.decision-panel {
+  max-width: 1320px;
+  margin: 0 auto;
+  background: var(--cream);
+  border-top: 14px solid var(--qld-maroon);
+  padding: 64px 72px 80px;
+}
+
+.decision-panel h2 {
+  font-family: var(--serif-display);
+  font-size: clamp(38px, 4.5vw, 64px);
+  color: var(--qld-maroon);
+  line-height: 1;
+  margin: 0 0 12px;
+  letter-spacing: -.01em;
+}
+
+.decision-panel .panel-deck {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--ink-soft);
+  margin: 0 0 40px;
+  max-width: 640px;
+}
+
+.pick-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.pick-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  padding: 18px 20px;
+  border: 1.5px solid var(--rule);
+  background: var(--cream-edge);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pick-option:hover {
+  border-color: var(--qld-maroon);
+  background: #f7ebd7;
+}
+
+.pick-option input[type="radio"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--qld-maroon);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.pick-option.selected {
+  border-color: var(--qld-maroon);
+  background: rgba(115, 24, 44, 0.06);
+}
+
+.pick-option .option-label {
+  font-family: var(--serif-body);
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.pick-option .option-label strong {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: 12px;
+  color: var(--qld-maroon);
+  display: block;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.pick-option.pick-none {
+  border-style: dashed;
+  background: transparent;
+}
+
+.pick-option.pick-none:hover {
+  background: #f7ebd7;
+}
+
+.notes-section {
+  margin-bottom: 36px;
+}
+
+.notes-section label {
+  display: block;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 11px;
+  color: var(--qld-maroon);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.notes-section textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--rule);
+  background: var(--cream-edge);
+  font-family: var(--serif-body);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.notes-section textarea:focus {
+  outline: none;
+  border-color: var(--qld-maroon);
+}
+
+.panel-validation-error {
+  display: none;
+  color: #b00020;
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: 11px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #b00020;
+  background: rgba(176,0,32,.05);
+}
+
+.panel-validation-error.visible {
+  display: block;
+}
+
+.panel-submit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.panel-submit-btn {
+  font-family: var(--sans-tab);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--qld-maroon);
+  color: var(--cream);
+  border: none;
+  padding: 16px 36px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.panel-submit-btn:hover:not(:disabled) {
+  background: var(--maroon-ink);
+}
+
+.panel-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel-error-msg {
+  display: none;
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 15px;
+  color: #b00020;
+}
+
+.panel-error-msg.visible { display: block; }
+
+/* Thank-you state */
+.panel-thankyou {
+  display: none;
+  padding: 48px 0 0;
+  text-align: center;
+}
+
+.panel-thankyou.visible { display: block; }
+
+.panel-thankyou p {
+  font-family: var(--serif-display);
+  font-size: 36px;
+  color: var(--qld-maroon);
+  margin: 0;
+  line-height: 1.1;
+}
+
+/* Reply site header overrides — keep it minimal above the comparison doc */
+.site-header {
+  background: var(--cream);
+  border-bottom: 2px solid var(--rule);
+}
+
+@media (max-width: 640px) {
+  .decision-panel {
+    padding: 40px 24px 56px;
+  }
+  .pick-option {
+    padding: 14px 14px;
+  }
+}
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">News site direction &mdash; pick the winner</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — news-site-vibe-2026-04
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var app = document.getElementById('app');
+
+        // ---- Inject the full Designer-Claude comparison document ----
+        app.innerHTML = SOURCE_HTML + DECISION_PANEL_HTML;
+
+        // ---- Wire the decision panel ----
+        var form = document.getElementById('decision-form');
+        var options = form.querySelectorAll('.pick-option');
+        var radioInputs = form.querySelectorAll('input[type="radio"]');
+        var notesTA = document.getElementById('panel-notes');
+        var submitBtn = document.getElementById('panel-submit-btn');
+        var validationEl = document.getElementById('panel-validation-error');
+        var errorEl = document.getElementById('panel-error-msg');
+        var thankyouEl = document.getElementById('panel-thankyou');
+        var formEl = document.getElementById('panel-form-fields');
+
+        // Highlight selected option label when radio changes
+        radioInputs.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                options.forEach(function(opt) { opt.classList.remove('selected'); });
+                var parent = radio.closest('.pick-option');
+                if (parent) parent.classList.add('selected');
+                validationEl.classList.remove('visible');
+            });
+        });
+
+        // Also handle click on the label container
+        options.forEach(function(opt) {
+            opt.addEventListener('click', function() {
+                var radio = opt.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        submitBtn.addEventListener('click', async function() {
+            // Validate: a pick is required
+            var picked = form.querySelector('input[type="radio"]:checked');
+            if (!picked) {
+                validationEl.classList.add('visible');
+                validationEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            validationEl.classList.remove('visible');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending\u2026';
+
+            var responsePayload = {
+                pick: picked.value,
+                notes: notesTA ? notesTA.value : ''
+            };
+
+            var ok = await window.submitMission(
+                tokenRecord,
+                responsePayload,
+                tokenRecord.respondent_name || 'Wade'
+            );
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answer';
+                errorEl.classList.add('visible');
+                return;
+            }
+
+            // Show thank-you inline in the panel (override app.js default)
+            if (formEl) formEl.style.display = 'none';
+            if (thankyouEl) thankyouEl.classList.add('visible');
+            // Scroll to the panel
+            document.getElementById('decision-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    };
+
+    // Override the default thank-you screen so it stays in-panel
+    var _origSubmit = window.submitMission;
+    window.submitMission = async function(tokenRecord, responsePayload, respondentName) {
+        // 1. POST the response
+        var PB_BASE = 'https://pb.croquetwade.com';
+        var RESPONSES_COLLECTION = 'reply_mission_responses';
+        var TOKENS_COLLECTION = 'reply_mission_tokens';
+
+        var postBody = JSON.stringify({
+            token: tokenRecord.token,
+            mission: tokenRecord.mission,
+            payload: responsePayload,
+            user_agent: navigator.userAgent,
+            submitted_at: new Date().toISOString()
+        });
+
+        var postOk = false;
+        try {
+            var res = await fetch(PB_BASE + '/api/collections/' + RESPONSES_COLLECTION + '/records', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: postBody
+            });
+            postOk = res.ok;
+        } catch(e) {
+            postOk = false;
+        }
+
+        if (!postOk) return false;
+
+        // 2. PATCH the token to mark as submitted
+        try {
+            await fetch(PB_BASE + '/api/collections/' + TOKENS_COLLECTION + '/records/' + tokenRecord.id, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ submitted_at: new Date().toISOString() })
+            });
+        } catch(e) { /* best-effort */ }
+
+        return true;
+    };
+
+    // ---- Source document (verbatim from Designer Claude) ----
+    var SOURCE_HTML = `
+<!-- ==================================================================
+     Reusable SVG definitions — ink-line illustrations
+     ================================================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <pattern id="hatchDark" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(35)">
+    <line x1="0" y1="0" x2="0" y2="5" stroke="#141414" stroke-width="0.8"/>
+  </pattern>
+
+  <!-- HERO 1: Player crouched lining up a shot -->
+  <symbol id="ink-aiming" viewBox="0 0 800 540">
+    <rect width="800" height="540" fill="#82b25e"/>
+    <path d="M0 300 C 120 280, 260 320, 400 295 S 680 280, 800 305 L 800 360 L 0 360 Z" fill="#6b9a49" stroke="#141414" stroke-width="1.2"/>
+    <g stroke="#6b9a49" stroke-width="1" fill="none" opacity=".7">
+      <path d="M0 420 Q 400 410 800 420"/>
+      <path d="M0 460 Q 400 450 800 460"/>
+      <path d="M0 500 Q 400 490 800 500"/>
+    </g>
+    <g stroke="#141414" stroke-width="3" fill="none">
+      <path d="M560 380 L 560 320 Q 560 298 582 298 Q 604 298 604 320 L 604 380"/>
+      <line x1="558" y1="380" x2="606" y2="380" stroke-width="4"/>
+    </g>
+    <circle cx="520" cy="396" r="14" fill="#FCF6DA" stroke="#141414" stroke-width="2.2"/>
+    <path d="M509 392 Q 520 386 531 392" stroke="#141414" stroke-width="1" fill="none"/>
+    <g stroke="#141414" stroke-width="2.4" fill="#FCF6DA" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M210 420 Q 200 360 240 340 Q 280 320 310 340 L 340 420 L 300 430 L 280 380 L 260 430 Z"/>
+      <path d="M210 345 Q 190 300 230 280 Q 275 262 320 290 L 340 345 Q 310 360 270 360 Q 230 362 210 345 Z"/>
+      <path d="M330 300 Q 380 310 420 330 L 430 350 Q 420 360 400 355 L 340 335 Z"/>
+      <path d="M420 340 L 480 360 L 490 370" fill="none"/>
+      <circle cx="270" cy="250" r="28"/>
+      <path d="M248 238 Q 256 216 280 220 Q 300 224 298 244" fill="#141414"/>
+      <path d="M258 248 Q 266 244 272 248" fill="none"/>
+      <circle cx="278" cy="252" r="1.6" fill="#141414" stroke="none"/>
+      <path d="M286 254 Q 292 258 290 262" fill="none"/>
+      <path d="M283 268 Q 288 270 292 268" fill="none"/>
+    </g>
+    <g stroke="#141414" stroke-width="3" fill="#FCF6DA">
+      <rect x="485" y="340" width="10" height="60" transform="rotate(12 490 370)"/>
+      <rect x="470" y="395" width="56" height="16" rx="2" transform="rotate(12 498 403)"/>
+    </g>
+    <ellipse cx="280" cy="438" rx="100" ry="10" fill="url(#hatchDark)" opacity=".55"/>
+    <ellipse cx="582" cy="400" rx="32" ry="5" fill="url(#hatchDark)" opacity=".5"/>
+  </symbol>
+
+  <!-- HERO 2: Mallet + balls close-up -->
+  <symbol id="ink-mallet" viewBox="0 0 800 540">
+    <rect width="800" height="540" fill="#82b25e"/>
+    <g stroke="#6b9a49" stroke-width="1" fill="none">
+      <path d="M0 380 Q 400 370 800 380"/>
+      <path d="M0 430 Q 400 420 800 430"/>
+      <path d="M0 480 Q 400 470 800 480"/>
+    </g>
+    <g stroke="#141414" stroke-width="4" fill="none">
+      <path d="M170 420 L 170 330 Q 170 306 198 306 Q 226 306 226 330 L 226 420"/>
+      <line x1="168" y1="420" x2="228" y2="420" stroke-width="5"/>
+    </g>
+    <ellipse cx="198" cy="432" rx="46" ry="6" fill="url(#hatchDark)" opacity=".55"/>
+    <g stroke="#141414" stroke-width="3" fill="#FCF6DA">
+      <rect x="340" y="320" width="220" height="52" rx="3"/>
+      <line x1="395" y1="320" x2="395" y2="372"/>
+      <line x1="505" y1="320" x2="505" y2="372"/>
+      <path d="M450 320 L 560 210 L 580 218 L 470 328 Z"/>
+    </g>
+    <g stroke="#141414" stroke-width="3" fill="#FCF6DA">
+      <circle cx="300" cy="400" r="42"/>
+      <path d="M270 392 Q 300 380 330 392" fill="none"/>
+      <path d="M270 408 Q 300 420 330 408" fill="none"/>
+    </g>
+    <ellipse cx="300" cy="446" rx="48" ry="7" fill="url(#hatchDark)" opacity=".5"/>
+    <g stroke="#141414" stroke-width="2.4" fill="#73182C">
+      <circle cx="620" cy="430" r="26"/>
+    </g>
+    <ellipse cx="620" cy="460" rx="30" ry="5" fill="url(#hatchDark)" opacity=".5"/>
+  </symbol>
+
+  <!-- HERO 3: Two players shaking hands on lawn -->
+  <symbol id="ink-handshake" viewBox="0 0 800 540">
+    <rect width="800" height="540" fill="#FCF6DA"/>
+    <rect y="360" width="800" height="180" fill="#82b25e"/>
+    <path d="M0 360 L 800 360" stroke="#141414" stroke-width="1.4"/>
+    <g stroke="#6b9a49" stroke-width="1" fill="none" opacity=".75">
+      <path d="M0 420 Q 400 412 800 420"/>
+      <path d="M0 470 Q 400 462 800 470"/>
+      <path d="M0 510 Q 400 502 800 510"/>
+    </g>
+    <g stroke="#141414" stroke-width="2.4" fill="#FCF6DA" stroke-linejoin="round">
+      <path d="M300 490 L 300 400 L 330 400 L 335 490 Z"/>
+      <path d="M255 490 L 265 400 L 295 400 L 290 490 Z"/>
+      <path d="M250 400 Q 240 330 280 310 Q 320 300 345 315 Q 360 360 345 400 Z" fill="#9aa3a3"/>
+      <line x1="302" y1="400" x2="302" y2="520" stroke-width="3"/>
+      <rect x="280" y="516" width="48" height="14" fill="#FCF6DA"/>
+      <path d="M340 320 Q 380 320 420 340 L 415 355 L 360 345 Z" fill="#FCF6DA"/>
+      <circle cx="305" cy="278" r="24" fill="#FCF6DA"/>
+      <path d="M275 270 Q 305 258 335 270" fill="#FCF6DA"/>
+      <path d="M283 268 Q 305 248 327 268" fill="#FCF6DA"/>
+      <circle cx="313" cy="282" r="1.4" fill="#141414" stroke="none"/>
+      <path d="M318 286 Q 322 290 320 293" fill="none"/>
+      <path d="M314 298 Q 320 300 324 298" fill="none"/>
+    </g>
+    <g stroke="#141414" stroke-width="2.4" fill="#FCF6DA" stroke-linejoin="round">
+      <path d="M470 490 L 475 400 L 510 400 L 515 490 Z"/>
+      <path d="M520 490 L 515 400 L 550 400 L 555 490 Z"/>
+      <path d="M460 400 Q 450 330 490 308 Q 540 300 568 322 Q 580 360 560 400 Z" fill="#9aa3a3"/>
+      <line x1="520" y1="400" x2="520" y2="520" stroke-width="3"/>
+      <rect x="498" y="516" width="48" height="14" fill="#FCF6DA"/>
+      <path d="M470 330 Q 440 335 415 352 L 420 340 Z" fill="#FCF6DA"/>
+      <circle cx="508" cy="278" r="25" fill="#FCF6DA"/>
+      <path d="M470 270 Q 508 258 548 270" fill="#141414" stroke-width="2"/>
+      <path d="M484 270 L 488 246 Q 508 236 528 246 L 532 270" fill="#141414"/>
+      <path d="M490 290 Q 508 310 526 290 Q 522 304 508 308 Q 494 304 490 290 Z" fill="#141414"/>
+      <circle cx="500" cy="278" r="1.4" fill="#141414" stroke="none"/>
+    </g>
+    <g stroke="#141414" stroke-width="2.4" fill="#FCF6DA">
+      <path d="M400 340 Q 410 332 420 340 Q 428 348 420 356 L 405 354 Q 395 352 400 340 Z"/>
+    </g>
+    <ellipse cx="295" cy="500" rx="60" ry="8" fill="url(#hatchDark)" opacity=".45"/>
+    <ellipse cx="515" cy="500" rx="70" ry="9" fill="url(#hatchDark)" opacity=".45"/>
+  </symbol>
+
+  <!-- HERO 4: Wide lawn + hoops -->
+  <symbol id="ink-lawn" viewBox="0 0 800 540">
+    <rect width="800" height="540" fill="#FCF6DA"/>
+    <rect y="260" width="800" height="280" fill="#82b25e"/>
+    <g stroke="#141414" stroke-width="1.6" fill="#6b9a49">
+      <path d="M60 260 Q 80 220 110 230 Q 140 214 160 250 Q 180 240 200 260 Z"/>
+      <path d="M580 260 Q 610 214 650 232 Q 690 214 720 250 Q 740 240 760 260 Z"/>
+    </g>
+    <g stroke="#141414" stroke-width="1.6" fill="#FCF6DA">
+      <rect x="330" y="218" width="140" height="44"/>
+      <path d="M320 220 L 400 194 L 480 220 Z"/>
+      <rect x="348" y="232" width="16" height="22" fill="#141414"/>
+      <rect x="378" y="232" width="16" height="22" fill="#141414"/>
+      <rect x="408" y="232" width="16" height="22" fill="#141414"/>
+      <rect x="438" y="232" width="16" height="22" fill="#141414"/>
+    </g>
+    <g stroke="#141414" stroke-width="3" fill="none">
+      <path d="M130 420 L 130 340 Q 130 320 154 320 Q 178 320 178 340 L 178 420"/>
+      <line x1="128" y1="420" x2="180" y2="420" stroke-width="4"/>
+      <path d="M420 390 L 420 320 Q 420 302 440 302 Q 460 302 460 320 L 460 390"/>
+      <line x1="418" y1="390" x2="462" y2="390" stroke-width="4"/>
+      <path d="M660 440 L 660 350 Q 660 328 686 328 Q 712 328 712 350 L 712 440"/>
+      <line x1="658" y1="440" x2="714" y2="440" stroke-width="4"/>
+    </g>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <circle cx="220" cy="446" r="12"/>
+      <circle cx="490" cy="414" r="10"/>
+    </g>
+    <circle cx="380" cy="466" r="11" stroke="#141414" stroke-width="2" fill="#73182C"/>
+    <circle cx="600" cy="490" r="12" stroke="#141414" stroke-width="2" fill="#141414"/>
+    <g stroke="#6b9a49" stroke-width="1" fill="none" opacity=".7">
+      <path d="M0 380 Q 400 372 800 380"/>
+      <path d="M0 430 Q 400 422 800 430"/>
+      <path d="M0 480 Q 400 472 800 480"/>
+      <path d="M0 520 Q 400 512 800 520"/>
+    </g>
+  </symbol>
+
+  <!-- Small spots -->
+  <symbol id="ink-spot-mallet" viewBox="0 0 160 120">
+    <rect width="160" height="120" fill="#82b25e"/>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <rect x="30" y="50" width="90" height="18" rx="2"/>
+      <line x1="50" y1="50" x2="50" y2="68"/>
+      <line x1="100" y1="50" x2="100" y2="68"/>
+      <path d="M75 50 L 115 18 L 124 22 L 84 56 Z"/>
+    </g>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <circle cx="40" cy="90" r="14"/>
+    </g>
+    <circle cx="118" cy="92" r="10" stroke="#141414" stroke-width="2" fill="#73182C"/>
+  </symbol>
+
+  <symbol id="ink-spot-hoop" viewBox="0 0 160 120">
+    <rect width="160" height="120" fill="#82b25e"/>
+    <g stroke="#141414" stroke-width="2.5" fill="none">
+      <path d="M60 90 L 60 40 Q 60 26 80 26 Q 100 26 100 40 L 100 90"/>
+      <line x1="58" y1="90" x2="102" y2="90" stroke-width="3"/>
+    </g>
+    <circle cx="130" cy="88" r="10" fill="#FCF6DA" stroke="#141414" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="ink-spot-walker" viewBox="0 0 160 120">
+    <rect width="160" height="120" fill="#82b25e"/>
+    <path d="M0 80 Q 80 74 160 80 L 160 120 L 0 120 Z" fill="#6b9a49"/>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <circle cx="80" cy="44" r="10"/>
+      <path d="M76 36 Q 80 24 88 30 L 88 42 Z" fill="#141414"/>
+      <path d="M72 58 L 70 86 L 78 90 L 82 60 Z"/>
+      <path d="M88 58 L 92 88 L 100 86 L 94 60 Z"/>
+      <line x1="96" y1="62" x2="120" y2="76" stroke-width="2"/>
+      <rect x="118" y="72" width="14" height="6"/>
+    </g>
+  </symbol>
+
+  <symbol id="ink-spot-pair" viewBox="0 0 160 120">
+    <rect width="160" height="120" fill="#82b25e"/>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <circle cx="50" cy="50" r="8"/>
+      <path d="M44 58 L 42 96 L 56 96 L 52 70 Z"/>
+      <circle cx="100" cy="46" r="9"/>
+      <path d="M94 54 L 90 96 L 108 96 L 104 66 Z"/>
+    </g>
+    <g stroke="#141414" stroke-width="2" fill="none">
+      <path d="M66 96 L 66 72 Q 66 64 76 64 Q 86 64 86 72 L 86 96"/>
+    </g>
+  </symbol>
+
+  <symbol id="ink-spot-clubhouse" viewBox="0 0 160 120">
+    <rect width="160" height="120" fill="#82b25e"/>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <rect x="40" y="54" width="80" height="40"/>
+      <path d="M36 56 L 80 36 L 124 56 Z"/>
+      <rect x="50" y="66" width="10" height="16" fill="#141414"/>
+      <rect x="74" y="66" width="12" height="22" fill="#141414"/>
+      <rect x="100" y="66" width="10" height="16" fill="#141414"/>
+    </g>
+    <line x1="125" y1="96" x2="125" y2="30" stroke="#141414" stroke-width="2"/>
+    <path d="M125 30 L 140 34 L 125 40 Z" fill="#73182C" stroke="#141414" stroke-width="1.5"/>
+  </symbol>
+
+  <!-- Cartoon SPOT -->
+  <symbol id="ink-cartoon" viewBox="0 0 360 360">
+    <rect width="360" height="360" fill="#FCF6DA"/>
+    <path d="M0 250 Q 180 240 360 250 L 360 360 L 0 360 Z" fill="#82b25e" stroke="#141414" stroke-width="1.4"/>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA" stroke-linejoin="round">
+      <circle cx="170" cy="110" r="20"/>
+      <path d="M154 100 Q 170 86 190 100" fill="#141414"/>
+      <path d="M152 130 Q 140 180 160 230 L 200 230 Q 214 180 194 130 Z"/>
+      <path d="M160 230 L 154 286 L 170 290 L 176 232 Z"/>
+      <path d="M188 232 L 192 286 L 206 290 L 198 232 Z"/>
+      <path d="M160 150 L 110 90 L 120 82 L 168 142 Z"/>
+      <path d="M196 150 L 244 96 L 254 104 L 204 158 Z"/>
+      <rect x="102" y="60" width="28" height="12" transform="rotate(-28 116 66)"/>
+    </g>
+    <g stroke="#141414" stroke-width="2" fill="#FCF6DA">
+      <circle cx="290" cy="210" r="16"/>
+      <path d="M268 206 Q 290 192 312 206" fill="#141414"/>
+      <path d="M276 226 L 272 300 L 308 300 L 304 226 Z"/>
+    </g>
+    <circle cx="230" cy="260" r="10" fill="#FCF6DA" stroke="#141414" stroke-width="2"/>
+    <ellipse cx="176" cy="298" rx="40" ry="5" fill="url(#hatchDark)" opacity=".4"/>
+    <ellipse cx="290" cy="310" rx="30" ry="4" fill="url(#hatchDark)" opacity=".4"/>
+  </symbol>
+
+  <!-- Avatars -->
+  <symbol id="ink-avatar-1" viewBox="0 0 40 40">
+    <rect width="40" height="40" fill="#82b25e"/>
+    <circle cx="20" cy="16" r="7" fill="#FCF6DA" stroke="#141414" stroke-width="1.4"/>
+    <path d="M8 40 Q 8 26 20 26 Q 32 26 32 40 Z" fill="#FCF6DA" stroke="#141414" stroke-width="1.4"/>
+  </symbol>
+  <symbol id="ink-avatar-2" viewBox="0 0 40 40">
+    <rect width="40" height="40" fill="#82b25e"/>
+    <circle cx="20" cy="17" r="7" fill="#FCF6DA" stroke="#141414" stroke-width="1.4"/>
+    <path d="M12 11 Q 20 4 28 11" fill="#141414" stroke="#141414" stroke-width="1"/>
+    <path d="M8 40 Q 8 27 20 27 Q 32 27 32 40 Z" fill="#FCF6DA" stroke="#141414" stroke-width="1.4"/>
+  </symbol>
+  <symbol id="ink-avatar-3" viewBox="0 0 40 40">
+    <rect width="40" height="40" fill="#82b25e"/>
+    <circle cx="20" cy="17" r="7" fill="#FCF6DA" stroke="#141414" stroke-width="1.4"/>
+    <path d="M10 12 Q 20 2 30 12" fill="#FCF6DA" stroke="#141414" stroke-width="1.2"/>
+    <path d="M8 40 Q 8 27 20 27 Q 32 27 32 40 Z" fill="#FCF6DA" stroke="#141414" stroke-width="1.4"/>
+  </symbol>
+</defs>
+</svg>
+
+<div class="page">
+
+<!-- Doc intro -->
+<section class="doc-intro">
+  <div class="eyebrow">Internal reference &middot; not a final design</div>
+  <h1>Four layouts, one brand</h1>
+  <p class="deck">Reasons to be Cheerful, The Bitter Southerner, Defector, The New Yorker &mdash; each homepage rebuilt with the CAQ skin on top. Same maroon, same cream, same lawn green, same ink figures. Scroll through, feel the four rhythms, pick the one that fits croquet news.</p>
+</section>
+
+<!-- Brand anchor -->
+<section class="brand-band">
+  <div class="label">The anchor</div>
+  <h2>The CAQ brand</h2>
+  <p class="note">Palette, typography and illustration style derived from the Hit Our Aims and Four Ideals posters. Every layout that follows obeys these constants.</p>
+
+  <div class="posters">
+    <figure>
+      <img src="../attachments/aims.png" alt="Hit Our Aims poster: bold oxblood serif on flat lawn green, ink-line illustration of a croquet player lining up a shot.">
+      <figcaption>Hit Our Aims &middot; 2025</figcaption>
+    </figure>
+    <figure>
+      <img src="../attachments/croquet_ideals.png" alt="Our Four Ideals poster: ink-wash illustration of two players shaking hands on a lawn, cream sky, italic serif headline.">
+      <figcaption>Our Four Ideals &middot; 2025</figcaption>
+    </figure>
+  </div>
+
+  <div class="tokens">
+    <div class="swatch">
+      <div class="chip" style="background:#73182C"></div>
+      <div>
+        <div class="name">QLD Maroon</div>
+        <div class="hex">#73182C</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:#82b25e"></div>
+      <div>
+        <div class="name">Lawn Green</div>
+        <div class="hex">#82B25E</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:#FCF6DA;border:1px solid #2a1a1c"></div>
+      <div>
+        <div class="name">Cream</div>
+        <div class="hex">#FCF6DA</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:#141414"></div>
+      <div>
+        <div class="name">Ink Black</div>
+        <div class="hex">#141414</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SKIN 1 — Reasons to be Cheerful -->
+<section class="skin-section">
+  <header class="skin-intro">
+    <div class="meta">
+      <p class="num">01</p>
+      <p class="source">After &middot; Reasons to be Cheerful</p>
+    </div>
+    <div>
+      <h3>The curated card feed</h3>
+      <p class="oneliner">A hero piece up top, then tidy rows of cards grouped into editorial sections &mdash; Latest, Editors' Picks, Collections.</p>
+    </div>
+  </header>
+
+  <div class="mock">
+    <div class="skin-cheerful">
+      <nav class="sc-nav">
+        <div class="brand">Croquet <span>Queensland</span></div>
+        <ul>
+          <li>Latest</li><li>Clubs</li><li>Play</li><li>People</li><li>Collections</li>
+        </ul>
+        <div class="join">Join a club</div>
+      </nav>
+
+      <div class="sc-tagline">A mallet, a hoop, a reason to turn up on Saturday.</div>
+
+      <div class="sc-hero">
+        <div class="art ink-hero">
+          <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet" style="height:100%"><use href="#ink-aiming"/></svg>
+        </div>
+        <div class="copy">
+          <div class="tag">The Lead &middot; Strategy</div>
+          <h1>Hit Our Aims: why purposeful decisions matter for every club</h1>
+          <p class="dek">Six aims, one test. If a committee decision doesn't move at least one of them, what is it doing on the agenda?</p>
+          <div class="byline">Wade Hart &middot; 8 min read &middot; April 2026</div>
+        </div>
+      </div>
+
+      <div class="sc-section-head">
+        <h2>Latest Stories</h2>
+        <a>View all &rarr;</a>
+      </div>
+      <div class="sc-cards">
+        <article class="sc-card">
+          <div class="ph"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-walker"/></svg></div>
+          <div class="tag">Clubs</div>
+          <h3>A Queensland guide to your first Come &amp; Try morning</h3>
+          <div class="meta">Penny Clarke &middot; 6 min read</div>
+        </article>
+        <article class="sc-card">
+          <div class="ph"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-pair"/></svg></div>
+          <div class="tag">Culture</div>
+          <h3>The Four Ideals &mdash; how they guide the way we work together</h3>
+          <div class="meta">Wade Hart &middot; 5 min read</div>
+        </article>
+        <article class="sc-card">
+          <div class="ph"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-hoop"/></svg></div>
+          <div class="tag">Greens</div>
+          <h3>What makes a croquet lawn great, and why so few of ours are</h3>
+          <div class="meta">Rob McKinnon &middot; 9 min read</div>
+        </article>
+      </div>
+
+      <div class="sc-collection">
+        <div>
+          <div class="label">Collection</div>
+          <h2>The Ipswich Story</h2>
+        </div>
+        <div>
+          <p>A six-part look at one club's doubling: what they changed, what they kept, and what finally started working after twelve years of quiet decline.</p>
+          <a>Start the series &rarr;</a>
+        </div>
+      </div>
+
+      <div class="sc-section-head">
+        <h2>Editors' Picks</h2>
+        <a>View all &rarr;</a>
+      </div>
+      <div class="sc-cards">
+        <article class="sc-card">
+          <div class="ph"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-mallet"/></svg></div>
+          <div class="tag">Etiquette</div>
+          <h3>Equipment, etiquette, and the unwritten rules new players never hear</h3>
+          <div class="meta">Anne Ridgeway &middot; 7 min read</div>
+        </article>
+        <article class="sc-card">
+          <div class="ph"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-clubhouse"/></svg></div>
+          <div class="tag">Feature</div>
+          <h3>The quiet revolution in Ipswich: one club's doubling story</h3>
+          <div class="meta">Wade Hart &middot; 12 min read</div>
+        </article>
+        <article class="sc-card">
+          <div class="ph"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-walker"/></svg></div>
+          <div class="tag">Grow</div>
+          <h3>The newcomer funnel: from Facebook ad to full-membership</h3>
+          <div class="meta">Penny Clarke &middot; 8 min read</div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="skin-notes">
+    <p><strong>What it gives you</strong>Predictable rhythm. Readers arrive, scan a hero, drop into tidy rows of three, hit a collection break, and keep going. Good for a publication that wants to show up often with steady, mixed coverage &mdash; weekly notes, player profiles, lawn-care pieces, club features &mdash; without any single piece needing to carry the page.</p>
+    <p><strong>The trade-off</strong>It is gentle, almost too gentle. Big moments (a Wade editorial, a champion profile) sit in the same rectangles as the small ones. If the croquet calendar has real peaks, this layout flattens them.</p>
+  </div>
+</section>
+
+
+<!-- SKIN 2 — The Bitter Southerner -->
+<section class="skin-section">
+  <header class="skin-intro">
+    <div class="meta">
+      <p class="num">02</p>
+      <p class="source">After &middot; The Bitter Southerner</p>
+    </div>
+    <div>
+      <h3>The long vertical essay</h3>
+      <p class="oneliner">One feature. Enormous. Then a single column of equally slow, equally considered pieces below &mdash; each one large, each one deserving its own scroll.</p>
+    </div>
+  </header>
+
+  <div class="mock">
+    <div class="skin-bs">
+      <nav class="bs-nav">
+        <div class="left">
+          <ul><li>About</li><li>Clubs</li><li>Play</li><li>Greens</li></ul>
+        </div>
+        <div class="mast">
+          Croquet Queensland
+          <small>An editorial journal of the Queensland game</small>
+        </div>
+        <div class="right">
+          <ul><li>Shop</li><li>Subscribe</li><li>Contact</li></ul>
+        </div>
+      </nav>
+
+      <div class="bs-feature">
+        <div class="date">Feature &middot; 18 April 2026</div>
+        <h1>The Quiet Revolution In Ipswich</h1>
+        <p class="subhead">How one Queensland club doubled its membership, broke its own rules, and remembered what croquet is actually for.</p>
+        <div class="byline">Words &middot; Wade Hart &nbsp;&bull;&nbsp; Ink &middot; Penny Clarke</div>
+      </div>
+
+      <div class="bs-hero-art">
+        <div class="frame has-cream-sky">
+          <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-lawn"/></svg>
+        </div>
+        <p class="caption">The East Ipswich green, 6.47am &mdash; three hoops set, no one there yet. Within the hour, fourteen players will be.</p>
+      </div>
+
+      <div class="bs-intro-mission">
+        <div class="mark">&ldquo;&rdquo;</div>
+        <p>We write long, we publish slowly, and we try to photograph croquet the way your grandfather would have remembered it. This is a publication for everyone who has ever turned up to a lawn with a mallet and a little bit of hope.</p>
+      </div>
+
+      <div class="bs-stack">
+
+        <article class="entry">
+          <div class="text">
+            <div class="date">Essay &middot; 11 April 2026</div>
+            <h2>Hit Our Aims</h2>
+            <p class="dek">Why purposeful decisions matter for every club &mdash; and why most committees are still making them by habit.</p>
+            <div class="byline">Wade Hart</div>
+          </div>
+          <div class="art">
+            <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-aiming"/></svg>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="text">
+            <div class="date">Guide &middot; 4 April 2026</div>
+            <h2>A Queensland Guide To Your First Come &amp; Try Morning</h2>
+            <p class="dek">What to wear, what to expect, what no one tells you, and why the bloke at the gate is the most important person there.</p>
+            <div class="byline">Penny Clarke</div>
+          </div>
+          <div class="art has-cream-sky">
+            <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-handshake"/></svg>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="text">
+            <div class="date">Field notes &middot; 28 March 2026</div>
+            <h2>What Makes A Croquet Lawn Great</h2>
+            <p class="dek">And why so few of ours are. A greenkeeper's account of soil, water, sunlight, and the small unglamorous choices that separate a passable lawn from a memorable one.</p>
+            <div class="byline">Rob McKinnon</div>
+          </div>
+          <div class="art">
+            <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-mallet"/></svg>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="skin-notes">
+    <p><strong>What it gives you</strong>Reverence. The front page treats one story as the main event &mdash; big type, big image, air around it &mdash; then hands you equally slow pieces below. This is how Wade's own writing actually reads. A long, walked-through argument; a field report; not a list of updates.</p>
+    <p><strong>The trade-off</strong>It is cruel to high-frequency content. Club results, small notices, upcoming Come &amp; Try dates &mdash; there's nowhere for them to live. You get gravitas at the cost of utility, which means a secondary surface (newsletter, calendar page, separate noticeboard) has to do the workaday job.</p>
+  </div>
+</section>
+
+
+<!-- SKIN 3 — Defector -->
+<section class="skin-section">
+  <header class="skin-intro">
+    <div class="meta">
+      <p class="num">03</p>
+      <p class="source">After &middot; Defector</p>
+    </div>
+    <div>
+      <h3>The opinionated magazine grid</h3>
+      <p class="oneliner">Lead story, then a tight magazine grid of posts tagged by category &mdash; with comment counts front-and-centre, a voice, and a personality running through every headline.</p>
+    </div>
+  </header>
+
+  <div class="mock">
+    <div class="skin-defector">
+      <div class="df-top">
+        <span>Member-supported &middot; Est. 2026</span>
+        <span>Sign in</span>
+      </div>
+
+      <header class="df-mast">
+        <div class="left">News &middot; Play &middot; Clubs</div>
+        <div class="name">
+          Croquet Queensland
+          <small>The last good croquet website.</small>
+        </div>
+        <div class="right">Members &middot; Shop &middot; Contact</div>
+      </header>
+
+      <nav class="df-catbar">
+        <span>Strategy</span><span>Greens</span><span>Come &amp; Try</span><span>Rules</span><span>Ipswich</span><span>Bamford</span><span>Clubhouse</span><span>The Lawn Report</span><span>Letters</span>
+      </nav>
+
+      <section class="df-lead">
+        <div class="art">
+          <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-aiming"/></svg>
+        </div>
+        <div class="copy">
+          <div class="tag">Strategy &middot; The Lead</div>
+          <h1>Hit Our Aims, or stop pretending you're running a club</h1>
+          <p class="dek">A blunt look at why most Queensland committee agendas would struggle to name a single thing they advance, and what to do about it before June.</p>
+          <div class="meta">
+            <span class="avatar"><svg viewBox="0 0 40 40"><use href="#ink-avatar-1"/></svg></span>
+            <span>Wade Hart</span>
+            <span>7 min</span>
+            <span class="comments">184 comments</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="df-grid">
+        <article class="item">
+          <div class="art has-cream-sky"><svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-handshake"/></svg></div>
+          <div class="tag">Come &amp; Try</div>
+          <h3>A Queensland guide to your first Come &amp; Try morning</h3>
+          <div class="meta">
+            <span class="avatar"><svg viewBox="0 0 40 40"><use href="#ink-avatar-2"/></svg></span>
+            <span>Penny Clarke</span>
+            <span class="comments">62</span>
+          </div>
+        </article>
+        <article class="item">
+          <div class="art"><svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-mallet"/></svg></div>
+          <div class="tag">Greens</div>
+          <h3>What makes a croquet lawn great, and why so few of ours are</h3>
+          <div class="meta">
+            <span class="avatar"><svg viewBox="0 0 40 40"><use href="#ink-avatar-3"/></svg></span>
+            <span>Rob McKinnon</span>
+            <span class="comments">41</span>
+          </div>
+        </article>
+        <article class="item">
+          <div class="art has-cream-sky"><svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-lawn"/></svg></div>
+          <div class="tag">Feature</div>
+          <h3>The quiet revolution in Ipswich: one club's doubling story</h3>
+          <div class="meta">
+            <span class="avatar"><svg viewBox="0 0 40 40"><use href="#ink-avatar-1"/></svg></span>
+            <span>Wade Hart</span>
+            <span class="comments">97</span>
+          </div>
+        </article>
+      </section>
+
+      <header class="df-section-head">
+        <h2>Blogs of Note</h2>
+        <span class="rule"></span>
+        <span class="tag">Shorter, sharper, same day</span>
+      </header>
+
+      <section class="df-blogs">
+        <article class="row">
+          <div class="art"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-mallet"/></svg></div>
+          <div>
+            <div class="tag">Etiquette</div>
+            <h4>Equipment, etiquette, and the unwritten rules new players never hear</h4>
+            <div class="meta">Anne Ridgeway &middot; 14 comments</div>
+          </div>
+        </article>
+        <article class="row">
+          <div class="art"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-pair"/></svg></div>
+          <div>
+            <div class="tag">Ideals</div>
+            <h4>The Four Ideals &mdash; how they guide the way we work together</h4>
+            <div class="meta">Wade Hart &middot; 28 comments</div>
+          </div>
+        </article>
+        <article class="row">
+          <div class="art"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-clubhouse"/></svg></div>
+          <div>
+            <div class="tag">Clubs</div>
+            <h4>Bamford 3 and what it means for Queensland tournaments in 2026</h4>
+            <div class="meta">Meg Tomlinson &middot; 52 comments</div>
+          </div>
+        </article>
+        <article class="row">
+          <div class="art"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid meet"><use href="#ink-spot-walker"/></svg></div>
+          <div>
+            <div class="tag">Letters</div>
+            <h4>Readers on why the handicap system still confuses them (and us)</h4>
+            <div class="meta">The editors &middot; 203 comments</div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+
+  <div class="skin-notes">
+    <p><strong>What it gives you</strong>Voice. This layout assumes there is a personality behind the site, and that the personality shows up in headlines, in a tagline ("the last good croquet website"), in comment counts that say real people are arguing about real things. It rewards a writer who has opinions, a masthead that answers letters, a publication that isn't afraid to be funny.</p>
+    <p><strong>The trade-off</strong>The voice has to be real. If the site is going to be careful, diplomatic, official &mdash; a flagship communication of the Association &mdash; the Defector register works against it. This layout wants a column, not a committee.</p>
+  </div>
+</section>
+
+
+<!-- SKIN 4 — The New Yorker -->
+<section class="skin-section">
+  <header class="skin-intro">
+    <div class="meta">
+      <p class="num">04</p>
+      <p class="source">After &middot; The New Yorker</p>
+    </div>
+    <div>
+      <h3>The magazine of record</h3>
+      <p class="oneliner">A thin masthead, a three-column grid separated by hairlines, a dense front page that behaves like the contents page of a magazine &mdash; with a single cartoon to remind you there's a human in there.</p>
+    </div>
+  </header>
+
+  <div class="mock">
+    <div class="skin-ny">
+      <div class="ny-promo">Subscribe &middot; The print edition, every quarter, posted to your door.</div>
+
+      <header class="ny-mast">
+        <div class="date">Saturday, 18 April 2026</div>
+        <div class="mast">
+          Croquet Queensland
+          <small>Since 1927</small>
+        </div>
+        <div class="tools">Search &middot; Newsletter &middot; Sign in</div>
+      </header>
+
+      <nav class="ny-cats">
+        <span>News</span><span>Play</span><span>Clubs</span><span>Greens</span><span>Profiles</span><span>Come &amp; Try</span><span>Letters</span><span>Archive</span>
+      </nav>
+
+      <section class="ny-hero">
+        <div class="left">
+          <div class="tag">Essay &middot; The Lead</div>
+          <h1>Hit Our Aims: why purposeful decisions matter for every club</h1>
+          <p class="dek">Six aims, one test. If a committee decision doesn't move at least one of them, what is it doing on the agenda? A long argument for a shorter meeting.</p>
+          <div class="byline">By Wade Hart</div>
+          <div class="art">
+            <svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-aiming"/></svg>
+          </div>
+        </div>
+        <aside class="right">
+          <h2>Also This Week</h2>
+          <div class="item">
+            <div class="tag">Come &amp; Try</div>
+            <h3>A Queensland guide to your first Come &amp; Try morning</h3>
+            <div class="byline">By Penny Clarke</div>
+          </div>
+          <div class="item">
+            <div class="tag">Ideals</div>
+            <h3>The Four Ideals &mdash; how they guide the way we work together</h3>
+            <div class="byline">By Wade Hart</div>
+          </div>
+          <div class="item">
+            <div class="tag">Greens</div>
+            <h3>What makes a croquet lawn great, and why so few of ours are</h3>
+            <div class="byline">By Rob McKinnon</div>
+          </div>
+          <div class="item">
+            <div class="tag">Letters</div>
+            <h3>On the handicap table, the Ipswich story, and flat whites at tournaments</h3>
+            <div class="byline">From our readers</div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="ny-threecol">
+        <div class="col">
+          <h2>Dept. of Play</h2>
+          <article class="item">
+            <div class="art"><svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-mallet"/></svg></div>
+            <div class="tag">Equipment</div>
+            <h3>Equipment, etiquette, and the unwritten rules new players never hear</h3>
+            <p class="dek">A patient, slightly exasperated field guide by a woman who has been at the front gate for thirty years.</p>
+            <div class="byline">By Anne Ridgeway</div>
+          </article>
+          <article class="item">
+            <div class="tag">Short cuts</div>
+            <h3>On the sudden return of the six-hoop lawn</h3>
+            <div class="byline">By the editors</div>
+          </article>
+        </div>
+
+        <div class="col">
+          <h2>Around The Clubs</h2>
+          <article class="item">
+            <div class="art has-cream-sky"><svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-lawn"/></svg></div>
+            <div class="tag">Feature</div>
+            <h3>The quiet revolution in Ipswich: one club's doubling story</h3>
+            <p class="dek">They broke three of the Association's unwritten rules. None of the sky has fallen.</p>
+            <div class="byline">By Wade Hart</div>
+          </article>
+          <article class="item">
+            <div class="tag">Notes</div>
+            <h3>Why Bamford 3 matters, and what comes next</h3>
+            <div class="byline">By Meg Tomlinson</div>
+          </article>
+        </div>
+
+        <div class="col">
+          <h2>On The Green</h2>
+          <article class="item">
+            <div class="art has-cream-sky"><svg viewBox="0 0 800 540" preserveAspectRatio="xMidYMid meet"><use href="#ink-handshake"/></svg></div>
+            <div class="tag">Opinion</div>
+            <h3>The Four Ideals &mdash; how they guide the way we work together</h3>
+            <p class="dek">Not four commandments. Four invitations, set out plainly.</p>
+            <div class="byline">By Wade Hart</div>
+          </article>
+          <article class="item">
+            <div class="tag">Short cuts</div>
+            <h3>A case for cream tea at the Queensland Open</h3>
+            <div class="byline">By Penny Clarke</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="ny-cartoon">
+        <div class="frame">
+          <svg viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"><use href="#ink-cartoon"/></svg>
+        </div>
+        <div>
+          <div class="lab">Cartoon of the week</div>
+          <p class="cap">&ldquo;I'm not saying you hit the wrong ball, Trevor. I'm saying you hit it with remarkable conviction.&rdquo;</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="skin-notes">
+    <p><strong>What it gives you</strong>Authority. The three-column grid, the hairline rules, the "Also This Week" sidebar, the cartoon &mdash; everything signals that this is a magazine with a point of view and an archive behind it. Readers adopt a browsing posture, not a scrolling one. Good for a site that wants to feel permanent, institutional, and a bit stately.</p>
+    <p><strong>The trade-off</strong>Density costs calm. For a volunteer reader on their phone after tea, it is a lot at once. And the three-column grid demands a full week of content every week &mdash; empty columns look worse here than anywhere else.</p>
+  </div>
+</section>
+
+
+<!-- Outro -->
+<section class="doc-outro">
+  <p>Four directions, one palette. Each mockup keeps the original site's layout DNA &mdash; grid, density, rhythm &mdash; and changes only the skin. The content is the same six croquet headlines in every case, so the comparison is fair.</p>
+</section>
+
+</div><!-- /.page -->
+`;
+
+    // ---- Decision panel HTML ----
+    var DECISION_PANEL_HTML = `
+<section class="decision-panel" id="decision-panel">
+  <h2>Which direction wins?</h2>
+  <p class="panel-deck">Pick the layout that fits croquet news. If none of them land, say so.</p>
+
+  <div id="decision-form">
+    <div id="panel-form-fields">
+      <div class="pick-options">
+
+        <label class="pick-option">
+          <input type="radio" name="skin-pick" value="cheerful">
+          <div class="option-label">
+            <strong>01 &mdash; Reasons to be Cheerful</strong>
+            Illustrated, optimistic &mdash; card feed, hero piece, editorial sections
+          </div>
+        </label>
+
+        <label class="pick-option">
+          <input type="radio" name="skin-pick" value="bitter-southerner">
+          <div class="option-label">
+            <strong>02 &mdash; Bitter Southerner</strong>
+            Slow, sense-of-place &mdash; one big feature, then considered essays below
+          </div>
+        </label>
+
+        <label class="pick-option">
+          <input type="radio" name="skin-pick" value="defector">
+          <div class="option-label">
+            <strong>03 &mdash; Defector</strong>
+            Indie, personal &mdash; magazine grid with voice, comment counts, a personality
+          </div>
+        </label>
+
+        <label class="pick-option">
+          <input type="radio" name="skin-pick" value="new-yorker">
+          <div class="option-label">
+            <strong>04 &mdash; New Yorker</strong>
+            Classic illustrated editorial &mdash; thin masthead, three columns, hairline rules
+          </div>
+        </label>
+
+        <label class="pick-option pick-none">
+          <input type="radio" name="skin-pick" value="none">
+          <div class="option-label">
+            <strong>None of these</strong>
+            Go back to the drawing board
+          </div>
+        </label>
+
+      </div>
+
+      <div class="notes-section">
+        <label for="panel-notes">What specifically worked or didn't (optional)</label>
+        <textarea id="panel-notes" placeholder="Anything to flag about a particular layout, or a direction not covered here\u2026"></textarea>
+      </div>
+
+      <div class="panel-validation-error" id="panel-validation-error">
+        Pick one option before sending.
+      </div>
+
+      <div class="panel-submit-wrap">
+        <button type="button" class="panel-submit-btn" id="panel-submit-btn">Send my answer</button>
+        <span class="panel-error-msg" id="panel-error-msg">
+          Something went wrong &mdash; reply to the email you received or contact
+          <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.
+        </span>
+      </div>
+    </div>
+
+    <div class="panel-thankyou" id="panel-thankyou">
+      <p>Got it. I'll take this forward.</p>
+    </div>
+  </div>
+</section>
+`;
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
