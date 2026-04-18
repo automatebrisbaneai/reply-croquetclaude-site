@@ -1405,21 +1405,77 @@ a { color: inherit; text-decoration: none; }
 
 .panel-error-msg.visible { display: block; }
 
-/* Thank-you state */
+/* Thank-you / celebration state */
 .panel-thankyou {
   display: none;
-  padding: 48px 0 0;
+  padding: 56px 0 32px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .panel-thankyou.visible { display: block; }
 
-.panel-thankyou p {
+.panel-thankyou .cc-avatar {
+  width: 200px;
+  height: auto;
+  margin: 0 auto 18px;
+  display: block;
+  animation: cc-pop 520ms cubic-bezier(.22,1.4,.36,1) both;
+  transform-origin: bottom center;
+}
+
+.panel-thankyou .cc-cheer {
   font-family: var(--serif-display);
-  font-size: 36px;
+  font-size: clamp(48px, 7vw, 88px);
+  line-height: .95;
   color: var(--qld-maroon);
-  margin: 0;
-  line-height: 1.1;
+  margin: 0 0 12px;
+  letter-spacing: -.01em;
+  animation: cc-rise 600ms 160ms cubic-bezier(.22,1.1,.36,1) both;
+}
+
+.panel-thankyou .cc-sub {
+  font-family: var(--serif-mag);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  max-width: 520px;
+  margin: 0 auto;
+  animation: cc-rise 600ms 280ms cubic-bezier(.22,1.1,.36,1) both;
+}
+
+@keyframes cc-pop {
+  0%   { transform: scale(.35) rotate(-12deg); opacity: 0; }
+  60%  { transform: scale(1.08) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes cc-rise {
+  0%   { transform: translateY(22px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Confetti */
+.cc-confetti {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 14px;
+  opacity: 0;
+  pointer-events: none;
+  animation: cc-fall 2200ms ease-in forwards;
+}
+.cc-confetti.c1 { background: var(--qld-maroon); }
+.cc-confetti.c2 { background: var(--lawn-green); }
+.cc-confetti.c3 { background: var(--cream-edge); border: 1px solid var(--qld-maroon); }
+.cc-confetti.c4 { background: var(--ink); }
+
+@keyframes cc-fall {
+  0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(640px) rotate(720deg); opacity: 0; }
 }
 
 /* Reply site header overrides — keep it minimal above the comparison doc */
@@ -1528,11 +1584,31 @@ a { color: inherit; text-decoration: none; }
 
             // Show thank-you inline in the panel (override app.js default)
             if (formEl) formEl.style.display = 'none';
-            if (thankyouEl) thankyouEl.classList.add('visible');
+            if (thankyouEl) {
+                thankyouEl.classList.add('visible');
+                spawnConfetti(thankyouEl);
+            }
             // Scroll to the panel
             document.getElementById('decision-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     };
+
+    // Confetti spawner — 60 pieces, random drift + delay
+    function spawnConfetti(container) {
+        var classes = ['c1','c2','c3','c4'];
+        for (var i = 0; i < 60; i++) {
+            var piece = document.createElement('span');
+            piece.className = 'cc-confetti ' + classes[i % 4];
+            piece.style.left = (Math.random() * 100) + '%';
+            piece.style.animationDelay = (Math.random() * 600) + 'ms';
+            piece.style.animationDuration = (1800 + Math.random() * 1200) + 'ms';
+            piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+            container.appendChild(piece);
+        }
+        setTimeout(function() {
+            container.querySelectorAll('.cc-confetti').forEach(function(p) { p.remove(); });
+        }, 3500);
+    }
 
     // Override the default thank-you screen so it stays in-panel
     var _origSubmit = window.submitMission;
@@ -2451,7 +2527,9 @@ a { color: inherit; text-decoration: none; }
     </div>
 
     <div class="panel-thankyou" id="panel-thankyou">
-      <p>Got it. I'll take this forward.</p>
+      <img src="claude-strong.webp" alt="CroquetClaude flexing, celebrating your pick" class="cc-avatar">
+      <h3 class="cc-cheer">Boom! Nice one, Wade.</h3>
+      <p class="cc-sub">Pick locked in. Building the direction from here &mdash; you'll see it land in news.croquetqld.org.</p>
     </div>
   </div>
 </section>
