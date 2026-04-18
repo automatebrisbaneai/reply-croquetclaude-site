@@ -1,6 +1,6 @@
 /* app.js — shared token loader + submit helper for reply.croquetclaude.com */
 
-const PB_BASE = 'https://pb.croquetwade.com';
+const PB_BASE = 'https://util.croquetwade.com';
 const TOKENS_COLLECTION = 'reply_mission_tokens';
 const RESPONSES_COLLECTION = 'reply_mission_responses';
 
