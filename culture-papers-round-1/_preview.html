@@ -129,6 +129,16 @@
             margin: 0 0 24px 0;
         }
 
+        .card-instruction {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-green);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin: 0 0 16px 0;
+        }
+
         .card-rule {
             border: none;
             border-top: 1px solid var(--color-border);
@@ -405,6 +415,13 @@
                 body.appendChild(preamble);
             }
 
+            if (opts.instruction) {
+                var instruction = document.createElement('p');
+                instruction.className = 'card-instruction';
+                instruction.textContent = opts.instruction;
+                body.appendChild(instruction);
+            }
+
             var rule = document.createElement('hr');
             rule.className = 'card-rule';
             body.appendChild(rule);
@@ -436,7 +453,7 @@
 
         var opener = document.createElement('p');
         opener.className = 'cp-opener';
-        opener.textContent = firstName + ', I\u2019ve done the reading on how other sports build winning team cultures without killing the enjoyment. The patterns hold across rugby league, the All Blacks, cycling. What I\u2019m missing is the croquet version, and no library gives me that. These six questions are me asking you for it: the cross-club dynamic, the loudest signals, who\u2019s already doing it right. No right answers. I want what you know.';
+        opener.textContent = firstName + ', I\u2019ve been reading up on how other sports build winning cultures without making the game miserable. The same patterns show up in rugby league, the All Blacks, cycling. What I don\u2019t have is the croquet version, and no book is going to give me that. These six questions are me asking you for it. How the clubs get on with each other, what signals are loudest, who\u2019s already doing it well. No right answers. I want what you know.';
         column.appendChild(opener);
 
         var cardsEl = document.createElement('div');
@@ -445,7 +462,8 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-1-frame.jpg',
             imgAlt: 'All Blacks in formation',
-            preamble: 'Queensland rugby league runs this play every June. Broncos players who\u2019ve spent the season hammering each other turn up as Maroons and mean it. Under Meninga, Queensland won State of Origin almost every year. The build was deliberate: club rivalry left at the door, state identity switched on through symbols and daily behaviour, senior players lifting younger ones. The broader research compresses to the same shape. Hold a visible standard, reward effort over results, make selection a conversation that weighs character alongside play. Wins follow.',
+            preamble: 'Queensland rugby league pulls this off every June. Broncos players who\u2019ve spent the season knocking each other about turn up as Maroons and play for each other. Under Meninga, Queensland won Origin almost every year. Personal rivalries left at the door, state identity switched on, senior players looking after the younger ones. The same pattern shows up in the research. Hold a clear standard, reward effort over results, and pick players on character as well as form. The wins follow.',
+            instruction: 'So here\u2019s my question',
             question: 'Does that shape fit what you\u2019d want from a state-level team culture, or is something off for your world?',
             choiceOptions: ['Yes, that fits', 'Mostly, something missing', 'Not quite, I\u2019d frame it differently'],
             choiceStateKey: 'q1_choice',
@@ -455,23 +473,26 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-2-coopetition.jpg',
             imgAlt: 'Queensland Maroons State of Origin',
-            preamble: 'The Maroons case rests on a split that\u2019s already working in the competitive phase. Rivals in the club season, teammates in June. Players who treat opponents well through the NRL year can put the shirt on and mean it. Players who don\u2019t, can\u2019t. The cross-club dynamic during competition either makes the representative culture possible or kills it before June.',
-            question: 'Does a dynamic like that exist in your world? If yes, what does it look like in practice. If no, what does the cross-club picture look like today?',
+            preamble: 'The Maroons thing only works because something earlier is already working. Personal rivals through the NRL season, genuine teammates in June. Players who treat their opponents well during the year can pull the jersey on and mean it. Players who don\u2019t, can\u2019t. How players get on with each other during competition either makes the rep side possible or kills it before anyone turns up in June.',
+            instruction: 'So here\u2019s my question',
+            question: 'Does a dynamic like that exist in your world? If yes, what does it look like in practice. If no, what does the cross-player picture look like today?',
             voiceStateKey: 'q2_voice'
         }));
 
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-3-artefact.jpg',
             imgAlt: 'Team selection board',
-            preamble: 'The change-management literature lands on one thing hard. Selection is the loudest artefact a program has. When stated values and selection practice don\u2019t line up, people read the practice. Not the policy doc, not the stated criteria, not the announcement. What gets rewarded when the list goes up is the answer everyone trusts.',
-            question: 'What\u2019s the loudest artefact in your world, the thing people read as the real answer to \u201cwhat does this program actually reward?\u201d',
+            preamble: 'Here\u2019s the bit that comes up again and again. Selection is the loudest thing a program does. If the stated values and the actual picks don\u2019t line up, people believe the picks. Not the policy, not the criteria on paper, not the press release. Who gets picked tells everyone what the program actually values.',
+            instruction: 'So here\u2019s my question',
+            question: 'What\u2019s the loudest thing in your world, the thing people read as the real answer to \u201cwhat does this program actually reward?\u201d',
             voiceStateKey: 'q3_voice'
         }));
 
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-4-small-room.jpg',
             imgAlt: 'Small coaching huddle',
-            preamble: 'One pattern runs through the cases. Not a reform of the whole program. A small group inside it, running the new way. Pat Lam\u2019s first move at Connacht wasn\u2019t a policy announcement. It was two senior players who already behaved the way he wanted, made the reference point. The All Blacks rebuild worked the same way. Twelve to sixteen people, meeting regularly, attitude-first entry. The group writes its own one-page standard on day one, and it holds.',
+            preamble: 'One pattern runs through all the cases. Nobody reformed the whole program at once. They started with a small group inside it, running the new way. Pat Lam\u2019s first move at Connacht was two senior players who already behaved the way he wanted, held up as the reference point. The All Blacks rebuild worked the same way. Twelve to sixteen people, meeting often, attitude mattering more than form for selection. The group writes its own one-page standard on day one and it holds.',
+            instruction: 'So here\u2019s my question',
             question: 'Does a shape like that fit somewhere in your world?',
             choiceOptions: ['Yes, here\u2019s where it fits', 'Partly, would need to change', 'No, my setup is different'],
             choiceStateKey: 'q4_choice',
@@ -482,8 +503,9 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-5-deviance.jpg',
             imgAlt: 'Senior coach mentoring a player',
-            preamble: 'One principle runs through the change-management research. Find the people inside your existing system who already behave the way you want, and spread their practice. It beats importing a culture from outside. Brailsford at British Cycling didn\u2019t announce a new culture. He announced that the program would measure everything it wasn\u2019t yet doing and improve each thing by one percent. The daily work was making it normal inside the program to talk honestly about the gaps.',
-            question: 'Who comes to mind in your world? Names, clubs, a coach whose sessions already feel right. Whatever\u2019s in your head.',
+            preamble: 'One idea runs through the research. Find the people inside your current system who already behave the way you want, and spread their practice. That works better than trying to import a new culture from outside. Brailsford at British Cycling didn\u2019t announce a new culture. He said the program would measure everything it wasn\u2019t measuring and improve each bit by one percent. The day to day work was making it normal for people to be honest about the gaps.',
+            instruction: 'So here\u2019s my question',
+            question: 'Who comes to mind in your world? Names, a coach whose sessions already feel right. Whatever\u2019s in your head.',
             voiceStateKey: 'q5_voice'
         }));
 
