@@ -16,7 +16,7 @@ Requires:
   - Local site server (started automatically, port 8000)
 
 The local server serves app.js from disk (latest version), but sends API
-requests to https://pb.croquetwade.com — exactly what the spec calls for.
+requests to https://util.croquetwade.com — exactly what the spec calls for.
 """
 
 import json
@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 # Config
 # ---------------------------------------------------------------------------
 
-PB_BASE = "https://pb.croquetwade.com"
+PB_BASE = "https://util.croquetwade.com"
 TOKENS_COLLECTION = "reply_mission_tokens"
 SITE_DIR = Path(__file__).parent                   # apps/reply-croquetclaude-site/
 SEED_FILE = SITE_DIR / "_seed" / "coaches-pending-15.json"

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superpowers adoption — 5 decisions — CroquetClaude</title>
+    <meta name="description" content="Superpowers adoption — 5 decisions before Phase A ships.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---- Mission-specific styles: superpowers-adoption-2026-04 ---- */
+
+        /* Always-visible notes area (Section D pattern) */
+        .notes-area-always {
+            margin-top: 0.75rem;
+        }
+
+        .notes-area-always label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .notes-area-always textarea {
+            width: 100%;
+            min-height: 3.5rem;
+            padding: 0.5rem 0.65rem;
+            border: 1px solid var(--border, #ccc);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            background: var(--cream-bg, #fefae0);
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        /* Terracotta accent buttons for non-primary options */
+        .btn-answer.btn-terracotta {
+            border-color: var(--accent, #bc6c25);
+            color: var(--accent, #bc6c25);
+        }
+
+        .btn-answer.btn-terracotta:hover,
+        .btn-answer.btn-terracotta.selected {
+            background: var(--accent, #bc6c25);
+            color: #fff;
+            border-color: var(--accent, #bc6c25);
+        }
+
+        /* Outline style for third-option buttons */
+        .btn-answer.btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary, #2d6a4f);
+            color: var(--primary, #2d6a4f);
+        }
+
+        .btn-answer.btn-outline:hover,
+        .btn-answer.btn-outline.selected {
+            background: var(--primary, #2d6a4f);
+            color: #fff;
+            border-color: var(--primary, #2d6a4f);
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Superpowers adoption &mdash; 5 decisions</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — superpowers-adoption-2026-04
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed           = tokenRecord.payload_seed;
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName      = respondentName.split(' ')[0].split(',')[0];
+        var draft          = tokenRecord.draft_payload || null;
+
+        // Pull decisions from seed
+        var decisions = (seed && seed.sections && seed.sections.decisions) || [];
+
+        // Card answer store — keyed by decision.key
+        var answers = {};
+        decisions.forEach(function(dec) {
+            answers[dec.key] = { answer: null, notes: '' };
+        });
+
+        // Pre-load from saved draft
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                if (entry.key && answers.hasOwnProperty(entry.key)) {
+                    answers[entry.key].answer = (entry.answer !== undefined) ? entry.answer : null;
+                    answers[entry.key].notes  = entry.notes || '';
+                }
+            });
+        }
+
+        // Autosave: forward-declared, assigned after DOM mount
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = decisions.map(function(dec) {
+                return {
+                    section: 'decisions',
+                    key:     dec.key,
+                    answer:  answers[dec.key].answer,
+                    notes:   answers[dec.key].notes || ''
+                };
+            });
+            return { cards: cards };
+        }
+
+        function updateValidationState() {
+            return decisions.filter(function(dec) { return answers[dec.key].answer === null; });
+        }
+
+        // ---- Card builder ----
+        // notesMode: always — notes textarea always visible (Section D pattern)
+        function buildCard(decisionKey, cardTitle, cardQuestion, buttonsConfig) {
+            var card = document.createElement('div');
+            card.className   = 'card';
+            card.dataset.key = decisionKey;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', cardTitle);
+
+            var nameEl = document.createElement('div');
+            nameEl.className   = 'card-name';
+            nameEl.textContent = cardTitle;
+            card.appendChild(nameEl);
+
+            if (cardQuestion) {
+                var metaEl = document.createElement('div');
+                metaEl.className   = 'card-meta';
+                metaEl.textContent = cardQuestion;
+                card.appendChild(metaEl);
+            }
+
+            // Button row
+            var btnRow = document.createElement('div');
+            btnRow.className = 'answer-buttons';
+
+            buttonsConfig.forEach(function(btn) {
+                var b = document.createElement('button');
+                b.className = 'btn-answer';
+                if (btn.style === 'terracotta') b.classList.add('btn-terracotta');
+                if (btn.style === 'outline')    b.classList.add('btn-outline');
+                b.textContent   = btn.label;
+                b.dataset.value = btn.value;
+                b.setAttribute('type', 'button');
+
+                b.addEventListener('click', function() {
+                    btnRow.querySelectorAll('.btn-answer').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers[decisionKey].answer = btn.value;
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+                    updateValidationState();
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            card.appendChild(btnRow);
+
+            // Always-visible notes
+            var alwaysWrap  = document.createElement('div');
+            alwaysWrap.className = 'notes-area-always';
+            var alwaysLabel = document.createElement('label');
+            alwaysLabel.textContent = 'Notes (optional):';
+            var alwaysTA    = document.createElement('textarea');
+            alwaysTA.placeholder = 'Anything to add, qualify, or flag\u2026';
+            alwaysTA.setAttribute('aria-label', 'Notes for ' + cardTitle);
+            alwaysTA.addEventListener('input', function() {
+                answers[decisionKey].notes = alwaysTA.value;
+                if (autosave) autosave.save();
+            });
+            alwaysWrap.appendChild(alwaysLabel);
+            alwaysWrap.appendChild(alwaysTA);
+            card.appendChild(alwaysWrap);
+
+            return card;
+        }
+
+        // ---- Build page ----
+        var app       = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // ---- Opener ----
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>' + firstName + ', \u2014</p>' +
+            '<p>Five decisions to approve before I start editing files for the Superpowers pattern adoption. ' +
+            'The full plan is at <code>C:\\Users\\Wade\\.claude\\plans\\we-need-a-plan-sorted-coral.md</code> \u2014 ' +
+            'this page asks you the questions it ends with, in a form where nothing slips.</p>' +
+            '<p style="margin-top:1rem;padding-top:0.75rem;border-top:1px dashed var(--border,#ccc);">' +
+            '<em style="font-size:0.92rem;">Your answers save automatically as you go. Close the tab and come back any time \u2014 ' +
+            'the link picks up where you left off until you press Send my answers.</em></p>';
+        container.appendChild(opener);
+
+        // ============================================================
+        // Section — Decisions
+        // ============================================================
+        var divD = document.createElement('hr');
+        divD.className = 'section-divider';
+        container.appendChild(divD);
+
+        var headD = document.createElement('h2');
+        headD.className   = 'section-heading';
+        headD.textContent = 'Decisions (' + decisions.length + ')';
+        container.appendChild(headD);
+
+        var subD = document.createElement('p');
+        subD.className   = 'section-subtitle';
+        subD.textContent = 'Each one gates a specific edit. Pick an option; add a note if you want to qualify or rethink the framing.';
+        container.appendChild(subD);
+
+        var gridD = document.createElement('div');
+        gridD.className = 'cards-grid';
+
+        decisions.forEach(function(dec) {
+            var buttonsConfig = (dec.options || []).map(function(opt, oIdx) {
+                var style;
+                if (oIdx === 0)          style = 'primary';
+                else if (oIdx % 2 === 1) style = 'terracotta';
+                else                     style = 'outline';
+                return { label: opt.label, value: opt.value, style: style };
+            });
+
+            var card = buildCard(dec.key, dec.title, dec.question, buttonsConfig);
+            gridD.appendChild(card);
+        });
+        container.appendChild(gridD);
+
+        // ============================================================
+        // Validation error + Submit
+        // ============================================================
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id        = 'validation-error';
+        container.appendChild(validationError);
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id        = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '\u2022 Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id        = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id        = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong \u2014 please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var unanswered = updateValidationState();
+
+            document.querySelectorAll('.card').forEach(function(card) {
+                var k = card.dataset.key;
+                if (k && answers[k] && answers[k].answer === null) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (unanswered.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One card still needs an answer \u2014 it\'s highlighted above.'
+                    : unanswered.length + ' cards still need answers \u2014 they\'re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.card.missing');
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            document.getElementById('validation-error').classList.remove('visible');
+
+            submitBtn.disabled  = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
+
+            var responsePayload = buildPayload();
+
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+            if (!ok) {
+                submitBtn.disabled    = false;
+                submitBtn.textContent = 'Send my answers';
+                document.getElementById('error-message').classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Initialise autosave (after mount) ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // ---- Restore draft state into DOM ----
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                if (!entry.key || entry.answer === null || entry.answer === undefined) return;
+                var card = container.querySelector('[data-key="' + entry.key + '"]');
+                if (!card) return;
+
+                // Restore button selection
+                var btnRow = card.querySelector('.answer-buttons');
+                if (btnRow) {
+                    var btn = btnRow.querySelector('[data-value="' + entry.answer + '"]');
+                    if (btn) {
+                        btn.classList.add('selected');
+                        card.classList.add('answered');
+                    }
+                }
+
+                // Restore notes text in always-visible area
+                if (entry.notes) {
+                    var alwaysWrap = card.querySelector('.notes-area-always');
+                    if (alwaysWrap) {
+                        var alwaysTA = alwaysWrap.querySelector('textarea');
+                        if (alwaysTA) alwaysTA.value = entry.notes;
+                    }
+                }
+            });
+
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
