@@ -14,14 +14,14 @@
            DO NOT touch app.js or styles.css — only this block.
         --------------------------------------------------------------- */
 
-        /* CSS Variables */
         :root {
             --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
             --font-sans: 'Atkinson Hyperlegible', 'Inter', system-ui, sans-serif;
             --color-page: #FAF9F6;
             --color-card: #FFFFFF;
             --color-border: #EBE8E1;
-            --color-maroon: #73182C;
+            --color-green: #2D6A4F;
+            --color-terracotta: #BC6C25;
             --color-ink: #1C1916;
             --color-preamble: #4A453D;
             --color-muted: #7A7268;
@@ -31,7 +31,6 @@
             --color-opener: #2D2822;
         }
 
-        /* Page */
         body {
             background: var(--color-page);
             font-family: var(--font-sans);
@@ -40,12 +39,11 @@
             padding: 0;
         }
 
-        /* Site header override for this mission */
         .site-header {
-            display: none; /* Hero band takes the top — no nav bar */
+            display: none;
         }
 
-        /* ---- Layout container ---- */
+        /* ---- Layout ---- */
         .cp-column {
             max-width: 680px;
             margin: 0 auto;
@@ -53,170 +51,65 @@
             box-sizing: border-box;
         }
 
-        /* ---- Hero band ---- */
+        /* ---- Hero letterhead ---- */
         .hero-band {
             width: 100%;
-            height: 280px;
+            padding: 64px 0 48px;
             background: var(--color-page);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        .hero-svg {
-            width: 100%;
-            max-width: 620px;
-            height: 120px;
-            overflow: visible;
-        }
-
-        /* Hero text: stroke-reveal animation */
-        .hero-text {
-            fill: none;
-            stroke: var(--color-ink);
-            stroke-width: 1.2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            font-family: var(--font-serif);
-            font-size: 28px;
-            font-weight: 500;
-        }
-
-        .hero-text-line1 {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: heroReveal 3.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
-        }
-
-        .hero-text-line2 {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: heroReveal 3.2s cubic-bezier(0.4, 0, 0.2, 1) 2.8s forwards;
-        }
-
-        .hero-underline {
-            stroke: var(--color-maroon);
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-dasharray: 120;
-            stroke-dashoffset: 120;
-            animation: underlineReveal 1s cubic-bezier(0.4, 0, 0.2, 1) 5.6s forwards,
-                       underlineBreathe 2s ease-in-out 6.8s infinite;
-        }
-
-        @keyframes heroReveal {
-            to { stroke-dashoffset: 0; }
-        }
-
-        @keyframes underlineReveal {
-            to { stroke-dashoffset: 0; }
-        }
-
-        @keyframes underlineBreathe {
-            0%, 100% { opacity: 0.9; }
-            50% { opacity: 1; }
-        }
-
-        /* Word-fade fallback (activated via JS when prefers-reduced-motion) */
-        .hero-word-fade {
-            display: none;
-            font-family: var(--font-serif);
-            font-size: clamp(1.2rem, 3.2vw, 1.6rem);
-            font-weight: 500;
-            color: var(--color-ink);
+        .hero-letterhead {
             text-align: center;
-            line-height: 1.5;
-        }
-
-        .hero-word-fade span {
-            opacity: 0;
-            display: inline;
-            animation: wordFadeIn 0.5s ease-out forwards;
-        }
-
-        @keyframes wordFadeIn {
-            to { opacity: 1; }
-        }
-
-        .hero-word-fade .accent-word {
-            position: relative;
-            display: inline-block;
-        }
-
-        .hero-word-fade .accent-word::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--color-maroon);
-            animation: underlineGrow 0.8s ease-out 4.5s forwards;
-        }
-
-        @keyframes underlineGrow {
-            to { width: 100%; }
-        }
-
-        /* Reduced motion: show word-fade, hide SVG */
-        @media (prefers-reduced-motion: reduce) {
-            .hero-svg { display: none; }
-            .hero-word-fade { display: block; opacity: 1; }
-            .hero-word-fade span {
-                opacity: 1;
-                animation: none;
-            }
-            .hero-word-fade .accent-word::after {
-                width: 100%;
-                animation: none;
-            }
-            .hero-text-line1,
-            .hero-text-line2,
-            .hero-underline {
-                animation: none;
-                stroke-dashoffset: 0;
-            }
-        }
-
-        /* ---- CroquetClaude header block ---- */
-        .cc-header {
-            margin-top: 88px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .cc-avatar {
-            width: 56px;
-            height: 56px;
-            flex-shrink: 0;
-        }
-
-        .cc-header-text {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            align-items: center;
+            gap: 10px;
         }
 
-        .cc-name {
-            font-family: var(--font-sans);
-            font-size: 17px;
-            font-weight: 600;
+        .hero-asterisk-icon {
+            display: block;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.15s forwards;
+        }
+
+        .hero-sender {
+            font-family: var(--font-serif);
+            font-size: clamp(1.7rem, 4vw, 2.2rem);
+            font-weight: 500;
             color: var(--color-ink);
-            line-height: 1.2;
+            letter-spacing: -0.01em;
+            line-height: 1.15;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.45s forwards;
         }
 
-        .cc-subtitle {
+        .hero-meta {
             font-family: var(--font-sans);
             font-size: 14px;
             font-weight: 400;
             color: var(--color-muted);
-            font-style: italic;
-            line-height: 1.2;
+            letter-spacing: 0.02em;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.8s forwards;
         }
 
-        /* ---- Opener paragraph ---- */
+        @keyframes heroFadeIn {
+            to { opacity: 1; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-asterisk-icon,
+            .hero-sender,
+            .hero-meta {
+                animation: none;
+                opacity: 1;
+            }
+        }
+
+        /* ---- Opener ---- */
         .cp-opener {
             margin-top: 48px;
             font-family: var(--font-serif);
@@ -225,7 +118,7 @@
             color: var(--color-opener);
         }
 
-        /* ---- Question cards container ---- */
+        /* ---- Cards ---- */
         .cp-cards {
             margin-top: 80px;
             display: flex;
@@ -233,27 +126,29 @@
             gap: 56px;
         }
 
-        /* ---- Individual question card ---- */
         .question-card {
             background: var(--color-card);
             border: 1px solid var(--color-border);
             border-radius: 14px;
-            padding: 32px 36px;
+            overflow: hidden;
             box-shadow: 0 1px 2px rgba(30, 24, 15, 0.04), 0 4px 14px rgba(30, 24, 15, 0.03);
         }
 
-        /* Card image — 64×64 */
+        /* Full-width card image banner */
         .card-img {
-            width: 64px;
-            height: 64px;
-            border-radius: 8px;
+            width: 100%;
+            height: 180px;
             object-fit: cover;
-            filter: saturate(0.88) contrast(0.96);
+            filter: saturate(0.82) contrast(0.96);
             display: block;
-            margin-bottom: 20px;
         }
 
-        /* Card 6 asterisk in image position */
+        /* Card body padding (separate from image) */
+        .card-body {
+            padding: 28px 36px 32px;
+        }
+
+        /* Card 6 asterisk */
         .card-asterisk {
             width: 32px;
             height: 32px;
@@ -261,7 +156,6 @@
             margin-bottom: 20px;
         }
 
-        /* Preamble text */
         .card-preamble {
             font-family: var(--font-serif);
             font-size: 17px;
@@ -270,7 +164,6 @@
             margin: 0 0 24px 0;
         }
 
-        /* Thin editorial rule */
         .card-rule {
             border: none;
             border-top: 1px solid var(--color-border);
@@ -278,7 +171,6 @@
             margin: 0 0 32px 0;
         }
 
-        /* The question */
         .card-question {
             font-family: var(--font-sans);
             font-size: 18px;
@@ -288,7 +180,7 @@
             margin: 0 0 24px 0;
         }
 
-        /* ---- Choice buttons (.choice-btn) ---- */
+        /* ---- Choice buttons ---- */
         .choice-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -318,14 +210,14 @@
         }
 
         .choice-btn.selected {
-            background: var(--color-maroon);
-            border-color: var(--color-maroon);
+            background: var(--color-green);
+            border-color: var(--color-green);
             color: #FFFFFF;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .choice-btn:focus-visible {
-            outline: 2px solid var(--color-maroon);
+            outline: 2px solid var(--color-green);
             outline-offset: 2px;
         }
 
@@ -338,10 +230,6 @@
             color: var(--color-muted);
             letter-spacing: 0.01em;
             margin-bottom: 4px;
-        }
-
-        .voice-textarea-wrapper {
-            position: relative;
         }
 
         .voice-textarea {
@@ -366,7 +254,7 @@
             background: #FFFFFF;
         }
 
-        /* ---- Submit section ---- */
+        /* ---- Submit ---- */
         .cp-submit {
             margin-top: 96px;
             text-align: center;
@@ -380,7 +268,7 @@
         }
 
         .btn-submit-cp {
-            background: var(--color-maroon);
+            background: var(--color-green);
             color: #FFFFFF;
             border: none;
             border-radius: 12px;
@@ -400,7 +288,7 @@
         }
 
         .btn-submit-cp:focus-visible {
-            outline: 2px solid var(--color-maroon);
+            outline: 2px solid var(--color-green);
             outline-offset: 3px;
         }
 
@@ -414,14 +302,13 @@
             display: none;
             font-family: var(--font-sans);
             font-size: 14px;
-            color: var(--color-maroon);
+            color: var(--color-green);
         }
 
         .cp-error-msg.visible {
             display: block;
         }
 
-        /* Draft saved indicator (app.js uses #draft-saved-indicator) */
         .draft-saved-indicator {
             font-family: var(--font-sans);
             font-size: 13px;
@@ -434,7 +321,6 @@
             opacity: 1;
         }
 
-        /* Draft restored notice */
         .draft-restored-notice {
             font-family: var(--font-sans);
             font-size: 13px;
@@ -482,19 +368,19 @@
         /* ---- Mobile ---- */
         @media (max-width: 720px) {
             .hero-band {
-                height: 200px;
+                padding: 48px 0 36px;
             }
 
-            .hero-text {
-                font-size: 22px;
+            .card-img {
+                height: 140px;
+            }
+
+            .card-body {
+                padding: 22px 24px 26px;
             }
 
             .cp-opener {
                 font-size: 18px;
-            }
-
-            .question-card {
-                padding: 24px;
             }
 
             .voice-textarea {
@@ -514,44 +400,32 @@
                 width: 100%;
             }
         }
-
-        @media (max-width: 400px) {
-            .hero-text {
-                font-size: 18px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Hero band -->
-    <div class="hero-band" aria-label="What does winning look like when it's also enjoyable?" role="img">
-        <!-- Stroke-reveal SVG hero (Concept A) -->
-        <svg class="hero-svg" viewBox="0 0 620 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <text class="hero-text hero-text-line1" x="310" y="44" text-anchor="middle">
-                What does winning look like
-            </text>
-            <text class="hero-text hero-text-line2" x="310" y="82" text-anchor="middle">
-                when it&#x2019;s also enjoyable?
-            </text>
-            <!-- Maroon underline under "enjoyable?" — approximately x positions for that word -->
-            <line class="hero-underline" x1="338" y1="90" x2="458" y2="90" />
-        </svg>
-
-        <!-- Word-fade fallback (shown only via CSS prefers-reduced-motion) -->
-        <div class="hero-word-fade" aria-hidden="true">
-            <span style="animation-delay:0.1s">What </span><span style="animation-delay:0.25s">does </span><span style="animation-delay:0.4s">winning </span><span style="animation-delay:0.55s">look </span><span style="animation-delay:0.7s">like </span><span style="animation-delay:0.85s">when </span><span style="animation-delay:1.0s">it&#x2019;s </span><span style="animation-delay:1.15s">also </span><span class="accent-word" style="animation-delay:1.3s"><span style="animation-delay:1.3s">enjoyable?</span></span>
+    <!-- Hero — CroquetClaude letterhead -->
+    <div class="hero-band" role="banner">
+        <div class="hero-letterhead">
+            <svg class="hero-asterisk-icon" viewBox="0 0 36 36" width="40" height="40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <line x1="18" y1="3" x2="18" y2="33" stroke="#BC6C25" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="3" y1="18" x2="33" y2="18" stroke="#BC6C25" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="7.5" y1="7.5" x2="28.5" y2="28.5" stroke="#BC6C25" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="28.5" y1="7.5" x2="7.5" y2="28.5" stroke="#BC6C25" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="3" y1="11" x2="33" y2="25" stroke="#BC6C25" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="3" y1="25" x2="33" y2="11" stroke="#BC6C25" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <div class="hero-sender">CroquetClaude</div>
+            <div class="hero-meta">Six questions &middot; Round 1</div>
         </div>
     </div>
 
     <div id="app">
-        <!-- Loading state — replaced by renderMission() -->
         <div class="cp-column">
             <div class="loading-screen">Loading your letter&hellip;</div>
         </div>
     </div>
 
-    <!-- GSAP + ScrollTrigger CDN -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
@@ -566,8 +440,6 @@
         var firstName = respondentName.split(' ')[0].split(',')[0];
         var draft = tokenRecord.draft_payload || null;
 
-        // ---- State: MC selections + textarea values ----
-        // Keys: 'q1_choice', 'q4_choice', 'q1_voice', 'q2_voice', 'q3_voice', 'q4_voice', 'q5_voice', 'q6_voice'
         var state = {
             q1_choice: null,
             q4_choice: null,
@@ -579,7 +451,6 @@
             q6_voice: ''
         };
 
-        // Restore from draft if present
         if (draft) {
             if (draft.q1_choice !== undefined) state.q1_choice = draft.q1_choice;
             if (draft.q4_choice !== undefined) state.q4_choice = draft.q4_choice;
@@ -605,8 +476,6 @@
                 q6_voice: state.q6_voice
             };
         }
-
-        // ---- Helpers ----
 
         function makeChoiceButtons(options, stateKey) {
             var wrap = document.createElement('div');
@@ -664,11 +533,23 @@
         }
 
         function makeCard(opts) {
-            // opts: { imgSrc, imgAlt, imgWidth, imgHeight, useAsterisk, preamble, question, choiceButtons, voiceStateKey, voicePlaceholder }
             var card = document.createElement('div');
             card.className = 'question-card';
 
-            // Image or asterisk
+            // Full-width image banner (no asterisk support at top — asterisk goes inside card-body)
+            if (opts.imgSrc) {
+                var img = document.createElement('img');
+                img.src = opts.imgSrc;
+                img.alt = opts.imgAlt || '';
+                img.className = 'card-img';
+                img.loading = 'lazy';
+                card.appendChild(img);
+            }
+
+            // Card body
+            var body = document.createElement('div');
+            body.className = 'card-body';
+
             if (opts.useAsterisk) {
                 var asterisk = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                 asterisk.setAttribute('viewBox', '0 0 32 32');
@@ -690,54 +571,37 @@
                     line.setAttribute('y1', coords[1]);
                     line.setAttribute('x2', coords[2]);
                     line.setAttribute('y2', coords[3]);
-                    line.setAttribute('stroke', '#73182C');
+                    line.setAttribute('stroke', '#BC6C25');
                     line.setAttribute('stroke-width', '2');
                     line.setAttribute('stroke-linecap', 'round');
                     asterisk.appendChild(line);
                 });
-                card.appendChild(asterisk);
-            } else if (opts.imgSrc) {
-                var img = document.createElement('img');
-                img.src = opts.imgSrc;
-                img.alt = opts.imgAlt || '';
-                img.className = 'card-img';
-                if (opts.imgWidth) img.setAttribute('width', opts.imgWidth);
-                if (opts.imgHeight) img.setAttribute('height', opts.imgHeight);
-                img.loading = 'lazy';
-                card.appendChild(img);
+                body.appendChild(asterisk);
             }
 
-            // Preamble
             if (opts.preamble) {
                 var preamble = document.createElement('p');
                 preamble.className = 'card-preamble';
                 preamble.textContent = opts.preamble;
-                card.appendChild(preamble);
+                body.appendChild(preamble);
             }
 
-            // Rule
             var rule = document.createElement('hr');
             rule.className = 'card-rule';
-            card.appendChild(rule);
+            body.appendChild(rule);
 
-            // Question
             var question = document.createElement('p');
             question.className = 'card-question';
             question.textContent = opts.question;
-            card.appendChild(question);
+            body.appendChild(question);
 
-            // MC buttons (if provided)
             if (opts.choiceOptions && opts.choiceStateKey) {
-                var btnGroup = makeChoiceButtons(opts.choiceOptions, opts.choiceStateKey);
-                card.appendChild(btnGroup);
+                body.appendChild(makeChoiceButtons(opts.choiceOptions, opts.choiceStateKey));
             }
 
-            // Voice textarea (if provided)
             if (opts.voiceStateKey) {
                 var voiceResult = makeVoiceTextarea(opts.voiceStateKey, opts.voicePlaceholder);
-                card.appendChild(voiceResult.container);
-                // Wire up voice input after mount (app.js auto-wires on DOMContentLoaded,
-                // but since we're building post-load, wire manually)
+                body.appendChild(voiceResult.container);
                 setTimeout(function() {
                     if (typeof window.attachVoiceInput === 'function') {
                         window.attachVoiceInput(voiceResult.textarea);
@@ -745,55 +609,27 @@
                 }, 0);
             }
 
+            card.appendChild(body);
             return card;
         }
 
         // ---- Build the page ----
         var app = document.getElementById('app');
-
         var column = document.createElement('div');
         column.className = 'cp-column';
 
-        // CroquetClaude header block
-        var ccHeader = document.createElement('div');
-        ccHeader.className = 'cc-header';
-
-        var avatarImg = document.createElement('img');
-        avatarImg.src = '/assets/drawn-claude.png';
-        avatarImg.alt = 'CroquetClaude';
-        avatarImg.className = 'cc-avatar';
-        avatarImg.width = 56;
-        avatarImg.height = 56;
-        ccHeader.appendChild(avatarImg);
-
-        var ccText = document.createElement('div');
-        ccText.className = 'cc-header-text';
-
-        var ccName = document.createElement('span');
-        ccName.className = 'cc-name';
-        ccName.textContent = 'CroquetClaude';
-        ccText.appendChild(ccName);
-
-        var ccSub = document.createElement('span');
-        ccSub.className = 'cc-subtitle';
-        ccSub.textContent = 'A letter to ' + firstName + ' \u00b7 Round 1';
-        ccText.appendChild(ccSub);
-
-        ccHeader.appendChild(ccText);
-        column.appendChild(ccHeader);
-
-        // Draft restored notice placeholder — filled by showDraftRestoredNotice if needed
+        // Draft restored notice anchor
         var noticeAnchor = document.createElement('div');
         noticeAnchor.id = 'draft-notice-anchor';
         column.appendChild(noticeAnchor);
 
-        // Opener paragraph
+        // Opener
         var opener = document.createElement('p');
         opener.className = 'cp-opener';
-        opener.textContent = respondentName + ' \u2014 I\u2019ve spent some time with the research on how other sports build winning team cultures without losing the enjoyment. The patterns are pretty consistent across rugby league, the All Blacks, cycling. What I don\u2019t have is the croquet version. I can\u2019t get that from a library. These six questions are me trying to get it from you \u2014 how you see the cross-club dynamic, what the loudest signals actually are, who\u2019s already doing it right. There are no right answers. I just want to know what you know.';
+        opener.textContent = firstName + ', I\u2019ve done the reading on how other sports build winning team cultures without killing the enjoyment. The patterns hold across rugby league, the All Blacks, cycling. What I\u2019m missing is the croquet version, and no library gives me that. These six questions are me asking you for it: the cross-club dynamic, the loudest signals, who\u2019s already doing it right. No right answers. I want what you know.';
         column.appendChild(opener);
 
-        // Cards container
+        // Cards
         var cardsEl = document.createElement('div');
         cardsEl.className = 'cp-cards';
 
@@ -801,9 +637,9 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-1-frame.jpg',
             imgAlt: 'All Blacks in formation',
-            preamble: 'Queensland rugby league does this every June. Brisbane Broncos players who have been hammering each other all season turn up as Maroons and mean it. Under Mal Meninga, Queensland won State of Origin almost every year. The culture was built on purpose: club rivalry left at the door, state identity turned on through symbols and daily behaviour, senior players pulling younger ones up. The research on winning team cultures compresses to something similar \u2014 hold a visible standard, reward effort over results, make selection a conversation that includes character alongside play, and wins come as a consequence.',
-            question: 'Does that shape fit what you\u2019d want from a state-level team culture, or is something missing or wrong for your world?',
-            choiceOptions: ['Yes, that fits', 'Mostly \u2014 something missing', 'Not quite \u2014 I\u2019d frame it differently'],
+            preamble: 'Queensland rugby league runs this play every June. Broncos players who\u2019ve spent the season hammering each other turn up as Maroons and mean it. Under Meninga, Queensland won State of Origin almost every year. The build was deliberate: club rivalry left at the door, state identity switched on through symbols and daily behaviour, senior players lifting younger ones. The broader research compresses to the same shape. Hold a visible standard, reward effort over results, make selection a conversation that weighs character alongside play. Wins follow.',
+            question: 'Does that shape fit what you\u2019d want from a state-level team culture, or is something off for your world?',
+            choiceOptions: ['Yes, that fits', 'Mostly, something missing', 'Not quite, I\u2019d frame it differently'],
             choiceStateKey: 'q1_choice',
             voiceStateKey: 'q1_voice'
         }));
@@ -812,10 +648,8 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-2-coopetition.jpg',
             imgAlt: 'Queensland Maroons State of Origin',
-            imgWidth: '128',
-            imgHeight: '128',
-            preamble: 'The Maroons case shows that the competitive-cooperative split \u2014 rivals in the club season, genuine teammates in June \u2014 has to already be working in the competitive phase. Players who treat opponents well through the NRL season can put on the Maroons shirt and mean it. Players who don\u2019t, can\u2019t. The cross-club dynamic during competition either makes the representative culture possible or it doesn\u2019t.',
-            question: 'Does a dynamic like that exist in your world? If yes, what does it look like in practice. If no, what does the cross-club picture actually look like today?',
+            preamble: 'The Maroons case rests on a split that\u2019s already working in the competitive phase. Rivals in the club season, teammates in June. Players who treat opponents well through the NRL year can put the shirt on and mean it. Players who don\u2019t, can\u2019t. The cross-club dynamic during competition either makes the representative culture possible or kills it before June.',
+            question: 'Does a dynamic like that exist in your world? If yes, what does it look like in practice. If no, what does the cross-club picture look like today?',
             voiceStateKey: 'q2_voice'
         }));
 
@@ -823,8 +657,8 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-3-artefact.jpg',
             imgAlt: 'Team selection board',
-            preamble: 'The change-management literature is consistent on one thing: selection is the loudest artefact a program has. When stated values and selection practice don\u2019t line up, people read the practice \u2014 not the policy document, not the stated criteria, not the announcement. The thing people watch most closely is what actually gets rewarded when the list goes up.',
-            question: 'What\u2019s the loudest artefact in your world \u2014 the thing people read as the real answer to \u2018what does this program actually reward?\u2019',
+            preamble: 'The change-management literature lands on one thing hard. Selection is the loudest artefact a program has. When stated values and selection practice don\u2019t line up, people read the practice. Not the policy doc, not the stated criteria, not the announcement. What gets rewarded when the list goes up is the answer everyone trusts.',
+            question: 'What\u2019s the loudest artefact in your world, the thing people read as the real answer to \u201cwhat does this program actually reward?\u201d',
             voiceStateKey: 'q3_voice'
         }));
 
@@ -832,24 +666,24 @@
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-4-small-room.jpg',
             imgAlt: 'Small coaching huddle',
-            preamble: 'One pattern keeps showing up across the cases. Not a reform of the whole program. A small group inside it, running the new way. Pat Lam\u2019s first move at Connacht wasn\u2019t a policy announcement \u2014 it was two senior players who already behaved the way he wanted, made the reference point. The All Blacks rebuild worked the same way. Twelve to sixteen people. Meeting regularly. Attitude-first entry. The group writes its own one-page standard on day one, and it holds.',
+            preamble: 'One pattern runs through the cases. Not a reform of the whole program. A small group inside it, running the new way. Pat Lam\u2019s first move at Connacht wasn\u2019t a policy announcement. It was two senior players who already behaved the way he wanted, made the reference point. The All Blacks rebuild worked the same way. Twelve to sixteen people, meeting regularly, attitude-first entry. The group writes its own one-page standard on day one, and it holds.',
             question: 'Does a shape like that fit somewhere in your world?',
-            choiceOptions: ['Yes \u2014 here\u2019s where it fits', 'Partly \u2014 would need to change', 'No \u2014 my setup is different'],
+            choiceOptions: ['Yes, here\u2019s where it fits', 'Partly, would need to change', 'No, my setup is different'],
             choiceStateKey: 'q4_choice',
             voiceStateKey: 'q4_voice',
-            voicePlaceholder: 'If yes \u2014 who\u2019d be in the room, and who\u2019d run it. If no \u2014 what\u2019s different about your setup.'
+            voicePlaceholder: 'If yes, who\u2019d be in the room and who\u2019d run it. If no, what\u2019s different about your setup.'
         }));
 
         // Card 5 — Positive deviance
         cardsEl.appendChild(makeCard({
             imgSrc: 'images/card-5-deviance.jpg',
             imgAlt: 'Senior coach mentoring a player',
-            preamble: 'One principle across the change-management research: find the people inside your existing system who already behave the way you want, and spread their practice. It consistently beats importing a culture from outside. Dave Brailsford at British Cycling didn\u2019t announce a new culture \u2014 he announced that the program would measure everything it wasn\u2019t yet doing and improve each thing by 1%. The daily work was making it normal inside the program to talk honestly about where the gaps were.',
-            question: 'Who comes to mind in your world? Names, clubs, a coach whose sessions already feel right \u2014 whatever\u2019s in your head.',
+            preamble: 'One principle runs through the change-management research. Find the people inside your existing system who already behave the way you want, and spread their practice. It beats importing a culture from outside. Brailsford at British Cycling didn\u2019t announce a new culture. He announced that the program would measure everything it wasn\u2019t yet doing and improve each thing by one percent. The daily work was making it normal inside the program to talk honestly about the gaps.',
+            question: 'Who comes to mind in your world? Names, clubs, a coach whose sessions already feel right. Whatever\u2019s in your head.',
             voiceStateKey: 'q5_voice'
         }));
 
-        // Card 6 — Open question (no image, no preamble)
+        // Card 6 — Open
         cardsEl.appendChild(makeCard({
             useAsterisk: true,
             question: 'What\u2019s in your head about this that these questions don\u2019t touch at all?',
@@ -858,7 +692,7 @@
 
         column.appendChild(cardsEl);
 
-        // Submit section
+        // Submit
         var submitSection = document.createElement('div');
         submitSection.className = 'cp-submit';
 
@@ -887,13 +721,11 @@
         submitSection.appendChild(submitWrap);
         column.appendChild(submitSection);
 
-        // Footer
         var footer = document.createElement('footer');
         footer.className = 'cp-footer';
         footer.innerHTML = 'Your answers autosave as you type. Close the page and come back anytime.<br><a href="https://croquetclaude.com/privacy">Privacy note</a>';
         column.appendChild(footer);
 
-        // Mount
         app.innerHTML = '';
         app.appendChild(column);
 
@@ -914,15 +746,10 @@
         // Autosave
         autosave = window.createAutosave(tokenRecord, buildPayload);
 
-        // Restore draft into DOM (re-wire textarea values and button states)
+        // Restore draft notice
         if (draft) {
-            // Textarea values already set via state above when makeVoiceTextarea ran.
-            // Choice buttons are already marked selected via makeChoiceButtons.
-            // Show the restored notice.
             var anchor = document.getElementById('draft-notice-anchor');
-            if (anchor && typeof window.showDraftRestoredNotice === 'function') {
-                // showDraftRestoredNotice inserts before firstChild of container arg
-                // We pass anchor's parent and then move it to the right spot
+            if (anchor) {
                 var noticeEl = document.createElement('div');
                 noticeEl.className = 'draft-restored-notice';
                 var rel = (function(dateStr) {
@@ -961,7 +788,6 @@
         }
     };
 
-    // Boot
     document.addEventListener('DOMContentLoaded', function() {
         window.initMission();
     });
