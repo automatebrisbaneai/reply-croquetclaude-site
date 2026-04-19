@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A letter, in six questions — CroquetClaude</title>
+    <meta name="description" content="A letter from CroquetClaude on winning team cultures in croquet — six questions for Marilyn Nelson.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><line x1='16' y1='4' x2='16' y2='28' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='4' y1='16' x2='28' y2='16' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='7.5' y1='7.5' x2='24.5' y2='24.5' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='24.5' y1='7.5' x2='7.5' y2='24.5' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='4' y1='10' x2='28' y2='22' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='4' y1='22' x2='28' y2='10' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---------------------------------------------------------------
+           culture-papers-round-1 — per-mission styles
+           DO NOT touch app.js or styles.css — only this block.
+        --------------------------------------------------------------- */
+
+        /* CSS Variables */
+        :root {
+            --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+            --font-sans: 'Atkinson Hyperlegible', 'Inter', system-ui, sans-serif;
+            --color-page: #FAF9F6;
+            --color-card: #FFFFFF;
+            --color-border: #EBE8E1;
+            --color-maroon: #73182C;
+            --color-ink: #1C1916;
+            --color-preamble: #4A453D;
+            --color-muted: #7A7268;
+            --color-hover-bg: #FAF9F6;
+            --color-hover-border: #C9C3B6;
+            --color-choice-border: #E0DCD3;
+            --color-opener: #2D2822;
+        }
+
+        /* Page */
+        body {
+            background: var(--color-page);
+            font-family: var(--font-sans);
+            color: var(--color-ink);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Site header override for this mission */
+        .site-header {
+            display: none; /* Hero band takes the top — no nav bar */
+        }
+
+        /* ---- Layout container ---- */
+        .cp-column {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
+
+        /* ---- Hero band ---- */
+        .hero-band {
+            width: 100%;
+            height: 280px;
+            background: var(--color-page);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-svg {
+            width: 100%;
+            max-width: 620px;
+            height: 120px;
+            overflow: visible;
+        }
+
+        /* Hero text: stroke-reveal animation */
+        .hero-text {
+            fill: none;
+            stroke: var(--color-ink);
+            stroke-width: 1.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        .hero-text-line1 {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: heroReveal 3.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+        }
+
+        .hero-text-line2 {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: heroReveal 3.2s cubic-bezier(0.4, 0, 0.2, 1) 2.8s forwards;
+        }
+
+        .hero-underline {
+            stroke: var(--color-maroon);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-dasharray: 120;
+            stroke-dashoffset: 120;
+            animation: underlineReveal 1s cubic-bezier(0.4, 0, 0.2, 1) 5.6s forwards,
+                       underlineBreathe 2s ease-in-out 6.8s infinite;
+        }
+
+        @keyframes heroReveal {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes underlineReveal {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes underlineBreathe {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+
+        /* Word-fade fallback (activated via JS when prefers-reduced-motion) */
+        .hero-word-fade {
+            display: none;
+            font-family: var(--font-serif);
+            font-size: clamp(1.2rem, 3.2vw, 1.6rem);
+            font-weight: 500;
+            color: var(--color-ink);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .hero-word-fade span {
+            opacity: 0;
+            display: inline;
+            animation: wordFadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes wordFadeIn {
+            to { opacity: 1; }
+        }
+
+        .hero-word-fade .accent-word {
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-word-fade .accent-word::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-maroon);
+            animation: underlineGrow 0.8s ease-out 4.5s forwards;
+        }
+
+        @keyframes underlineGrow {
+            to { width: 100%; }
+        }
+
+        /* Reduced motion: show word-fade, hide SVG */
+        @media (prefers-reduced-motion: reduce) {
+            .hero-svg { display: none; }
+            .hero-word-fade { display: block; opacity: 1; }
+            .hero-word-fade span {
+                opacity: 1;
+                animation: none;
+            }
+            .hero-word-fade .accent-word::after {
+                width: 100%;
+                animation: none;
+            }
+            .hero-text-line1,
+            .hero-text-line2,
+            .hero-underline {
+                animation: none;
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* ---- CroquetClaude header block ---- */
+        .cc-header {
+            margin-top: 88px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .cc-avatar {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+        }
+
+        .cc-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cc-name {
+            font-family: var(--font-sans);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-ink);
+            line-height: 1.2;
+        }
+
+        .cc-subtitle {
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-muted);
+            font-style: italic;
+            line-height: 1.2;
+        }
+
+        /* ---- Opener paragraph ---- */
+        .cp-opener {
+            margin-top: 48px;
+            font-family: var(--font-serif);
+            font-size: 19px;
+            line-height: 1.7;
+            color: var(--color-opener);
+        }
+
+        /* ---- Question cards container ---- */
+        .cp-cards {
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 56px;
+        }
+
+        /* ---- Individual question card ---- */
+        .question-card {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 14px;
+            padding: 32px 36px;
+            box-shadow: 0 1px 2px rgba(30, 24, 15, 0.04), 0 4px 14px rgba(30, 24, 15, 0.03);
+        }
+
+        /* Card image — 64×64 */
+        .card-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+            filter: saturate(0.88) contrast(0.96);
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* Card 6 asterisk in image position */
+        .card-asterisk {
+            width: 32px;
+            height: 32px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* Preamble text */
+        .card-preamble {
+            font-family: var(--font-serif);
+            font-size: 17px;
+            line-height: 1.65;
+            color: var(--color-preamble);
+            margin: 0 0 24px 0;
+        }
+
+        /* Thin editorial rule */
+        .card-rule {
+            border: none;
+            border-top: 1px solid var(--color-border);
+            width: 48px;
+            margin: 0 0 32px 0;
+        }
+
+        /* The question */
+        .card-question {
+            font-family: var(--font-sans);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--color-ink);
+            line-height: 1.45;
+            margin: 0 0 24px 0;
+        }
+
+        /* ---- Choice buttons (.choice-btn) ---- */
+        .choice-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .choice-btn {
+            background: #FFFFFF;
+            border: 1px solid var(--color-choice-border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-family: var(--font-sans);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-opener);
+            min-height: 48px;
+            cursor: pointer;
+            transition: border-color 0.18s ease-out, background 0.18s ease-out, color 0.18s ease-out, box-shadow 0.18s ease-out;
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover-bg);
+        }
+
+        .choice-btn.selected {
+            background: var(--color-maroon);
+            border-color: var(--color-maroon);
+            color: #FFFFFF;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .choice-btn:focus-visible {
+            outline: 2px solid var(--color-maroon);
+            outline-offset: 2px;
+        }
+
+        /* ---- Voice textarea ---- */
+        .voice-label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-muted);
+            letter-spacing: 0.01em;
+            margin-bottom: 4px;
+        }
+
+        .voice-textarea-wrapper {
+            position: relative;
+        }
+
+        .voice-textarea {
+            width: 100%;
+            min-height: 96px;
+            background: var(--color-page);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 16px 56px 16px 20px;
+            font-family: var(--font-serif);
+            font-size: 16px;
+            line-height: 1.55;
+            color: var(--color-opener);
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.18s ease-out, background 0.18s ease-out;
+            outline: none;
+        }
+
+        .voice-textarea:focus {
+            border-color: var(--color-hover-border);
+            background: #FFFFFF;
+        }
+
+        /* ---- Submit section ---- */
+        .cp-submit {
+            margin-top: 96px;
+            text-align: center;
+        }
+
+        .cp-submit-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-submit-cp {
+            background: var(--color-maroon);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 28px;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 280px;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-submit-cp:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(115, 24, 44, 0.22);
+        }
+
+        .btn-submit-cp:focus-visible {
+            outline: 2px solid var(--color-maroon);
+            outline-offset: 3px;
+        }
+
+        .btn-submit-cp:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cp-error-msg {
+            display: none;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--color-maroon);
+        }
+
+        .cp-error-msg.visible {
+            display: block;
+        }
+
+        /* Draft saved indicator (app.js uses #draft-saved-indicator) */
+        .draft-saved-indicator {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-muted);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .draft-saved-indicator.visible {
+            opacity: 1;
+        }
+
+        /* Draft restored notice */
+        .draft-restored-notice {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-muted);
+            background: #F3F1EC;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 24px;
+        }
+
+        /* ---- Footer ---- */
+        .cp-footer {
+            margin-top: 64px;
+            padding-bottom: 48px;
+            text-align: center;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: #9A9389;
+            line-height: 1.6;
+        }
+
+        .cp-footer a {
+            color: #9A9389;
+            text-decoration: underline;
+            text-decoration-color: #C9C3B6;
+        }
+
+        /* ---- Spinner ---- */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---- Mobile ---- */
+        @media (max-width: 720px) {
+            .hero-band {
+                height: 200px;
+            }
+
+            .hero-text {
+                font-size: 22px;
+            }
+
+            .cp-opener {
+                font-size: 18px;
+            }
+
+            .question-card {
+                padding: 24px;
+            }
+
+            .voice-textarea {
+                min-height: 80px;
+            }
+
+            .btn-submit-cp {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .choice-buttons {
+                flex-direction: column;
+            }
+
+            .choice-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero band -->
+    <div class="hero-band" aria-label="What does winning look like when it's also enjoyable?" role="img">
+        <!-- Stroke-reveal SVG hero (Concept A) -->
+        <svg class="hero-svg" viewBox="0 0 620 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <text class="hero-text hero-text-line1" x="310" y="44" text-anchor="middle">
+                What does winning look like
+            </text>
+            <text class="hero-text hero-text-line2" x="310" y="82" text-anchor="middle">
+                when it&#x2019;s also enjoyable?
+            </text>
+            <!-- Maroon underline under "enjoyable?" — approximately x positions for that word -->
+            <line class="hero-underline" x1="338" y1="90" x2="458" y2="90" />
+        </svg>
+
+        <!-- Word-fade fallback (shown only via CSS prefers-reduced-motion) -->
+        <div class="hero-word-fade" aria-hidden="true">
+            <span style="animation-delay:0.1s">What </span><span style="animation-delay:0.25s">does </span><span style="animation-delay:0.4s">winning </span><span style="animation-delay:0.55s">look </span><span style="animation-delay:0.7s">like </span><span style="animation-delay:0.85s">when </span><span style="animation-delay:1.0s">it&#x2019;s </span><span style="animation-delay:1.15s">also </span><span class="accent-word" style="animation-delay:1.3s"><span style="animation-delay:1.3s">enjoyable?</span></span>
+        </div>
+    </div>
+
+    <div id="app">
+        <!-- Loading state — replaced by renderMission() -->
+        <div class="cp-column">
+            <div class="loading-screen">Loading your letter&hellip;</div>
+        </div>
+    </div>
+
+    <!-- GSAP + ScrollTrigger CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — culture-papers-round-1
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        // ---- State: MC selections + textarea values ----
+        // Keys: 'q1_choice', 'q4_choice', 'q1_voice', 'q2_voice', 'q3_voice', 'q4_voice', 'q5_voice', 'q6_voice'
+        var state = {
+            q1_choice: null,
+            q4_choice: null,
+            q1_voice: '',
+            q2_voice: '',
+            q3_voice: '',
+            q4_voice: '',
+            q5_voice: '',
+            q6_voice: ''
+        };
+
+        // Restore from draft if present
+        if (draft) {
+            if (draft.q1_choice !== undefined) state.q1_choice = draft.q1_choice;
+            if (draft.q4_choice !== undefined) state.q4_choice = draft.q4_choice;
+            if (draft.q1_voice !== undefined) state.q1_voice = draft.q1_voice;
+            if (draft.q2_voice !== undefined) state.q2_voice = draft.q2_voice;
+            if (draft.q3_voice !== undefined) state.q3_voice = draft.q3_voice;
+            if (draft.q4_voice !== undefined) state.q4_voice = draft.q4_voice;
+            if (draft.q5_voice !== undefined) state.q5_voice = draft.q5_voice;
+            if (draft.q6_voice !== undefined) state.q6_voice = draft.q6_voice;
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            return {
+                q1_choice: state.q1_choice,
+                q4_choice: state.q4_choice,
+                q1_voice: state.q1_voice,
+                q2_voice: state.q2_voice,
+                q3_voice: state.q3_voice,
+                q4_voice: state.q4_voice,
+                q5_voice: state.q5_voice,
+                q6_voice: state.q6_voice
+            };
+        }
+
+        // ---- Helpers ----
+
+        function makeChoiceButtons(options, stateKey) {
+            var wrap = document.createElement('div');
+            wrap.className = 'choice-buttons';
+            wrap.setAttribute('role', 'group');
+
+            options.forEach(function(opt) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'choice-btn';
+                btn.textContent = opt;
+                btn.setAttribute('data-value', opt);
+
+                if (state[stateKey] === opt) {
+                    btn.classList.add('selected');
+                }
+
+                btn.addEventListener('click', function() {
+                    wrap.querySelectorAll('.choice-btn').forEach(function(b) {
+                        b.classList.remove('selected');
+                    });
+                    btn.classList.add('selected');
+                    state[stateKey] = opt;
+                    if (autosave) autosave.save();
+                });
+
+                wrap.appendChild(btn);
+            });
+
+            return wrap;
+        }
+
+        function makeVoiceTextarea(stateKey, placeholder, labelText) {
+            var container = document.createElement('div');
+
+            var label = document.createElement('label');
+            label.className = 'voice-label';
+            label.textContent = labelText || 'Add a thought (or hold the mic to speak)';
+            container.appendChild(label);
+
+            var ta = document.createElement('textarea');
+            ta.className = 'voice-textarea';
+            ta.setAttribute('data-voice', 'true');
+            ta.setAttribute('rows', '4');
+            if (placeholder) ta.placeholder = placeholder;
+            ta.value = state[stateKey] || '';
+
+            ta.addEventListener('input', function() {
+                state[stateKey] = ta.value;
+                if (autosave) autosave.save();
+            });
+
+            container.appendChild(ta);
+            return { container: container, textarea: ta };
+        }
+
+        function makeCard(opts) {
+            // opts: { imgSrc, imgAlt, imgWidth, imgHeight, useAsterisk, preamble, question, choiceButtons, voiceStateKey, voicePlaceholder }
+            var card = document.createElement('div');
+            card.className = 'question-card';
+
+            // Image or asterisk
+            if (opts.useAsterisk) {
+                var asterisk = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                asterisk.setAttribute('viewBox', '0 0 32 32');
+                asterisk.setAttribute('width', '32');
+                asterisk.setAttribute('height', '32');
+                asterisk.className = 'card-asterisk';
+                asterisk.setAttribute('aria-hidden', 'true');
+                var lines = [
+                    [16, 4, 16, 28],
+                    [4, 16, 28, 16],
+                    [7.5, 7.5, 24.5, 24.5],
+                    [24.5, 7.5, 7.5, 24.5],
+                    [4, 10, 28, 22],
+                    [4, 22, 28, 10]
+                ];
+                lines.forEach(function(coords) {
+                    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', coords[0]);
+                    line.setAttribute('y1', coords[1]);
+                    line.setAttribute('x2', coords[2]);
+                    line.setAttribute('y2', coords[3]);
+                    line.setAttribute('stroke', '#73182C');
+                    line.setAttribute('stroke-width', '2');
+                    line.setAttribute('stroke-linecap', 'round');
+                    asterisk.appendChild(line);
+                });
+                card.appendChild(asterisk);
+            } else if (opts.imgSrc) {
+                var img = document.createElement('img');
+                img.src = opts.imgSrc;
+                img.alt = opts.imgAlt || '';
+                img.className = 'card-img';
+                if (opts.imgWidth) img.setAttribute('width', opts.imgWidth);
+                if (opts.imgHeight) img.setAttribute('height', opts.imgHeight);
+                img.loading = 'lazy';
+                card.appendChild(img);
+            }
+
+            // Preamble
+            if (opts.preamble) {
+                var preamble = document.createElement('p');
+                preamble.className = 'card-preamble';
+                preamble.textContent = opts.preamble;
+                card.appendChild(preamble);
+            }
+
+            // Rule
+            var rule = document.createElement('hr');
+            rule.className = 'card-rule';
+            card.appendChild(rule);
+
+            // Question
+            var question = document.createElement('p');
+            question.className = 'card-question';
+            question.textContent = opts.question;
+            card.appendChild(question);
+
+            // MC buttons (if provided)
+            if (opts.choiceOptions && opts.choiceStateKey) {
+                var btnGroup = makeChoiceButtons(opts.choiceOptions, opts.choiceStateKey);
+                card.appendChild(btnGroup);
+            }
+
+            // Voice textarea (if provided)
+            if (opts.voiceStateKey) {
+                var voiceResult = makeVoiceTextarea(opts.voiceStateKey, opts.voicePlaceholder);
+                card.appendChild(voiceResult.container);
+                // Wire up voice input after mount (app.js auto-wires on DOMContentLoaded,
+                // but since we're building post-load, wire manually)
+                setTimeout(function() {
+                    if (typeof window.attachVoiceInput === 'function') {
+                        window.attachVoiceInput(voiceResult.textarea);
+                    }
+                }, 0);
+            }
+
+            return card;
+        }
+
+        // ---- Build the page ----
+        var app = document.getElementById('app');
+
+        var column = document.createElement('div');
+        column.className = 'cp-column';
+
+        // CroquetClaude header block
+        var ccHeader = document.createElement('div');
+        ccHeader.className = 'cc-header';
+
+        var avatarImg = document.createElement('img');
+        avatarImg.src = '/assets/drawn-claude.png';
+        avatarImg.alt = 'CroquetClaude';
+        avatarImg.className = 'cc-avatar';
+        avatarImg.width = 56;
+        avatarImg.height = 56;
+        ccHeader.appendChild(avatarImg);
+
+        var ccText = document.createElement('div');
+        ccText.className = 'cc-header-text';
+
+        var ccName = document.createElement('span');
+        ccName.className = 'cc-name';
+        ccName.textContent = 'CroquetClaude';
+        ccText.appendChild(ccName);
+
+        var ccSub = document.createElement('span');
+        ccSub.className = 'cc-subtitle';
+        ccSub.textContent = 'A letter to ' + firstName + ' \u00b7 Round 1';
+        ccText.appendChild(ccSub);
+
+        ccHeader.appendChild(ccText);
+        column.appendChild(ccHeader);
+
+        // Draft restored notice placeholder — filled by showDraftRestoredNotice if needed
+        var noticeAnchor = document.createElement('div');
+        noticeAnchor.id = 'draft-notice-anchor';
+        column.appendChild(noticeAnchor);
+
+        // Opener paragraph
+        var opener = document.createElement('p');
+        opener.className = 'cp-opener';
+        opener.textContent = respondentName + ' \u2014 I\u2019ve spent some time with the research on how other sports build winning team cultures without losing the enjoyment. The patterns are pretty consistent across rugby league, the All Blacks, cycling. What I don\u2019t have is the croquet version. I can\u2019t get that from a library. These six questions are me trying to get it from you \u2014 how you see the cross-club dynamic, what the loudest signals actually are, who\u2019s already doing it right. There are no right answers. I just want to know what you know.';
+        column.appendChild(opener);
+
+        // Cards container
+        var cardsEl = document.createElement('div');
+        cardsEl.className = 'cp-cards';
+
+        // Card 1 — Big frame
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-1-frame.jpg',
+            imgAlt: 'All Blacks in formation',
+            preamble: 'Queensland rugby league does this every June. Brisbane Broncos players who have been hammering each other all season turn up as Maroons and mean it. Under Mal Meninga, Queensland won State of Origin almost every year. The culture was built on purpose: club rivalry left at the door, state identity turned on through symbols and daily behaviour, senior players pulling younger ones up. The research on winning team cultures compresses to something similar \u2014 hold a visible standard, reward effort over results, make selection a conversation that includes character alongside play, and wins come as a consequence.',
+            question: 'Does that shape fit what you\u2019d want from a state-level team culture, or is something missing or wrong for your world?',
+            choiceOptions: ['Yes, that fits', 'Mostly \u2014 something missing', 'Not quite \u2014 I\u2019d frame it differently'],
+            choiceStateKey: 'q1_choice',
+            voiceStateKey: 'q1_voice'
+        }));
+
+        // Card 2 — Coopetition
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-2-coopetition.jpg',
+            imgAlt: 'Queensland Maroons State of Origin',
+            imgWidth: '128',
+            imgHeight: '128',
+            preamble: 'The Maroons case shows that the competitive-cooperative split \u2014 rivals in the club season, genuine teammates in June \u2014 has to already be working in the competitive phase. Players who treat opponents well through the NRL season can put on the Maroons shirt and mean it. Players who don\u2019t, can\u2019t. The cross-club dynamic during competition either makes the representative culture possible or it doesn\u2019t.',
+            question: 'Does a dynamic like that exist in your world? If yes, what does it look like in practice. If no, what does the cross-club picture actually look like today?',
+            voiceStateKey: 'q2_voice'
+        }));
+
+        // Card 3 — Loudest artefact
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-3-artefact.jpg',
+            imgAlt: 'Team selection board',
+            preamble: 'The change-management literature is consistent on one thing: selection is the loudest artefact a program has. When stated values and selection practice don\u2019t line up, people read the practice \u2014 not the policy document, not the stated criteria, not the announcement. The thing people watch most closely is what actually gets rewarded when the list goes up.',
+            question: 'What\u2019s the loudest artefact in your world \u2014 the thing people read as the real answer to \u2018what does this program actually reward?\u2019',
+            voiceStateKey: 'q3_voice'
+        }));
+
+        // Card 4 — Small room
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-4-small-room.jpg',
+            imgAlt: 'Small coaching huddle',
+            preamble: 'One pattern keeps showing up across the cases. Not a reform of the whole program. A small group inside it, running the new way. Pat Lam\u2019s first move at Connacht wasn\u2019t a policy announcement \u2014 it was two senior players who already behaved the way he wanted, made the reference point. The All Blacks rebuild worked the same way. Twelve to sixteen people. Meeting regularly. Attitude-first entry. The group writes its own one-page standard on day one, and it holds.',
+            question: 'Does a shape like that fit somewhere in your world?',
+            choiceOptions: ['Yes \u2014 here\u2019s where it fits', 'Partly \u2014 would need to change', 'No \u2014 my setup is different'],
+            choiceStateKey: 'q4_choice',
+            voiceStateKey: 'q4_voice',
+            voicePlaceholder: 'If yes \u2014 who\u2019d be in the room, and who\u2019d run it. If no \u2014 what\u2019s different about your setup.'
+        }));
+
+        // Card 5 — Positive deviance
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-5-deviance.jpg',
+            imgAlt: 'Senior coach mentoring a player',
+            preamble: 'One principle across the change-management research: find the people inside your existing system who already behave the way you want, and spread their practice. It consistently beats importing a culture from outside. Dave Brailsford at British Cycling didn\u2019t announce a new culture \u2014 he announced that the program would measure everything it wasn\u2019t yet doing and improve each thing by 1%. The daily work was making it normal inside the program to talk honestly about where the gaps were.',
+            question: 'Who comes to mind in your world? Names, clubs, a coach whose sessions already feel right \u2014 whatever\u2019s in your head.',
+            voiceStateKey: 'q5_voice'
+        }));
+
+        // Card 6 — Open question (no image, no preamble)
+        cardsEl.appendChild(makeCard({
+            useAsterisk: true,
+            question: 'What\u2019s in your head about this that these questions don\u2019t touch at all?',
+            voiceStateKey: 'q6_voice'
+        }));
+
+        column.appendChild(cardsEl);
+
+        // Submit section
+        var submitSection = document.createElement('div');
+        submitSection.className = 'cp-submit';
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'cp-submit-wrap submit-wrap';
+
+        var draftIndicator = document.createElement('span');
+        draftIndicator.id = 'draft-saved-indicator';
+        draftIndicator.className = 'draft-saved-indicator';
+        draftIndicator.textContent = '\u2022 Draft saved';
+        submitWrap.appendChild(draftIndicator);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.type = 'button';
+        submitBtn.className = 'btn-submit-cp btn-submit';
+        submitBtn.textContent = 'Send your reply \u2192';
+        submitWrap.appendChild(submitBtn);
+
+        var errorMsg = document.createElement('div');
+        errorMsg.id = 'error-message';
+        errorMsg.className = 'cp-error-msg error-message';
+        errorMsg.innerHTML = 'Something went wrong \u2014 please try again or email <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+        submitWrap.appendChild(errorMsg);
+
+        submitSection.appendChild(submitWrap);
+        column.appendChild(submitSection);
+
+        // Footer
+        var footer = document.createElement('footer');
+        footer.className = 'cp-footer';
+        footer.innerHTML = 'Your answers autosave as you type. Close the page and come back anytime.<br><a href="https://croquetclaude.com/privacy">Privacy note</a>';
+        column.appendChild(footer);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(column);
+
+        // Submit handler
+        submitBtn.addEventListener('click', async function() {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
+            errorMsg.classList.remove('visible');
+
+            var ok = await window.submitMission(tokenRecord, buildPayload(), respondentName);
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send your reply \u2192';
+                errorMsg.classList.add('visible');
+            }
+        });
+
+        // Autosave
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft into DOM (re-wire textarea values and button states)
+        if (draft) {
+            // Textarea values already set via state above when makeVoiceTextarea ran.
+            // Choice buttons are already marked selected via makeChoiceButtons.
+            // Show the restored notice.
+            var anchor = document.getElementById('draft-notice-anchor');
+            if (anchor && typeof window.showDraftRestoredNotice === 'function') {
+                // showDraftRestoredNotice inserts before firstChild of container arg
+                // We pass anchor's parent and then move it to the right spot
+                var noticeEl = document.createElement('div');
+                noticeEl.className = 'draft-restored-notice';
+                var rel = (function(dateStr) {
+                    if (!dateStr) return null;
+                    var then = new Date(dateStr);
+                    if (isNaN(then.getTime())) return null;
+                    var diffMs = Date.now() - then.getTime();
+                    var diffMins = Math.floor(diffMs / 60000);
+                    if (diffMins < 1) return 'just now';
+                    if (diffMins < 60) return diffMins + ' minute' + (diffMins === 1 ? '' : 's') + ' ago';
+                    var diffHours = Math.floor(diffMins / 60);
+                    if (diffHours < 24) return diffHours + ' hour' + (diffHours === 1 ? '' : 's') + ' ago';
+                    var diffDays = Math.floor(diffHours / 24);
+                    return diffDays + ' day' + (diffDays === 1 ? '' : 's') + ' ago';
+                })(tokenRecord.updated);
+                noticeEl.textContent = 'Draft from ' + (rel || 'earlier') + ' restored.';
+                anchor.appendChild(noticeEl);
+            }
+        }
+
+        // GSAP scroll animations
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.gsap && window.ScrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+            document.querySelectorAll('.question-card').forEach(function(card) {
+                gsap.from(card, {
+                    opacity: 0,
+                    y: 24,
+                    duration: 0.6,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 88%'
+                    }
+                });
+            });
+        }
+    };
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
