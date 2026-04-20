@@ -81,13 +81,11 @@
             letter-spacing: 0.02em;
         }
 
-        .cp-opener {
-            margin-top: 48px;
-            font-family: var(--font-serif);
-            font-size: 19px;
-            line-height: 1.7;
-            color: var(--color-opener);
-        }
+        .cp-intro { margin-top: 48px; border-left: 3px solid var(--color-green); padding: 28px 32px; background: #F4F1EB; border-radius: 0 10px 10px 0; }
+        .cp-intro-label { font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-green); margin: 0 0 16px 0; }
+        .cp-opener { font-family: var(--font-serif); font-size: 18px; line-height: 1.75; color: var(--color-opener); margin: 0; }
+        .cp-opener p { margin: 0 0 1em 0; }
+        .cp-opener p:last-child { margin-bottom: 0; }
 
         .cp-cards {
             margin-top: 80px;
@@ -106,7 +104,7 @@
 
         .card-img {
             width: 100%;
-            height: 180px;
+            height: 240px;
             object-fit: cover;
             filter: saturate(0.82) contrast(0.96);
             display: block;
@@ -449,10 +447,20 @@
         var column = document.createElement('div');
         column.className = 'cp-column';
 
-        var opener = document.createElement('p');
+        var intro = document.createElement('div');
+        intro.className = 'cp-intro';
+        var introLabel = document.createElement('p');
+        introLabel.className = 'cp-intro-label';
+        introLabel.textContent = 'A note before you start';
+        intro.appendChild(introLabel);
+        var opener = document.createElement('div');
         opener.className = 'cp-opener';
-        opener.innerHTML = firstName + ', these questions are from CroquetClaude \u2014 Wade Hart\u2019s AI assistant. I\u2019ve been reading about how other sports build winning team cultures. The same patterns come up in rugby league, the All Blacks, British Cycling, Pat Lam at Connacht. But I don\u2019t know Queensland croquet. I don\u2019t know how your program runs, how selection actually works, what\u2019s been tried before, or where the tensions sit. No amount of research gives me that.<br><br>Each card below describes a pattern from another sport. <strong>For each one, I want your read: does this happen in Queensland croquet, and if so, what does it look like in your world?</strong> If a pattern doesn\u2019t fit your situation, say that too. Your knowledge of the Queensland game is what\u2019s missing \u2014 these questions are an attempt to get it.';
-        column.appendChild(opener);
+        opener.innerHTML = '<p>' + firstName + ', these questions are from CroquetClaude \u2014 Wade Hart\u2019s AI assistant. I\u2019ve been reading about how other sports build winning team cultures: Queensland rugby league under Meninga, the All Blacks rebuild, British Cycling under Brailsford, Pat Lam at Connacht. The same patterns keep coming up.</p>'
+            + '<p>But I have a real problem with croquet. There is very little written about it \u2014 almost nothing compared to a sport like rugby league or AFL. I can describe patterns from other sports, but I genuinely can\u2019t tell you whether any of them apply to Queensland croquet. I don\u2019t know how your selection process actually works, what\u2019s been tried before, who the key figures are, or where the tensions sit.</p>'
+            + '<p><strong>' + firstName + ', you have that knowledge and I don\u2019t.</strong> Each card below describes a pattern from another sport. For each one I want your honest read: does this pattern happen in Queensland croquet? Does it apply to your situation, or does it not fit at all? If it does apply, what does it actually look like in practice? If it doesn\u2019t, what\u2019s different about your world?</p>'
+            + '<p>Your answers are the whole point. I\u2019m asking because I can\u2019t work this out from the outside.</p>';
+        intro.appendChild(opener);
+        column.appendChild(intro);
 
         var cardsEl = document.createElement('div');
         cardsEl.className = 'cp-cards';
