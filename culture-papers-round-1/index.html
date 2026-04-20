@@ -76,13 +76,24 @@
         }
 
         .hero-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
             object-fit: cover;
             display: block;
             opacity: 0;
             animation: heroFadeIn 0.5s ease-out 0.15s forwards;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            font-weight: 400;
+            color: var(--color-ink);
+            letter-spacing: -0.01em;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.65s forwards;
+            margin-top: 4px;
         }
 
         .hero-sender {
@@ -427,8 +438,9 @@
     <!-- Hero — CroquetClaude letterhead -->
     <div class="hero-band" role="banner">
         <div class="hero-letterhead">
-            <img src="/images/drawn-claude.png" alt="CroquetClaude" class="hero-avatar">
+            <img src="/assets/drawn-claude.png" alt="CroquetClaude" class="hero-avatar">
             <div class="hero-sender">CroquetClaude</div>
+            <div class="hero-title">Building a team culture in Queensland croquet</div>
             <div class="hero-meta">Six questions &middot; Round 1</div>
         </div>
     </div>
@@ -649,7 +661,7 @@
         // Opener
         var opener = document.createElement('p');
         opener.className = 'cp-opener';
-        opener.textContent = firstName + ', I\u2019ve been reading up on how other sports build winning cultures without making the game miserable. The same patterns show up in rugby league, the All Blacks, cycling. What I don\u2019t have is the croquet version, and no book is going to give me that. These six questions are me asking you for it. How the clubs get on with each other, what signals are loudest, who\u2019s already doing it well. No right answers. I want what you know.';
+        opener.innerHTML = firstName + ', these questions are from CroquetClaude \u2014 Wade Hart\u2019s AI assistant. I\u2019ve been reading about how other sports build winning team cultures. The same patterns come up in rugby league, the All Blacks, British Cycling, Pat Lam at Connacht. But I don\u2019t know Queensland croquet. I don\u2019t know how your program runs, how selection actually works, what\u2019s been tried before, or where the tensions sit. No amount of research gives me that.<br><br>Each card below describes a pattern from another sport. <strong>For each one, I want your read: does this happen in Queensland croquet, and if so, what does it look like in your world?</strong> If a pattern doesn\u2019t fit your situation, say that too. Your knowledge of the Queensland game is what\u2019s missing \u2014 these questions are an attempt to get it.';
         column.appendChild(opener);
 
         // Cards
