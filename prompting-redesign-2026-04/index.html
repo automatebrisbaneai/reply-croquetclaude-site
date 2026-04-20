@@ -563,6 +563,10 @@
         // Initialise autosave after DOM is mounted
         autosave = window.createAutosave(tokenRecord, buildPayload);
     };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
     </script>
 </body>
 </html>
