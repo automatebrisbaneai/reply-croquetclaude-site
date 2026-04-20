@@ -323,120 +323,119 @@ window.submitMission = submitMission;
 window.createAutosave = createAutosave;
 window.showDraftRestoredNotice = showDraftRestoredNotice;
 
-/**
- * Attach a voice-input mic button to a textarea element.
- * Only activates if data-voice="true" is set on the textarea and the
- * Web Speech API is available. Gracefully degrades — no visual change
- * if the API is absent.
- *
- * @param {HTMLTextAreaElement} textarea
- */
-function attachVoiceInput(textarea) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+// Voice input is now handled by /shared/voice-to-text.js (Phase 2 swap, 2026-04-19).
+// Templates call VoiceToText.init({ target: ta, cleanUrl: null }) directly after
+// creating each textarea. No DOMContentLoaded auto-attach needed here.
 
-    // Wrap the textarea in a positioning container
-    const wrapper = document.createElement('div');
-    wrapper.className = 'voice-textarea-wrapper';
-    textarea.parentNode.insertBefore(wrapper, textarea);
-    wrapper.appendChild(textarea);
-
-    // Build the mic button
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'voice-btn';
-    btn.setAttribute('aria-label', 'Start voice input');
-    btn.setAttribute('title', 'Start voice input');
-    btn.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="9" y="2" width="6" height="12" rx="3" stroke-width="1.75"/>
-        <path d="M5 11a7 7 0 0 0 14 0" stroke-width="1.75" stroke-linecap="round"/>
-        <line x1="12" y1="18" x2="12" y2="22" stroke-width="1.75" stroke-linecap="round"/>
-        <line x1="9" y1="22" x2="15" y2="22" stroke-width="1.75" stroke-linecap="round"/>
-    </svg>`;
-    wrapper.appendChild(btn);
-
-    // Interim preview element
-    const preview = document.createElement('div');
-    preview.className = 'voice-interim';
-    wrapper.after(preview);
-
-    let recognition = null;
-    let silenceTimer = null;
-    let isRecording = false;
-
-    function startRecording() {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-AU';
-
-        recognition.onresult = function(event) {
-            // Reset silence timer on any result
-            clearTimeout(silenceTimer);
-            silenceTimer = setTimeout(stopRecording, 3000);
-
-            let interim = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const result = event.results[i];
-                if (result.isFinal) {
-                    textarea.value = (textarea.value ? textarea.value + ' ' : '') + result[0].transcript.trim();
-                    // Trigger input event so autosave and other listeners fire
-                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                } else {
-                    interim += result[0].transcript;
-                }
-            }
-            preview.textContent = interim;
-        };
-
-        recognition.onend = function() {
-            // onend fires when recognition stops — clean up if not intentional
-            if (isRecording) {
-                stopRecording();
-            }
-        };
-
-        recognition.onerror = function() {
-            stopRecording();
-        };
-
-        recognition.start();
-        isRecording = true;
-        btn.classList.add('voice-active');
-        btn.setAttribute('aria-label', 'Stop voice input');
-        btn.setAttribute('title', 'Stop voice input');
-
-        // Arm 3-second silence timer immediately
-        silenceTimer = setTimeout(stopRecording, 3000);
-    }
-
-    function stopRecording() {
-        clearTimeout(silenceTimer);
-        isRecording = false;
-        preview.textContent = '';
-        btn.classList.remove('voice-active');
-        btn.setAttribute('aria-label', 'Start voice input');
-        btn.setAttribute('title', 'Start voice input');
-        if (recognition) {
-            try { recognition.stop(); } catch (_) { /* already stopped */ }
-            recognition = null;
-        }
-    }
-
-    btn.addEventListener('click', function() {
-        if (isRecording) {
-            stopRecording();
-        } else {
-            startRecording();
-        }
-    });
-}
-
-// Auto-attach on page load for any textarea with data-voice="true"
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('textarea[data-voice="true"]').forEach(function(ta) {
-        attachVoiceInput(ta);
-    });
-});
-
-window.attachVoiceInput = attachVoiceInput;
+// KILL SWITCH: uncomment if shared voice-to-text.js regresses.
+// Delete after one deploy cycle (post 2026-04-21).
+//
+// function attachVoiceInput(textarea) {
+//     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+//     if (!SpeechRecognition) return;
+//
+//     // Wrap the textarea in a positioning container
+//     const wrapper = document.createElement('div');
+//     wrapper.className = 'voice-textarea-wrapper';
+//     textarea.parentNode.insertBefore(wrapper, textarea);
+//     wrapper.appendChild(textarea);
+//
+//     // Build the mic button
+//     const btn = document.createElement('button');
+//     btn.type = 'button';
+//     btn.className = 'voice-btn';
+//     btn.setAttribute('aria-label', 'Start voice input');
+//     btn.setAttribute('title', 'Start voice input');
+//     btn.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+//         <rect x="9" y="2" width="6" height="12" rx="3" stroke-width="1.75"/>
+//         <path d="M5 11a7 7 0 0 0 14 0" stroke-width="1.75" stroke-linecap="round"/>
+//         <line x1="12" y1="18" x2="12" y2="22" stroke-width="1.75" stroke-linecap="round"/>
+//         <line x1="9" y1="22" x2="15" y2="22" stroke-width="1.75" stroke-linecap="round"/>
+//     </svg>`;
+//     wrapper.appendChild(btn);
+//
+//     // Interim preview element
+//     const preview = document.createElement('div');
+//     preview.className = 'voice-interim';
+//     wrapper.after(preview);
+//
+//     let recognition = null;
+//     let silenceTimer = null;
+//     let isRecording = false;
+//
+//     function startRecording() {
+//         recognition = new SpeechRecognition();
+//         recognition.continuous = true;
+//         recognition.interimResults = true;
+//         recognition.lang = 'en-AU';
+//
+//         recognition.onresult = function(event) {
+//             // Reset silence timer on any result
+//             clearTimeout(silenceTimer);
+//             silenceTimer = setTimeout(stopRecording, 3000);
+//
+//             let interim = '';
+//             for (let i = event.resultIndex; i < event.results.length; i++) {
+//                 const result = event.results[i];
+//                 if (result.isFinal) {
+//                     textarea.value = (textarea.value ? textarea.value + ' ' : '') + result[0].transcript.trim();
+//                     // Trigger input event so autosave and other listeners fire
+//                     textarea.dispatchEvent(new Event('input', { bubbles: true }));
+//                 } else {
+//                     interim += result[0].transcript;
+//                 }
+//             }
+//             preview.textContent = interim;
+//         };
+//
+//         recognition.onend = function() {
+//             // onend fires when recognition stops — clean up if not intentional
+//             if (isRecording) {
+//                 stopRecording();
+//             }
+//         };
+//
+//         recognition.onerror = function() {
+//             stopRecording();
+//         };
+//
+//         recognition.start();
+//         isRecording = true;
+//         btn.classList.add('voice-active');
+//         btn.setAttribute('aria-label', 'Stop voice input');
+//         btn.setAttribute('title', 'Stop voice input');
+//
+//         // Arm 3-second silence timer immediately
+//         silenceTimer = setTimeout(stopRecording, 3000);
+//     }
+//
+//     function stopRecording() {
+//         clearTimeout(silenceTimer);
+//         isRecording = false;
+//         preview.textContent = '';
+//         btn.classList.remove('voice-active');
+//         btn.setAttribute('aria-label', 'Start voice input');
+//         btn.setAttribute('title', 'Start voice input');
+//         if (recognition) {
+//             try { recognition.stop(); } catch (_) { /* already stopped */ }
+//             recognition = null;
+//         }
+//     }
+//
+//     btn.addEventListener('click', function() {
+//         if (isRecording) {
+//             stopRecording();
+//         } else {
+//             startRecording();
+//         }
+//     });
+// }
+//
+// // Auto-attach on page load for any textarea with data-voice="true"
+// document.addEventListener('DOMContentLoaded', function() {
+//     document.querySelectorAll('textarea[data-voice="true"]').forEach(function(ta) {
+//         attachVoiceInput(ta);
+//     });
+// });
+//
+// window.attachVoiceInput = attachVoiceInput;

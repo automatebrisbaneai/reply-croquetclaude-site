@@ -327,6 +327,7 @@
         </div>
     </div>
 
+    <script src="/shared/voice-to-text.js"></script>
     <script src="/app.js"></script>
     <script>
     window.renderMission = function(tokenRecord) {
@@ -366,10 +367,13 @@
             container.appendChild(label);
             var ta = document.createElement('textarea');
             ta.className = 'voice-textarea';
-            ta.setAttribute('data-voice', 'true');
             ta.setAttribute('rows', '4');
             if (placeholder) ta.placeholder = placeholder;
             container.appendChild(ta);
+            // Wire shared voice module. cleanUrl: null = noCleanup mode (raw text only).
+            if (window.VoiceToText) {
+                window.VoiceToText.init({ target: ta, cleanUrl: 'https://talk.croquetwade.com/clean' });
+            }
             return { container: container, textarea: ta };
         }
 
@@ -438,9 +442,7 @@
             if (opts.voiceStateKey) {
                 var vr = makeVoiceTextarea(opts.voiceStateKey, opts.voicePlaceholder);
                 body.appendChild(vr.container);
-                setTimeout(function() {
-                    if (typeof window.attachVoiceInput === 'function') window.attachVoiceInput(vr.textarea);
-                }, 0);
+                // VoiceToText.init() is called inside makeVoiceTextarea — no extra wiring needed.
             }
 
             card.appendChild(body);

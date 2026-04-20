@@ -673,45 +673,6 @@ body {
     }
 }
 
-/* === Voice input shared feature === */
-.voice-textarea-wrapper { position: relative; }
-.voice-btn {
-  position: absolute;
-  top: 12px; right: 12px;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid #E0DCD3;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.18s, border-color 0.18s;
-}
-.voice-btn:hover { background: #FAF9F6; border-color: #C9C3B6; }
-.voice-btn svg { stroke: #7A7268; fill: none; width: 18px; height: 18px; }
-.voice-btn:hover svg { stroke: #2D2822; }
-
-.voice-btn.voice-active { background: #82B25E; border-color: #82B25E; }
-.voice-btn.voice-active svg { stroke: #FFFFFF; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .voice-btn.voice-active::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 2px solid #82B25E;
-    animation: voice-pulse 1.2s ease-in-out infinite;
-  }
-  @keyframes voice-pulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.08); }
-  }
-}
-
-.voice-interim {
-  font-style: italic;
-  font-size: 13px;
-  color: #9A9389;
-  margin-top: 4px;
-  min-height: 18px;
-}
+/* === Voice input styles removed (Phase 2, 2026-04-19) ===
+   Replaced by .vtt-* styles injected by /shared/voice-to-text.js.
+   Kill-switch: restore from git if shared module regresses. */

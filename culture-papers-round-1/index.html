@@ -439,6 +439,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
+    <script src="/shared/voice-to-text.js"></script>
     <script src="/app.js"></script>
     <script>
     // -----------------------------------------------------------------------
@@ -528,7 +529,6 @@
 
             var ta = document.createElement('textarea');
             ta.className = 'voice-textarea';
-            ta.setAttribute('data-voice', 'true');
             ta.setAttribute('rows', '4');
             if (placeholder) ta.placeholder = placeholder;
             ta.value = state[stateKey] || '';
@@ -539,6 +539,13 @@
             });
 
             container.appendChild(ta);
+
+            // Wire shared voice module after ta is in the DOM.
+            // cleanUrl points at talk.cw — cross-origin cleanup via CORSMiddleware in voice-transcribe.
+            if (window.VoiceToText) {
+                window.VoiceToText.init({ target: ta, cleanUrl: 'https://talk.croquetwade.com/clean' });
+            }
+
             return { container: container, textarea: ta };
         }
 
@@ -619,11 +626,7 @@
             if (opts.voiceStateKey) {
                 var voiceResult = makeVoiceTextarea(opts.voiceStateKey, opts.voicePlaceholder);
                 body.appendChild(voiceResult.container);
-                setTimeout(function() {
-                    if (typeof window.attachVoiceInput === 'function') {
-                        window.attachVoiceInput(voiceResult.textarea);
-                    }
-                }, 0);
+                // VoiceToText.init() is called inside makeVoiceTextarea — no extra wiring needed.
             }
 
             card.appendChild(body);
