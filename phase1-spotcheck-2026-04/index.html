@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1 spot-check &#8212; CroquetClaude</title>
+    <meta name="description" content="Spot-check three sections of the offshoot harvest before Phase 2 execution begins.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* ---- Mission-scoped styles: phase1-spotcheck-2026-04 ---- */
+
+    .q-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.25rem;
+        transition: border-color 0.2s;
+    }
+    .q-card.answered { border-color: #2d6a4f; }
+    .q-card.missing  { border-color: #b83227; background: #fff8f7; }
+
+    .q-number {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #bc6c25;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+    }
+    .q-label {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1a2e1f;
+        margin-bottom: 0.35rem;
+        line-height: 1.4;
+    }
+    .q-detail {
+        font-size: 0.92rem;
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .bucket-summary {
+        font-size: 0.8rem;
+        color: #6b7280;
+        font-family: monospace;
+        background: #f3f4f6;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        display: inline-block;
+        line-height: 1.5;
+    }
+
+    .section-link-wrap { margin-bottom: 1.1rem; }
+    .section-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.85rem;
+        color: #2d6a4f;
+        text-decoration: none;
+        border: 1px solid #d1e8df;
+        background: #f0f7f3;
+        padding: 0.35rem 0.8rem;
+        border-radius: 6px;
+        transition: background 0.15s, border-color 0.15s;
+    }
+    .section-link:hover { background: #daf0e5; border-color: #2d6a4f; }
+
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+    }
+    .radio-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.7rem 0.9rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        background: #fafafa;
+    }
+    .radio-option:hover            { background: #f0f7f3; border-color: #9dc9b2; }
+    .radio-option.sel-ok           { border-color: #2d6a4f; background: #f0f7f3; }
+    .radio-option.sel-warn         { border-color: #bc6c25; background: #fdf5ee; }
+    .radio-option.sel-halt         { border-color: #b83227; background: #fff8f7; }
+    .radio-option input[type="radio"] {
+        margin-top: 0.15rem;
+        accent-color: #2d6a4f;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+    }
+    .radio-option-text { font-size: 0.97rem; color: #1a2e1f; line-height: 1.45; }
+    .radio-option-sub  { font-size: 0.84rem; color: #6b7280; margin-top: 0.15rem; line-height: 1.4; }
+
+    /* Priority flag items */
+    .flag-item {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1.1rem 1.3rem 1rem;
+        margin-bottom: 0.85rem;
+        transition: border-color 0.2s;
+    }
+    .flag-item.answered { border-color: #2d6a4f; }
+    .flag-item.missing  { border-color: #b83227; background: #fff8f7; }
+    .flag-label  { font-size: 0.97rem; font-weight: 600; color: #1a2e1f; margin-bottom: 0.25rem; }
+    .flag-detail { font-size: 0.87rem; color: #4b5563; line-height: 1.55; margin-bottom: 0.55rem; }
+    .flag-source { font-size: 0.8rem; color: #6b7280; margin-bottom: 0.75rem; }
+    .flag-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .btn-flag {
+        padding: 0.45rem 0.9rem;
+        border-radius: 7px;
+        border: 1.5px solid;
+        font-size: 0.88rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        background: #fff;
+    }
+    .btn-flag-first  { border-color: #2d6a4f; color: #2d6a4f; }
+    .btn-flag-first:hover, .btn-flag-first.selected  { background: #2d6a4f; color: #fff; }
+    .btn-flag-normal { border-color: #6b7280; color: #4b5563; }
+    .btn-flag-normal:hover, .btn-flag-normal.selected { background: #6b7280; color: #fff; }
+    .btn-flag-skip   { border-color: #b83227; color: #b83227; }
+    .btn-flag-skip:hover, .btn-flag-skip.selected    { background: #b83227; color: #fff; }
+
+    /* Comments */
+    .comments-label {
+        display: block;
+        font-size: 0.97rem;
+        font-weight: 600;
+        color: #1a2e1f;
+        margin-bottom: 0.4rem;
+    }
+    .comments-label-sub { font-size: 0.87rem; color: #6b7280; font-weight: 400; margin-left: 0.4rem; }
+    .comments-textarea {
+        width: 100%;
+        min-height: 100px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.95rem;
+        font-family: inherit;
+        color: #1a2e1f;
+        background: #fafafa;
+        resize: vertical;
+        transition: border-color 0.15s;
+        box-sizing: border-box;
+    }
+    .comments-textarea:focus { outline: none; border-color: #2d6a4f; background: #fff; }
+
+    .q-section-heading {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #6b7280;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 2rem 0 0.9rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .validation-error { color: #b83227; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+    .validation-error.visible { display: block; }
+
+    .submit-wrap { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+    .error-message { display: none; font-size: 0.9rem; color: #b83227; }
+    .error-message.visible { display: block; }
+
+    .context-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.88rem;
+        color: #4b5563;
+        line-height: 1.65;
+    }
+    .context-box strong { color: #1a2e1f; }
+    .context-box ul { margin: 0.4rem 0 0.4rem 1.2rem; padding: 0; }
+    .context-box li { margin-bottom: 0.2rem; }
+
+    @media (max-width: 600px) {
+        .q-card { padding: 1.25rem 1.1rem; }
+        .flag-buttons { flex-direction: column; }
+        .btn-flag { width: 100%; text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .radio-option, .btn-flag { transition: none; }
+    }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Phase 1 spot-check</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: phase1-spotcheck-2026-04
+    // Spot-check 3 sections of the orchestrator->agent revert harvest audit
+    // before Phase 2 execution begins.
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed;
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var spotSections = (seed && seed.sections && seed.sections['spotcheck_sections']) || [];
+        var priorityFlags = (seed && seed.sections && seed.sections['priority_flags']) || [];
+
+        // Answer state
+        var answers = {
+            spotcheck: {},
+            flags: {},
+            authorization: null,
+            comments: ''
+        };
+        spotSections.forEach(function(s) { answers.spotcheck[s.id] = null; });
+        priorityFlags.forEach(function(f) { answers.flags[f.id] = null; });
+
+        // Pre-load from draft
+        if (draft) {
+            if (draft.spotcheck) {
+                Object.keys(draft.spotcheck).forEach(function(k) {
+                    if (answers.spotcheck.hasOwnProperty(k)) answers.spotcheck[k] = draft.spotcheck[k];
+                });
+            }
+            if (draft.flags) {
+                Object.keys(draft.flags).forEach(function(k) {
+                    if (answers.flags.hasOwnProperty(k)) answers.flags[k] = draft.flags[k];
+                });
+            }
+            if (draft.authorization !== undefined) answers.authorization = draft.authorization;
+            if (draft.comments !== undefined) answers.comments = draft.comments;
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            var commentsEl = document.getElementById('comments-field');
+            return {
+                spotcheck: JSON.parse(JSON.stringify(answers.spotcheck)),
+                flags: JSON.parse(JSON.stringify(answers.flags)),
+                authorization: answers.authorization,
+                comments: commentsEl ? commentsEl.value : answers.comments
+            };
+        }
+
+        function externalLinkSvg() {
+            return '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="flex-shrink:0">'
+                + '<path d="M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+                + '<path d="M7.5 1h3.5v3.5M11 1 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+                + '</svg>';
+        }
+
+        function updateValidationState() {
+            var missing = [];
+            spotSections.forEach(function(s) {
+                if (answers.spotcheck[s.id] === null) missing.push('spotcheck/' + s.id);
+            });
+            priorityFlags.forEach(function(f) {
+                if (answers.flags[f.id] === null) missing.push('flag/' + f.id);
+            });
+            if (answers.authorization === null) missing.push('authorization');
+            return missing;
+        }
+
+        // ---- Build DOM ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML = '<p>Hi ' + firstName + ' \u2014 Phase 1 of the orchestrator\u2192agent revert audit is complete: 23 sections, ~375 items classified, ~70 Phase-2 harvest cards projected.</p>'
+            + '<p>Before Phase 2 (harvest execution) begins, the plan asks you to spot-check <strong>3 sections</strong> \u2014 one heavy, one medium, one light. This page has those three, plus <strong>4 high-priority flags</strong> and a final <strong>Phase 2 authorisation</strong>.</p>'
+            + '<p>There\'s a comments box at the bottom for any flagged items or different instructions. Shouldn\'t take more than 10 minutes.</p>'
+            + '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">\u270e</span> Your answers save automatically as you go. Close the tab and come back any time \u2014 the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        // Background context box
+        var ctxBox = document.createElement('div');
+        ctxBox.className = 'context-box';
+        ctxBox.innerHTML = '<strong>Background: retained dispatch cases</strong><br>'
+            + 'The heavy harvests kept these offshoots in dispatch (everything else reverts to CroquetClaude direct):'
+            + '<ul>'
+            + '<li><strong>writer-claude</strong> \u2014 case (c): long-form prose where temperature matters</li>'
+            + '<li><strong>review-claude</strong> \u2014 case (b): fresh-context review to catch your own errors</li>'
+            + '<li><strong>design-reviewer</strong> \u2014 case (b) variant: perceptual pattern-match on a fixed checklist</li>'
+            + '<li><strong>pipeline-runner</strong> \u2014 new case (d): structural YAML execution, literal spec runner</li>'
+            + '</ul>';
+        container.appendChild(ctxBox);
+
+        // ---- PART 1: Spot-checks ----
+        var scHead = document.createElement('p');
+        scHead.className = 'q-section-heading';
+        scHead.textContent = 'Part 1 \u2014 Section spot-checks (3 sections)';
+        container.appendChild(scHead);
+
+        var scSub = document.createElement('p');
+        scSub.style.cssText = 'font-size:0.9rem;color:#4b5563;margin-bottom:1.25rem;line-height:1.55;';
+        scSub.innerHTML = 'For each section: open the harvest file at <code style="font-size:0.85rem;background:#f3f4f6;padding:0.1rem 0.3rem;border-radius:3px;">inbox/offshoot-harvest-2026-04-20.md</code> using the link below, scan the classification table, and tell me if the buckets look right.';
+        container.appendChild(scSub);
+
+        var spotRadioOptions = [
+            { value: 'proceed',            label: 'Classifications look right, proceed',              selClass: 'sel-ok'   },
+            { value: 'one-miscategorised', label: 'One item miscategorised \u2014 I\'ll flag it in comments', selClass: 'sel-warn' },
+            { value: 're-audit',           label: 'Re-audit this section',                             selClass: 'sel-halt' }
+        ];
+
+        spotSections.forEach(function(section, idx) {
+            var card = document.createElement('div');
+            card.className = 'q-card';
+            card.id = 'spotcheck-' + section.id;
+            card.dataset.key = 'spotcheck/' + section.id;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-labelledby', 'qlabel-' + section.id);
+            if (answers.spotcheck[section.id] !== null) card.classList.add('answered');
+
+            var qNum = document.createElement('div');
+            qNum.className = 'q-number';
+            qNum.textContent = 'Spot-check ' + (idx + 1) + ' of 3';
+            card.appendChild(qNum);
+
+            var qLabel = document.createElement('div');
+            qLabel.className = 'q-label';
+            qLabel.id = 'qlabel-' + section.id;
+            qLabel.textContent = section.label;
+            card.appendChild(qLabel);
+
+            var qDetail = document.createElement('div');
+            qDetail.className = 'q-detail';
+            qDetail.textContent = section.summary;
+            card.appendChild(qDetail);
+
+            var bucketEl = document.createElement('span');
+            bucketEl.className = 'bucket-summary';
+            bucketEl.textContent = section.buckets;
+            card.appendChild(bucketEl);
+
+            // Obsidian link
+            var linkWrap = document.createElement('div');
+            linkWrap.className = 'section-link-wrap';
+            var vaultPath = 'inbox/offshoot-harvest-2026-04-20.md';
+            var linkEl = document.createElement('a');
+            linkEl.href = 'obsidian://open?vault=croquet-os&file=' + encodeURIComponent(vaultPath) + '&line=' + section.harvest_file_line;
+            linkEl.className = 'section-link';
+            linkEl.target = '_blank';
+            linkEl.rel = 'noopener';
+            linkEl.innerHTML = externalLinkSvg() + ' Open section in Obsidian (line ' + section.harvest_file_line + ')';
+            linkWrap.appendChild(linkEl);
+            card.appendChild(linkWrap);
+
+            // Radio group
+            var radioGroup = document.createElement('div');
+            radioGroup.className = 'radio-group';
+            radioGroup.setAttribute('role', 'radiogroup');
+            radioGroup.setAttribute('aria-label', 'Verdict for ' + section.label);
+
+            spotRadioOptions.forEach(function(opt) {
+                var optEl = document.createElement('label');
+                optEl.className = 'radio-option';
+                if (answers.spotcheck[section.id] === opt.value) optEl.classList.add(opt.selClass);
+
+                var input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'spotcheck-' + section.id;
+                input.value = opt.value;
+                input.checked = (answers.spotcheck[section.id] === opt.value);
+
+                var textEl = document.createElement('div');
+                textEl.className = 'radio-option-text';
+                textEl.textContent = opt.label;
+
+                optEl.appendChild(input);
+                optEl.appendChild(textEl);
+
+                // Capture in closure
+                (function(capturedOpt, capturedCard, capturedGroup, capturedSectionId) {
+                    input.addEventListener('change', function() {
+                        if (input.checked) {
+                            answers.spotcheck[capturedSectionId] = capturedOpt.value;
+                            capturedGroup.querySelectorAll('label.radio-option').forEach(function(l) {
+                                l.classList.remove('sel-ok', 'sel-warn', 'sel-halt');
+                            });
+                            optEl.classList.add(capturedOpt.selClass);
+                            capturedCard.classList.add('answered');
+                            capturedCard.classList.remove('missing');
+                            if (autosave) autosave.save();
+                        }
+                    });
+                })(opt, card, radioGroup, section.id);
+
+                radioGroup.appendChild(optEl);
+            });
+
+            card.appendChild(radioGroup);
+            container.appendChild(card);
+        });
+
+        // ---- PART 2: Priority flags ----
+        var pfHead = document.createElement('p');
+        pfHead.className = 'q-section-heading';
+        pfHead.textContent = 'Part 2 \u2014 High-priority harvest flags (4 flags)';
+        container.appendChild(pfHead);
+
+        var pfSub = document.createElement('p');
+        pfSub.style.cssText = 'font-size:0.9rem;color:#4b5563;margin-bottom:1.25rem;line-height:1.55;';
+        pfSub.textContent = 'These four flags were identified across the full 23-section audit as the highest-priority items to harvest first. For each one, tell me whether to lead with it in Phase 2 or handle it in normal order.';
+        container.appendChild(pfSub);
+
+        var flagBtnConfig = [
+            { value: 'first',  label: 'Harvest this first', btnClass: 'btn-flag-first'  },
+            { value: 'normal', label: 'Normal order',        btnClass: 'btn-flag-normal' },
+            { value: 'skip',   label: 'Skip this harvest',   btnClass: 'btn-flag-skip'   }
+        ];
+
+        priorityFlags.forEach(function(flag) {
+            var flagItem = document.createElement('div');
+            flagItem.className = 'flag-item';
+            flagItem.id = 'flag-' + flag.id;
+            flagItem.dataset.key = 'flag/' + flag.id;
+            if (answers.flags[flag.id] !== null) flagItem.classList.add('answered');
+
+            var fl = document.createElement('div');
+            fl.className = 'flag-label';
+            fl.textContent = flag.label;
+            flagItem.appendChild(fl);
+
+            var fd = document.createElement('div');
+            fd.className = 'flag-detail';
+            fd.textContent = flag.detail;
+            flagItem.appendChild(fd);
+
+            var fs = document.createElement('div');
+            fs.className = 'flag-source';
+            fs.textContent = 'Source: ' + flag.source_section;
+            flagItem.appendChild(fs);
+
+            var btnRow = document.createElement('div');
+            btnRow.className = 'flag-buttons';
+
+            flagBtnConfig.forEach(function(cfg) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn-flag ' + cfg.btnClass;
+                btn.textContent = cfg.label;
+                if (answers.flags[flag.id] === cfg.value) btn.classList.add('selected');
+
+                (function(capturedFlagId, capturedCfg, capturedFlagItem, capturedBtnRow) {
+                    btn.addEventListener('click', function() {
+                        answers.flags[capturedFlagId] = capturedCfg.value;
+                        capturedBtnRow.querySelectorAll('.btn-flag').forEach(function(b) { b.classList.remove('selected'); });
+                        btn.classList.add('selected');
+                        capturedFlagItem.classList.add('answered');
+                        capturedFlagItem.classList.remove('missing');
+                        if (autosave) autosave.save();
+                    });
+                })(flag.id, cfg, flagItem, btnRow);
+
+                btnRow.appendChild(btn);
+            });
+
+            flagItem.appendChild(btnRow);
+            container.appendChild(flagItem);
+        });
+
+        // ---- PART 3: Overall authorisation ----
+        var authHead = document.createElement('p');
+        authHead.className = 'q-section-heading';
+        authHead.textContent = 'Part 3 \u2014 Overall authorisation';
+        container.appendChild(authHead);
+
+        var authCard = document.createElement('div');
+        authCard.className = 'q-card';
+        authCard.id = 'authorization-card';
+        authCard.dataset.key = 'authorization';
+        authCard.setAttribute('role', 'group');
+        authCard.setAttribute('aria-labelledby', 'auth-label');
+        if (answers.authorization !== null) authCard.classList.add('answered');
+
+        var authNum = document.createElement('div');
+        authNum.className = 'q-number';
+        authNum.textContent = 'Final call';
+        authCard.appendChild(authNum);
+
+        var authLabel = document.createElement('div');
+        authLabel.className = 'q-label';
+        authLabel.id = 'auth-label';
+        authLabel.textContent = 'Overall: proceed to Phase 2?';
+        authCard.appendChild(authLabel);
+
+        var authDetail = document.createElement('div');
+        authDetail.className = 'q-detail';
+        authDetail.textContent = 'Phase 2 will execute the harvest cards \u2014 creating new feedback files, extending procedures, building new procedure files. Once it starts, the classified items become vault entries. This is the last gate before that work begins.';
+        authCard.appendChild(authDetail);
+
+        var authOptions = [
+            { value: 'proceed',              label: 'Proceed to Phase 2 harvest',                          sub: 'Execute all harvest cards in the priority order from this page.',                              selClass: 'sel-ok'   },
+            { value: 're-audit-flagged',      label: 'Re-audit the sections I flagged, hold Phase 2',       sub: 'I\'ve flagged one or more sections above. Re-audit those before proceeding.',                 selClass: 'sel-warn' },
+            { value: 'different-instruction', label: 'Different instruction \u2014 see comments',           sub: 'I\'ve written a different direction in the comments box below.',                              selClass: 'sel-halt' }
+        ];
+
+        var authGroup = document.createElement('div');
+        authGroup.className = 'radio-group';
+        authGroup.setAttribute('role', 'radiogroup');
+        authGroup.setAttribute('aria-label', 'Overall authorisation');
+
+        authOptions.forEach(function(opt) {
+            var optEl = document.createElement('label');
+            optEl.className = 'radio-option';
+            if (answers.authorization === opt.value) optEl.classList.add(opt.selClass);
+
+            var input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'authorization';
+            input.value = opt.value;
+            input.checked = (answers.authorization === opt.value);
+
+            var textWrap = document.createElement('div');
+            var mainText = document.createElement('div');
+            mainText.className = 'radio-option-text';
+            mainText.textContent = opt.label;
+            var subText = document.createElement('div');
+            subText.className = 'radio-option-sub';
+            subText.textContent = opt.sub;
+            textWrap.appendChild(mainText);
+            textWrap.appendChild(subText);
+            optEl.appendChild(input);
+            optEl.appendChild(textWrap);
+
+            (function(capturedOpt, capturedAuthCard, capturedAuthGroup) {
+                input.addEventListener('change', function() {
+                    if (input.checked) {
+                        answers.authorization = capturedOpt.value;
+                        capturedAuthGroup.querySelectorAll('label.radio-option').forEach(function(l) {
+                            l.classList.remove('sel-ok', 'sel-warn', 'sel-halt');
+                        });
+                        optEl.classList.add(capturedOpt.selClass);
+                        capturedAuthCard.classList.add('answered');
+                        capturedAuthCard.classList.remove('missing');
+                        if (autosave) autosave.save();
+                    }
+                });
+            })(opt, authCard, authGroup);
+
+            authGroup.appendChild(optEl);
+        });
+
+        authCard.appendChild(authGroup);
+        container.appendChild(authCard);
+
+        // ---- Comments ----
+        var commentsHr = document.createElement('hr');
+        commentsHr.className = 'section-divider';
+        container.appendChild(commentsHr);
+
+        var commentsLabel = document.createElement('label');
+        commentsLabel.className = 'comments-label';
+        commentsLabel.setAttribute('for', 'comments-field');
+        commentsLabel.innerHTML = 'Comments <span class="comments-label-sub">(optional \u2014 for any flagged items or different instructions)</span>';
+        container.appendChild(commentsLabel);
+
+        var commentsTA = document.createElement('textarea');
+        commentsTA.id = 'comments-field';
+        commentsTA.className = 'comments-textarea';
+        commentsTA.placeholder = 'Flag a miscategorised item, describe a different instruction, or note anything else I should know before Phase 2 begins\u2026';
+        commentsTA.value = answers.comments || '';
+        commentsTA.addEventListener('input', function() {
+            answers.comments = commentsTA.value;
+            if (autosave) autosave.save();
+        });
+        container.appendChild(commentsTA);
+
+        // Validation error
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '\u2022 Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong \u2014 please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', function() {
+            // Sync comments
+            var commentsEl = document.getElementById('comments-field');
+            if (commentsEl) answers.comments = commentsEl.value;
+
+            var unanswered = updateValidationState();
+
+            // Highlight missing
+            spotSections.forEach(function(s) {
+                var el = document.getElementById('spotcheck-' + s.id);
+                if (!el) return;
+                if (answers.spotcheck[s.id] === null) {
+                    el.classList.add('missing'); el.classList.remove('answered');
+                } else {
+                    el.classList.remove('missing');
+                }
+            });
+            priorityFlags.forEach(function(f) {
+                var el = document.getElementById('flag-' + f.id);
+                if (!el) return;
+                if (answers.flags[f.id] === null) {
+                    el.classList.add('missing'); el.classList.remove('answered');
+                } else {
+                    el.classList.remove('missing');
+                }
+            });
+            var authEl = document.getElementById('authorization-card');
+            if (authEl) {
+                if (answers.authorization === null) {
+                    authEl.classList.add('missing'); authEl.classList.remove('answered');
+                } else {
+                    authEl.classList.remove('missing');
+                }
+            }
+
+            if (unanswered.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One question still needs an answer \u2014 it\'s highlighted above.'
+                    : unanswered.length + ' questions still need answers \u2014 they\'re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.q-card.missing, .flag-item.missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            document.getElementById('validation-error').classList.remove('visible');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
+
+            var payload = buildPayload();
+            window.submitMission(tokenRecord, payload, respondentName).then(function(ok) {
+                if (!ok) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send my answers';
+                    document.getElementById('error-message').classList.add('visible');
+                }
+            });
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Autosave
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft into rendered DOM
+        if (draft) {
+            // Spotcheck radios
+            if (draft.spotcheck) {
+                Object.keys(draft.spotcheck).forEach(function(sectionId) {
+                    var val = draft.spotcheck[sectionId];
+                    if (!val) return;
+                    var inp = container.querySelector('input[name="spotcheck-' + sectionId + '"][value="' + val + '"]');
+                    if (inp) {
+                        inp.checked = true;
+                        var matchOpt = spotRadioOptions.find(function(o) { return o.value === val; });
+                        if (matchOpt && inp.parentElement) inp.parentElement.classList.add(matchOpt.selClass);
+                        var sc = document.getElementById('spotcheck-' + sectionId);
+                        if (sc) sc.classList.add('answered');
+                    }
+                });
+            }
+            // Flag buttons
+            if (draft.flags) {
+                Object.keys(draft.flags).forEach(function(flagId) {
+                    var val = draft.flags[flagId];
+                    if (!val) return;
+                    var fi = document.getElementById('flag-' + flagId);
+                    if (!fi) return;
+                    fi.classList.add('answered');
+                    var matchCfg = flagBtnConfig.find(function(c) { return c.value === val; });
+                    if (matchCfg) {
+                        var btn = fi.querySelector('.' + matchCfg.btnClass);
+                        if (btn) btn.classList.add('selected');
+                    }
+                });
+            }
+            // Auth radio
+            if (draft.authorization) {
+                var ainp = container.querySelector('input[name="authorization"][value="' + draft.authorization + '"]');
+                if (ainp) {
+                    ainp.checked = true;
+                    var matchAuth = authOptions.find(function(o) { return o.value === draft.authorization; });
+                    if (matchAuth && ainp.parentElement) ainp.parentElement.classList.add(matchAuth.selClass);
+                    var ac = document.getElementById('authorization-card');
+                    if (ac) ac.classList.add('answered');
+                }
+            }
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
