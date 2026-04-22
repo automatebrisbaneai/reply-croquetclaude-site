@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building on what you told us — Round 2 — CroquetClaude</title>
+    <meta name="description" content="Six follow-up questions from CroquetClaude, building on Marilyn Nelson's Round 1 answers about Queensland team culture.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><line x1='16' y1='4' x2='16' y2='28' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='4' y1='16' x2='28' y2='16' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='7.5' y1='7.5' x2='24.5' y2='24.5' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='24.5' y1='7.5' x2='7.5' y2='24.5' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='4' y1='10' x2='28' y2='22' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/><line x1='4' y1='22' x2='28' y2='10' stroke='%2373182C' stroke-width='2.5' stroke-linecap='round'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---------------------------------------------------------------
+           culture-papers-round-2 — per-mission styles
+           DO NOT touch app.js or styles.css — only this block.
+        --------------------------------------------------------------- */
+
+        :root {
+            --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+            --font-sans: 'Atkinson Hyperlegible', 'Inter', system-ui, sans-serif;
+            --color-page: #FAF9F6;
+            --color-card: #FFFFFF;
+            --color-border: #EBE8E1;
+            --color-green: #2D6A4F;
+            --color-terracotta: #BC6C25;
+            --color-ink: #1C1916;
+            --color-preamble: #4A453D;
+            --color-muted: #7A7268;
+            --color-hover-bg: #FAF9F6;
+            --color-hover-border: #C9C3B6;
+            --color-opener: #2D2822;
+        }
+
+        body {
+            background: var(--color-page);
+            font-family: var(--font-sans);
+            color: var(--color-ink);
+            margin: 0;
+            padding: 0;
+        }
+
+        .site-header {
+            display: none;
+        }
+
+        /* ---- Layout ---- */
+        .cp-column {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
+
+        /* ---- Hero letterhead ---- */
+        .hero-band {
+            width: 100%;
+            padding: 64px 0 48px;
+            background: var(--color-page);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-letterhead {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.15s forwards;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            font-weight: 400;
+            color: var(--color-ink);
+            letter-spacing: -0.01em;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.65s forwards;
+            margin-top: 4px;
+        }
+
+        .hero-sender {
+            font-family: var(--font-serif);
+            font-size: clamp(1.7rem, 4vw, 2.2rem);
+            font-weight: 500;
+            color: var(--color-ink);
+            letter-spacing: -0.01em;
+            line-height: 1.15;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.45s forwards;
+        }
+
+        .hero-meta {
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-muted);
+            letter-spacing: 0.02em;
+            opacity: 0;
+            animation: heroFadeIn 0.5s ease-out 0.8s forwards;
+        }
+
+        @keyframes heroFadeIn {
+            to { opacity: 1; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-avatar,
+            .hero-sender,
+            .hero-meta {
+                animation: none;
+                opacity: 1;
+            }
+        }
+
+        /* ---- Opener ---- */
+        .cp-intro {
+            margin-top: 48px;
+            border-left: 3px solid var(--color-green);
+            padding: 28px 32px;
+            background: #F4F1EB;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .cp-intro-label {
+            font-family: var(--font-sans);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-green);
+            margin: 0 0 16px 0;
+        }
+
+        .cp-opener {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            line-height: 1.75;
+            color: var(--color-opener);
+            margin: 0;
+        }
+
+        .cp-opener p {
+            margin: 0 0 1em 0;
+        }
+
+        .cp-opener p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ---- Cards ---- */
+        .cp-cards {
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 56px;
+        }
+
+        .question-card {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(30, 24, 15, 0.04), 0 4px 14px rgba(30, 24, 15, 0.03);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            filter: saturate(0.82) contrast(0.96);
+            display: block;
+        }
+
+        .card-body {
+            padding: 28px 36px 32px;
+        }
+
+        .card-asterisk {
+            width: 32px;
+            height: 32px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .card-preamble {
+            font-family: var(--font-serif);
+            font-size: 17px;
+            line-height: 1.65;
+            color: var(--color-preamble);
+            margin: 0 0 24px 0;
+        }
+
+        .card-instruction {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-green);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin: 0 0 16px 0;
+        }
+
+        .card-rule {
+            border: none;
+            border-top: 1px solid var(--color-border);
+            width: 48px;
+            margin: 0 0 32px 0;
+        }
+
+        .card-question {
+            font-family: var(--font-sans);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--color-ink);
+            line-height: 1.45;
+            margin: 0 0 24px 0;
+        }
+
+        /* ---- Voice textarea ---- */
+        .voice-label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-muted);
+            letter-spacing: 0.01em;
+            margin-bottom: 4px;
+        }
+
+        .voice-textarea {
+            width: 100%;
+            min-height: 96px;
+            background: var(--color-page);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 16px 56px 16px 20px;
+            font-family: var(--font-serif);
+            font-size: 16px;
+            line-height: 1.55;
+            color: var(--color-opener);
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.18s ease-out, background 0.18s ease-out;
+            outline: none;
+        }
+
+        .voice-textarea:focus {
+            border-color: var(--color-hover-border);
+            background: #FFFFFF;
+        }
+
+        /* ---- Submit ---- */
+        .cp-submit {
+            margin-top: 96px;
+            text-align: center;
+        }
+
+        .cp-submit-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-submit-cp {
+            background: var(--color-green);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 28px;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 280px;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-submit-cp:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(115, 24, 44, 0.22);
+        }
+
+        .btn-submit-cp:focus-visible {
+            outline: 2px solid var(--color-green);
+            outline-offset: 3px;
+        }
+
+        .btn-submit-cp:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cp-error-msg {
+            display: none;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--color-green);
+        }
+
+        .cp-error-msg.visible {
+            display: block;
+        }
+
+        .draft-saved-indicator {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-muted);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .draft-saved-indicator.visible {
+            opacity: 1;
+        }
+
+        .draft-restored-notice {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-muted);
+            background: #F3F1EC;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 24px;
+        }
+
+        /* ---- Footer ---- */
+        .cp-footer {
+            margin-top: 64px;
+            padding-bottom: 48px;
+            text-align: center;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: #9A9389;
+            line-height: 1.6;
+        }
+
+        .cp-footer a {
+            color: #9A9389;
+            text-decoration: underline;
+            text-decoration-color: #C9C3B6;
+        }
+
+        /* ---- Spinner ---- */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---- Mobile ---- */
+        @media (max-width: 720px) {
+            .hero-band {
+                padding: 48px 0 36px;
+            }
+
+            .card-img {
+                height: 190px;
+            }
+
+            .card-body {
+                padding: 22px 24px 26px;
+            }
+
+            .cp-intro {
+                padding: 22px 20px;
+            }
+
+            .cp-opener {
+                font-size: 17px;
+            }
+
+            .voice-textarea {
+                min-height: 80px;
+            }
+
+            .btn-submit-cp {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <div class="hero-band" role="banner">
+        <div class="hero-letterhead">
+            <img src="/assets/drawn-claude.png" alt="CroquetClaude" class="hero-avatar">
+            <div class="hero-sender">CroquetClaude</div>
+            <div class="hero-title">What the founding group looks like</div>
+            <div class="hero-meta">Six questions &middot; Round 2</div>
+        </div>
+    </div>
+
+    <div id="app">
+        <div class="cp-column">
+            <div class="loading-screen">Loading your letter&hellip;</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <script src="/shared/voice-to-text.js"></script>
+    <script src="/app.js"></script>
+
+    <!-- Site editor — only activates on ?edit&t=<token>; zero impact otherwise -->
+    <script src="https://edit.croquetwade.com/edit.js"
+            data-stack="git"
+            data-site="reply-cc"
+            data-html-file="culture-papers-round-2/index.html"
+            defer></script>
+
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — culture-papers-round-2
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var state = {
+            q1_voice: '',
+            q2_voice: '',
+            q3_voice: '',
+            q4_voice: '',
+            q5_voice: '',
+            q6_voice: ''
+        };
+
+        if (draft) {
+            if (draft.q1_voice !== undefined) state.q1_voice = draft.q1_voice;
+            if (draft.q2_voice !== undefined) state.q2_voice = draft.q2_voice;
+            if (draft.q3_voice !== undefined) state.q3_voice = draft.q3_voice;
+            if (draft.q4_voice !== undefined) state.q4_voice = draft.q4_voice;
+            if (draft.q5_voice !== undefined) state.q5_voice = draft.q5_voice;
+            if (draft.q6_voice !== undefined) state.q6_voice = draft.q6_voice;
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            return {
+                q1_voice: state.q1_voice,
+                q2_voice: state.q2_voice,
+                q3_voice: state.q3_voice,
+                q4_voice: state.q4_voice,
+                q5_voice: state.q5_voice,
+                q6_voice: state.q6_voice
+            };
+        }
+
+        function makeVoiceTextarea(stateKey, placeholder) {
+            var container = document.createElement('div');
+
+            var label = document.createElement('label');
+            label.className = 'voice-label';
+            label.textContent = 'Add a thought (or hold the mic to speak)';
+            container.appendChild(label);
+
+            var ta = document.createElement('textarea');
+            ta.className = 'voice-textarea';
+            ta.setAttribute('rows', '4');
+            if (placeholder) ta.placeholder = placeholder;
+            ta.value = state[stateKey] || '';
+
+            ta.addEventListener('input', function() {
+                state[stateKey] = ta.value;
+                if (autosave) autosave.save();
+            });
+
+            container.appendChild(ta);
+
+            if (window.VoiceToText) {
+                window.VoiceToText.init({ target: ta, cleanUrl: 'https://talk.croquetwade.com/clean' });
+            }
+
+            return { container: container, textarea: ta };
+        }
+
+        function makeCard(opts) {
+            var card = document.createElement('div');
+            card.className = 'question-card';
+
+            if (opts.imgSrc) {
+                var img = document.createElement('img');
+                img.src = opts.imgSrc;
+                img.alt = opts.imgAlt || '';
+                img.className = 'card-img';
+                img.loading = 'lazy';
+                card.appendChild(img);
+            }
+
+            var body = document.createElement('div');
+            body.className = 'card-body';
+
+            if (opts.useAsterisk) {
+                var asterisk = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                asterisk.setAttribute('viewBox', '0 0 32 32');
+                asterisk.setAttribute('width', '32');
+                asterisk.setAttribute('height', '32');
+                asterisk.className = 'card-asterisk';
+                asterisk.setAttribute('aria-hidden', 'true');
+                var lines = [
+                    [16, 4, 16, 28],
+                    [4, 16, 28, 16],
+                    [7.5, 7.5, 24.5, 24.5],
+                    [24.5, 7.5, 7.5, 24.5],
+                    [4, 10, 28, 22],
+                    [4, 22, 28, 10]
+                ];
+                lines.forEach(function(coords) {
+                    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', coords[0]);
+                    line.setAttribute('y1', coords[1]);
+                    line.setAttribute('x2', coords[2]);
+                    line.setAttribute('y2', coords[3]);
+                    line.setAttribute('stroke', '#BC6C25');
+                    line.setAttribute('stroke-width', '2');
+                    line.setAttribute('stroke-linecap', 'round');
+                    asterisk.appendChild(line);
+                });
+                body.appendChild(asterisk);
+            }
+
+            if (opts.preamble) {
+                var preamble = document.createElement('p');
+                preamble.className = 'card-preamble';
+                if (opts.preambleEditId) preamble.setAttribute('data-edit-id', opts.preambleEditId);
+                preamble.textContent = opts.preamble;
+                body.appendChild(preamble);
+            }
+
+            if (opts.instruction) {
+                var instruction = document.createElement('p');
+                instruction.className = 'card-instruction';
+                instruction.textContent = opts.instruction;
+                body.appendChild(instruction);
+            }
+
+            var rule = document.createElement('hr');
+            rule.className = 'card-rule';
+            body.appendChild(rule);
+
+            var question = document.createElement('p');
+            question.className = 'card-question';
+            if (opts.questionEditId) question.setAttribute('data-edit-id', opts.questionEditId);
+            question.textContent = opts.question;
+            body.appendChild(question);
+
+            if (opts.voiceStateKey) {
+                var voiceResult = makeVoiceTextarea(opts.voiceStateKey, opts.voicePlaceholder);
+                body.appendChild(voiceResult.container);
+            }
+
+            card.appendChild(body);
+            return card;
+        }
+
+        // ---- Build the page ----
+        var app = document.getElementById('app');
+        var column = document.createElement('div');
+        column.className = 'cp-column';
+
+        // Draft restored notice anchor
+        var noticeAnchor = document.createElement('div');
+        noticeAnchor.id = 'draft-notice-anchor';
+        column.appendChild(noticeAnchor);
+
+        // Opener
+        var intro = document.createElement('div');
+        intro.className = 'cp-intro';
+
+        var introLabel = document.createElement('p');
+        introLabel.className = 'cp-intro-label';
+        introLabel.textContent = 'Before you start';
+        intro.appendChild(introLabel);
+
+        var opener = document.createElement('div');
+        opener.className = 'cp-opener';
+
+        var p1 = document.createElement('p');
+        p1.setAttribute('data-edit-id', 'cp2-opener-p1');
+        p1.textContent = firstName + ', thanks for what you sent back on the first round. Your answers were clear and every one of them gave me something concrete to work with.';
+        opener.appendChild(p1);
+
+        var p2 = document.createElement('p');
+        p2.setAttribute('data-edit-id', 'cp2-opener-p2');
+        p2.textContent = 'These six follow-ups build on what you said. You named specific people, described how selection works in practice, and told me where you want to start. I need the details behind those answers before any of this can move forward.';
+        opener.appendChild(p2);
+
+        var p3 = document.createElement('p');
+        p3.setAttribute('data-edit-id', 'cp2-opener-p3');
+        p3.textContent = 'Same format as last time. Say as much or as little as fits. The mic button works if you would rather talk than type.';
+        opener.appendChild(p3);
+
+        intro.appendChild(opener);
+        column.appendChild(intro);
+
+        // Cards
+        var cardsEl = document.createElement('div');
+        cardsEl.className = 'cp-cards';
+
+        // Card 1 — The founding group
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-1-founding.jpg',
+            imgAlt: 'Pat Lam, Connacht and Bristol Bears rugby coach',
+            preamble: 'When Pat Lam took over at Connacht, his first move was identifying two senior players who already carried the standard he wanted. Everything else followed from that starting group. You named three people who sound like they fill that same role in Queensland GC.',
+            preambleEditId: 'cp2-card1-preamble',
+            instruction: 'Here\u2019s my question',
+            question: 'You named Dick Byers to lead it, with Murray Tinker and Peter Nicholson alongside. What does each of them bring that the others don\u2019t? And would they be willing \u2014 have you had that conversation with any of them?',
+            questionEditId: 'cp2-card1-question',
+            voiceStateKey: 'q1_voice'
+        }));
+
+        // Card 2 — "Few if any of the current players"
+        cardsEl.appendChild(makeCard({
+            useAsterisk: true,
+            preamble: 'You said \u201cfew if any of the current players in the current system should be there.\u201d That\u2019s a strong position and worth unpacking. When Fagan started at the Lions in 2017, some players left on their own once the standard shifted. Others stayed and grew into it.',
+            preambleEditId: 'cp2-card2-preamble',
+            instruction: 'Here\u2019s my question',
+            question: 'What are you seeing in the current group that makes you say that? Is it attitude, effort, how they treat other players \u2014 or something else? And are there any current players who would fit if the standard changed?',
+            questionEditId: 'cp2-card2-question',
+            voiceStateKey: 'q2_voice'
+        }));
+
+        // Card 3 — Club nominations
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-3-clubs.jpg',
+            imgAlt: 'Golf croquet match at club level',
+            preamble: 'The pattern across every case in the papers is the same: find people already inside the system who play and behave the way you want, then build outward from them. You said clubs should nominate young players with five or more years of potential ahead of them.',
+            preambleEditId: 'cp2-card3-preamble',
+            instruction: 'Here\u2019s my question',
+            question: 'Which clubs have GC players worth asking about? And who at those clubs \u2014 a captain, a coach, someone informal \u2014 would you trust to spot the right people?',
+            questionEditId: 'cp2-card3-question',
+            voiceStateKey: 'q3_voice'
+        }));
+
+        // Card 4 — How GC selection actually works today
+        cardsEl.appendChild(makeCard({
+            imgSrc: 'images/card-4-selection.jpg',
+            imgAlt: 'Team selection board',
+            preamble: 'You said the program is splintered \u2014 different selectors for each code, golf rewards best rankings first. The papers describe selection as the loudest signal a program sends. If the stated values and the actual picks don\u2019t line up, people believe the picks. This question is about the mechanics.',
+            preambleEditId: 'cp2-card4-preamble',
+            instruction: 'Here\u2019s my question',
+            question: 'Walk me through how GC state selection actually works right now. Who decides? What information do they look at? Is there a meeting, a spreadsheet, a conversation? And where does attitude come into it in practice \u2014 not on paper, but what actually happens?',
+            questionEditId: 'cp2-card4-question',
+            voiceStateKey: 'q4_voice'
+        }));
+
+        // Card 5 — First step after ISS
+        cardsEl.appendChild(makeCard({
+            useAsterisk: true,
+            preamble: 'You said \u201cstart immediately after ISS this year.\u201d This question is about what that first step actually looks like.',
+            preambleEditId: 'cp2-card5-preamble',
+            instruction: 'Here\u2019s my question',
+            question: 'When is ISS this year? And what does \u201cimmediately after\u201d look like to you \u2014 a first squad day, a coffee with Dick, a written proposal to the Board, something else?',
+            questionEditId: 'cp2-card5-question',
+            voiceStateKey: 'q5_voice'
+        }));
+
+        // Card 6 — Her role
+        cardsEl.appendChild(makeCard({
+            useAsterisk: true,
+            preamble: 'The founding group you described \u2014 Dick, Murray, Peter \u2014 are all players and coaches. You\u2019re the Golf Coordinator.',
+            preambleEditId: 'cp2-card6-preamble',
+            instruction: 'Here\u2019s my question',
+            question: 'What authority do you actually have here? Can you bring that founding group together directly, or does it need to go through the Board or the Selection Committee first? And how do you see your own role once the squad is running?',
+            questionEditId: 'cp2-card6-question',
+            voiceStateKey: 'q6_voice'
+        }));
+
+        column.appendChild(cardsEl);
+
+        // Submit
+        var submitSection = document.createElement('div');
+        submitSection.className = 'cp-submit';
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'cp-submit-wrap submit-wrap';
+
+        var draftIndicator = document.createElement('span');
+        draftIndicator.id = 'draft-saved-indicator';
+        draftIndicator.className = 'draft-saved-indicator';
+        draftIndicator.textContent = '\u2022 Draft saved';
+        submitWrap.appendChild(draftIndicator);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.type = 'button';
+        submitBtn.className = 'btn-submit-cp btn-submit';
+        submitBtn.textContent = 'Send your reply \u2192';
+        submitWrap.appendChild(submitBtn);
+
+        var errorMsg = document.createElement('div');
+        errorMsg.id = 'error-message';
+        errorMsg.className = 'cp-error-msg error-message';
+        errorMsg.innerHTML = 'Something went wrong \u2014 please try again or email <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+        submitWrap.appendChild(errorMsg);
+
+        submitSection.appendChild(submitWrap);
+        column.appendChild(submitSection);
+
+        var footer = document.createElement('footer');
+        footer.className = 'cp-footer';
+        footer.innerHTML = 'Your answers autosave as you type. Close the page and come back anytime.<br><a href="https://croquetclaude.com/privacy">Privacy note</a>';
+        column.appendChild(footer);
+
+        app.innerHTML = '';
+        app.appendChild(column);
+
+        // Submit handler
+        submitBtn.addEventListener('click', async function() {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
+            errorMsg.classList.remove('visible');
+
+            var ok = await window.submitMission(tokenRecord, buildPayload(), respondentName);
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send your reply \u2192';
+                errorMsg.classList.add('visible');
+            }
+        });
+
+        // Autosave
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft notice
+        if (draft) {
+            var anchor = document.getElementById('draft-notice-anchor');
+            if (anchor) {
+                var noticeEl = document.createElement('div');
+                noticeEl.className = 'draft-restored-notice';
+                var rel = (function(dateStr) {
+                    if (!dateStr) return null;
+                    var then = new Date(dateStr);
+                    if (isNaN(then.getTime())) return null;
+                    var diffMs = Date.now() - then.getTime();
+                    var diffMins = Math.floor(diffMs / 60000);
+                    if (diffMins < 1) return 'just now';
+                    if (diffMins < 60) return diffMins + ' minute' + (diffMins === 1 ? '' : 's') + ' ago';
+                    var diffHours = Math.floor(diffMins / 60);
+                    if (diffHours < 24) return diffHours + ' hour' + (diffHours === 1 ? '' : 's') + ' ago';
+                    var diffDays = Math.floor(diffHours / 24);
+                    return diffDays + ' day' + (diffDays === 1 ? '' : 's') + ' ago';
+                })(tokenRecord.updated);
+                noticeEl.textContent = 'Draft from ' + (rel || 'earlier') + ' restored.';
+                anchor.appendChild(noticeEl);
+            }
+        }
+
+        // GSAP scroll animations
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.gsap && window.ScrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+            document.querySelectorAll('.question-card').forEach(function(card) {
+                gsap.from(card, {
+                    opacity: 0,
+                    y: 24,
+                    duration: 0.6,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 88%'
+                    }
+                });
+            });
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
