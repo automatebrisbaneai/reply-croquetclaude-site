@@ -260,6 +260,36 @@
             background: #FFFFFF;
         }
 
+        /* ---- File upload ---- */
+        .file-upload-wrap {
+            margin-top: 16px;
+            padding: 16px 20px;
+            border: 1px dashed var(--color-border);
+            border-radius: 10px;
+            background: var(--color-page);
+        }
+        .file-upload-label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-preamble);
+            margin-bottom: 10px;
+        }
+        .file-upload-input {
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--color-opener);
+        }
+        .file-upload-list {
+            margin-top: 8px;
+        }
+        .file-upload-item {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            color: var(--color-green);
+            padding: 4px 0;
+        }
+
         /* ---- Submit ---- */
         .cp-submit {
             margin-top: 96px;
@@ -579,6 +609,40 @@
                 body.appendChild(voiceResult.container);
             }
 
+            if (opts.fileUpload) {
+                var uploadWrap = document.createElement('div');
+                uploadWrap.className = 'file-upload-wrap';
+
+                var uploadLabel = document.createElement('label');
+                uploadLabel.className = 'file-upload-label';
+                uploadLabel.textContent = opts.fileUploadLabel || 'Attach files (PDF, Word, images)';
+                uploadWrap.appendChild(uploadLabel);
+
+                var fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.multiple = true;
+                fileInput.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt';
+                fileInput.className = 'file-upload-input';
+                fileInput.id = opts.fileUploadId || 'file-upload';
+                uploadWrap.appendChild(fileInput);
+
+                var fileList = document.createElement('div');
+                fileList.className = 'file-upload-list';
+                uploadWrap.appendChild(fileList);
+
+                fileInput.addEventListener('change', function() {
+                    fileList.innerHTML = '';
+                    for (var i = 0; i < fileInput.files.length; i++) {
+                        var item = document.createElement('div');
+                        item.className = 'file-upload-item';
+                        item.textContent = fileInput.files[i].name + ' (' + Math.round(fileInput.files[i].size / 1024) + ' KB)';
+                        fileList.appendChild(item);
+                    }
+                });
+
+                body.appendChild(uploadWrap);
+            }
+
             card.appendChild(body);
             return card;
         }
@@ -642,7 +706,7 @@
         // Card 2 — "Few if any of the current players"
         cardsEl.appendChild(makeCard({
             useAsterisk: true,
-            preamble: 'You said \u201cfew if any of the current players in the current system should be there.\u201d That\u2019s a strong position and worth unpacking. When Fagan started at the Lions in 2017, some players left on their own once the standard shifted. Others stayed and grew into it.',
+            preamble: 'You said \u201cfew if any of the current players in the current system should be there.\u201d That\u2019s a strong position. When Fagan started at the Lions in 2017, some players left on their own once the standard shifted. Others stayed and grew into it.',
             preambleEditId: 'cp2-card2-preamble',
             instruction: 'Here\u2019s my question',
             question: 'What are you seeing in the current group that makes you say that? Is it attitude, effort, how they treat other players \u2014 or something else? And are there any current players who would fit if the standard changed?',
@@ -669,9 +733,12 @@
             preamble: 'You said the program is splintered \u2014 different selectors for each code, golf rewards best rankings first. The papers describe selection as the loudest signal a program sends. If the stated values and the actual picks don\u2019t line up, people believe the picks. This question is about the mechanics.',
             preambleEditId: 'cp2-card4-preamble',
             instruction: 'Here\u2019s my question',
-            question: 'Walk me through how GC state selection actually works right now. Who decides? What information do they look at? Is there a meeting, a spreadsheet, a conversation? And where does attitude come into it in practice \u2014 not on paper, but what actually happens?',
+            question: 'Can you send me the current GC selection policies? The actual documents \u2014 whatever selectors are working from. And walk me through how it plays out in practice: who decides, what information do they look at, and where does attitude come into it \u2014 not on paper, but what actually happens?',
             questionEditId: 'cp2-card4-question',
-            voiceStateKey: 'q4_voice'
+            voiceStateKey: 'q4_voice',
+            fileUpload: true,
+            fileUploadId: 'q4-files',
+            fileUploadLabel: 'Attach the selection policy documents if you have them (PDF, Word, or photo of a printout)'
         }));
 
         // Card 5 — First step after ISS
@@ -741,7 +808,9 @@
             submitBtn.innerHTML = '<span class="spinner"></span> Sending\u2026';
             errorMsg.classList.remove('visible');
 
-            var ok = await window.submitMission(tokenRecord, buildPayload(), respondentName);
+            var fileInput = document.getElementById('q4-files');
+            var files = fileInput ? fileInput.files : null;
+            var ok = await window.submitMission(tokenRecord, buildPayload(), respondentName, files);
             if (!ok) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send your reply \u2192';

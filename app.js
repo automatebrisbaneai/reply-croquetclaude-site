@@ -270,24 +270,41 @@ function showDraftRestoredNotice(container, savedAt) {
  * @param {object} tokenRecord  — the full PB token record (needs .id and .token and .mission)
  * @param {object} responsePayload — the JSON payload to store
  * @param {string} respondentName — for the thank-you message
+ * @param {FileList|File[]} [attachments] — optional file attachments
  * @returns {Promise<boolean>} — true on success
  */
-async function submitMission(tokenRecord, responsePayload, respondentName) {
-    // 1. POST the response
-    const postBody = JSON.stringify({
-        token: tokenRecord.token,
-        mission: tokenRecord.mission,
-        payload: responsePayload,
-        user_agent: navigator.userAgent,
-        submitted_at: new Date().toISOString()
-    });
-
+async function submitMission(tokenRecord, responsePayload, respondentName, attachments) {
+    // 1. POST the response — use FormData when attachments present
     let postOk = false;
     try {
+        let body, headers;
+        if (attachments && attachments.length > 0) {
+            const fd = new FormData();
+            fd.append('token', tokenRecord.token);
+            fd.append('mission', tokenRecord.mission);
+            fd.append('payload', JSON.stringify(responsePayload));
+            fd.append('user_agent', navigator.userAgent);
+            fd.append('submitted_at', new Date().toISOString());
+            for (let i = 0; i < attachments.length; i++) {
+                fd.append('attachments', attachments[i]);
+            }
+            body = fd;
+            headers = {};
+        } else {
+            body = JSON.stringify({
+                token: tokenRecord.token,
+                mission: tokenRecord.mission,
+                payload: responsePayload,
+                user_agent: navigator.userAgent,
+                submitted_at: new Date().toISOString()
+            });
+            headers = { 'Content-Type': 'application/json' };
+        }
+
         const res = await fetch(`${PB_BASE}/api/collections/${RESPONSES_COLLECTION}/records`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: postBody
+            headers: headers,
+            body: body
         });
         postOk = res.ok;
     } catch {
