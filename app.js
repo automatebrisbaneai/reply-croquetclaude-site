@@ -126,6 +126,17 @@ async function fetchToken(tokenValue) {
  * The mission page must define window.renderMission before calling this.
  */
 async function initMission() {
+    const params = new URLSearchParams(window.location.search);
+
+    // Edit mode: skip reply-token validation — render page for editing.
+    // edit.js handles its own token from the edit_tokens collection.
+    if (params.has('edit')) {
+        if (typeof window.renderMission === 'function') {
+            window.renderMission({ token: 'edit-preview', seed: {} });
+        }
+        return;
+    }
+
     const tokenValue = getTokenParam();
     if (!tokenValue) {
         showExpiredScreen();
