@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awaiting Wade queue drain -- CroquetClaude</title>
+    <meta name="description" content="Six decisions bundled into one pass. Clear the queue.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* ---- Mission-scoped styles: queue-drain-2026-04 ---- */
+
+    .qd-section {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 2rem 2.25rem;
+        margin-bottom: 2rem;
+        transition: border-color 0.2s;
+    }
+    .qd-section-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: #bc6c25;
+        background: #fdf5ee;
+        border: 1px solid #f0d4b0;
+        border-radius: 4px;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.75rem;
+    }
+    .qd-section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a2e1f;
+        margin-bottom: 0.4rem;
+        line-height: 1.3;
+    }
+    .qd-section-sub {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin-bottom: 1.4rem;
+        line-height: 1.55;
+    }
+    .qd-divider {
+        height: 1px;
+        background: #f0f0f0;
+        margin: 0 0 1.5rem;
+    }
+
+    /* Voice URL cards */
+    .voice-url-card {
+        background: #fafafa;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1.25rem 1.4rem;
+        margin-bottom: 1.1rem;
+        transition: border-color 0.2s;
+    }
+    .voice-url-card.answered { border-color: #2d6a4f; }
+    .voice-url-card.missing  { border-color: #b83227; background: #fff8f7; }
+    .voice-url-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1a2e1f;
+        margin-bottom: 0.85rem;
+    }
+    .voice-url-label a {
+        color: #2d6a4f;
+        text-decoration: none;
+        border-bottom: 1px solid #9dc9b2;
+    }
+    .voice-url-label a:hover { border-color: #2d6a4f; }
+
+    .criteria-list {
+        margin: 0 0 1rem 0;
+        padding: 0;
+        list-style: none;
+    }
+    .criteria-list li {
+        font-size: 0.85rem;
+        color: #4b5563;
+        padding: 0.22rem 0 0.22rem 1.4rem;
+        position: relative;
+        line-height: 1.5;
+    }
+    .criteria-list li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0.55rem;
+        width: 10px;
+        height: 10px;
+        border: 1.5px solid #9dc9b2;
+        border-radius: 2px;
+        background: #fff;
+    }
+
+    .pf-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .pf-label { font-size: 0.85rem; color: #4b5563; min-width: 60px; }
+    .pf-select {
+        padding: 0.4rem 2rem 0.4rem 0.75rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 7px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        color: #1a2e1f;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color 0.15s;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.65rem center;
+        min-width: 120px;
+    }
+    .pf-select:focus { outline: none; border-color: #2d6a4f; }
+    .pf-select.val-pass { border-color: #2d6a4f; background-color: #f0f7f3; color: #1a5c38; }
+    .pf-select.val-fail { border-color: #b83227; background-color: #fff8f7; color: #b83227; }
+    .pf-select.val-skip { border-color: #bc6c25; background-color: #fdf5ee; color: #8b4a16; }
+
+    .notes-field {
+        width: 100%;
+        min-height: 72px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        font-size: 0.88rem;
+        font-family: inherit;
+        color: #1a2e1f;
+        background: #fafafa;
+        resize: vertical;
+        box-sizing: border-box;
+        transition: border-color 0.15s;
+        margin-top: 0.6rem;
+    }
+    .notes-field:focus { outline: none; border-color: #2d6a4f; background: #fff; }
+    .notes-label { font-size: 0.8rem; color: #6b7280; margin-top: 0.75rem; margin-bottom: 0.2rem; display: block; }
+
+    /* Section 2 free-text questions */
+    .fq-card {
+        background: #fafafa;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        transition: border-color 0.2s;
+    }
+    .fq-card.answered { border-color: #2d6a4f; }
+    .fq-card.missing  { border-color: #b83227; background: #fff8f7; }
+    .fq-num {
+        font-size: 0.73rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #bc6c25;
+        margin-bottom: 0.3rem;
+    }
+    .fq-question {
+        font-size: 0.97rem;
+        font-weight: 600;
+        color: #1a2e1f;
+        margin-bottom: 0.6rem;
+        line-height: 1.4;
+    }
+    .fq-textarea {
+        width: 100%;
+        min-height: 80px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        font-size: 0.92rem;
+        font-family: inherit;
+        color: #1a2e1f;
+        background: #fff;
+        resize: vertical;
+        box-sizing: border-box;
+        transition: border-color 0.15s;
+    }
+    .fq-textarea:focus { outline: none; border-color: #2d6a4f; }
+
+    /* Embedded doc preview */
+    .doc-preview {
+        background: #f8f9fa;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.88rem;
+        color: #374151;
+        line-height: 1.7;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .doc-preview h1 { font-size: 1.05rem; color: #1a2e1f; margin: 0 0 0.75rem; font-weight: 700; }
+    .doc-preview h2 { font-size: 0.95rem; color: #1a2e1f; margin: 1rem 0 0.4rem; font-weight: 700; }
+    .doc-preview h3 { font-size: 0.9rem; color: #1a2e1f; margin: 0.75rem 0 0.3rem; font-weight: 600; }
+    .doc-preview p  { margin: 0.5rem 0; }
+    .doc-preview ul { margin: 0.3rem 0 0.3rem 1.2rem; padding: 0; }
+    .doc-preview li { margin-bottom: 0.25rem; }
+    .doc-preview strong { color: #1a2e1f; }
+    .doc-preview hr { border: none; border-top: 1px solid #e5e7eb; margin: 0.75rem 0; }
+    .doc-preview em { color: #6b7280; font-style: italic; font-size: 0.85rem; }
+
+    /* Radio groups */
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        margin-bottom: 0.75rem;
+    }
+    .radio-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        background: #fafafa;
+    }
+    .radio-option:hover { background: #f0f7f3; border-color: #9dc9b2; }
+    .radio-option.sel-approve { border-color: #2d6a4f; background: #f0f7f3; }
+    .radio-option.sel-revise  { border-color: #bc6c25; background: #fdf5ee; }
+    .radio-option.sel-park    { border-color: #6b7280; background: #f3f4f6; }
+    .radio-option.sel-clean   { border-color: #2d6a4f; background: #f0f7f3; }
+    .radio-option.sel-alarm   { border-color: #b83227; background: #fff8f7; }
+    .radio-option.sel-pilot   { border-color: #2d6a4f; background: #f0f7f3; }
+    .radio-option.sel-custom  { border-color: #bc6c25; background: #fdf5ee; }
+    .radio-option input[type="radio"] {
+        margin-top: 0.2rem;
+        accent-color: #2d6a4f;
+        flex-shrink: 0;
+        width: 17px;
+        height: 17px;
+    }
+    .radio-option-text { font-size: 0.97rem; color: #1a2e1f; line-height: 1.4; }
+    .radio-option-sub  { font-size: 0.84rem; color: #6b7280; margin-top: 0.1rem; }
+
+    .conditional-textarea {
+        margin-top: 0.75rem;
+        display: none;
+    }
+    .conditional-textarea.visible { display: block; }
+
+    /* Skill cards */
+    .skill-card {
+        background: #f8f9fa;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 0.85rem;
+    }
+    .skill-rank {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #bc6c25;
+        margin-bottom: 0.25rem;
+    }
+    .skill-name { font-size: 0.97rem; font-weight: 600; color: #1a2e1f; margin-bottom: 0.2rem; }
+    .skill-detail { font-size: 0.85rem; color: #4b5563; line-height: 1.5; }
+
+    /* Log tail unavailable */
+    .log-tail-unavailable {
+        background: #f3f4f6;
+        border: 1px dashed #d1d5db;
+        border-radius: 9px;
+        padding: 1.1rem 1.4rem;
+        font-size: 0.88rem;
+        color: #6b7280;
+        margin-bottom: 1.25rem;
+        line-height: 1.6;
+    }
+    .log-tail-unavailable a { color: #2d6a4f; }
+
+    /* Context box */
+    .context-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-left: 3px solid #2d6a4f;
+        border-radius: 0 8px 8px 0;
+        padding: 0.9rem 1.2rem;
+        margin-bottom: 1.25rem;
+        font-size: 0.88rem;
+        color: #374151;
+        line-height: 1.65;
+    }
+    .context-box strong { color: #1a2e1f; }
+
+    /* Progress bar */
+    .progress-bar-wrap { margin-bottom: 2rem; }
+    .progress-bar-label { font-size: 0.82rem; color: #6b7280; margin-bottom: 0.4rem; display: flex; justify-content: space-between; }
+    .progress-bar-track { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #2d6a4f; border-radius: 3px; transition: width 0.3s; }
+
+    /* Validation + submit */
+    .validation-error { color: #b83227; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+    .validation-error.visible { display: block; }
+    .submit-wrap { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f0f0f0; }
+    .error-message { display: none; font-size: 0.9rem; color: #b83227; }
+    .error-message.visible { display: block; }
+
+    @media (max-width: 620px) {
+        .qd-section { padding: 1.35rem 1.2rem; }
+        .pf-row { flex-direction: column; align-items: flex-start; }
+        .radio-option { padding: 0.7rem 0.75rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .radio-option, .pf-select, .voice-url-card, .fq-card, .qd-section, .progress-bar-fill { transition: none; }
+    }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Queue drain -- April 2026</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: queue-drain-2026-04
+    // Awaiting Wade overflow -- 6 items bundled into one pass.
+    // Cards cleared: voice walkthrough x3, Dick Byres email, research brief,
+    // GC Worlds article, Better Skills pilot, Phase 7c log observation.
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var respondentName = tokenRecord.respondent_name || 'Wade';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        // ---- Answer state ----
+        var answers = {
+            voice_talk:    { result: '', notes: '' },
+            voice_share:   { result: '', notes: '' },
+            voice_reply:   { result: '', notes: '' },
+            noosa_outcome:   '',
+            coolum_venue:    '',
+            date_window:     '',
+            project_name:    '',
+            nambour_framing: '',
+            speaker_lineup:  '',
+            research_decision: '',
+            research_notes:    '',
+            article_decision:  '',
+            article_notes:     '',
+            skills_decision:   '',
+            skills_notes:      '',
+            phase7c_decision:  '',
+            phase7c_notes:     ''
+        };
+
+        // Pre-load from draft
+        if (draft) {
+            Object.keys(answers).forEach(function(k) {
+                if (draft[k] !== undefined) {
+                    if (typeof answers[k] === 'object' && answers[k] !== null) {
+                        Object.assign(answers[k], draft[k]);
+                    } else {
+                        answers[k] = draft[k];
+                    }
+                }
+            });
+        }
+
+        var autosave = null;
+        var s3el, s4el, s5el, s6el;
+
+        function getFieldVal(id) {
+            var el = document.getElementById(id);
+            return el ? el.value : '';
+        }
+
+        function buildPayload() {
+            return {
+                voice_talk:    { result: answers.voice_talk.result,  notes: getFieldVal('notes-talk') || answers.voice_talk.notes },
+                voice_share:   { result: answers.voice_share.result, notes: getFieldVal('notes-share') || answers.voice_share.notes },
+                voice_reply:   { result: answers.voice_reply.result, notes: getFieldVal('notes-reply') || answers.voice_reply.notes },
+                noosa_outcome:   getFieldVal('fq-noosa-outcome')   || answers.noosa_outcome,
+                coolum_venue:    getFieldVal('fq-coolum-venue')    || answers.coolum_venue,
+                date_window:     getFieldVal('fq-date-window')     || answers.date_window,
+                project_name:    getFieldVal('fq-project-name')    || answers.project_name,
+                nambour_framing: getFieldVal('fq-nambour-framing') || answers.nambour_framing,
+                speaker_lineup:  getFieldVal('fq-speaker-lineup')  || answers.speaker_lineup,
+                research_decision: answers.research_decision,
+                research_notes:    getFieldVal('research-notes')   || answers.research_notes,
+                article_decision:  answers.article_decision,
+                article_notes:     getFieldVal('article-notes')    || answers.article_notes,
+                skills_decision:   answers.skills_decision,
+                skills_notes:      getFieldVal('skills-notes')     || answers.skills_notes,
+                phase7c_decision:  answers.phase7c_decision,
+                phase7c_notes:     getFieldVal('phase7c-notes')    || answers.phase7c_notes
+            };
+        }
+
+        function updateProgress() {
+            var total = 13, done = 0;
+
+            if (answers.voice_talk.result) done++;
+            if (answers.voice_share.result) done++;
+            if (answers.voice_reply.result) done++;
+
+            var s2ids = ['fq-noosa-outcome','fq-coolum-venue','fq-date-window','fq-project-name','fq-nambour-framing','fq-speaker-lineup'];
+            s2ids.forEach(function(id) { if (getFieldVal(id).trim()) done++; });
+
+            if (answers.research_decision) done++;
+            if (answers.article_decision) done++;
+            if (answers.skills_decision) done++;
+            if (answers.phase7c_decision) done++;
+
+            var pct = Math.round((done / total) * 100);
+            var fill = document.getElementById('progress-fill');
+            var lbl = document.getElementById('progress-label-count');
+            if (fill) fill.style.width = pct + '%';
+            if (lbl) lbl.textContent = done + ' of ' + total + ' items answered';
+        }
+
+        // ---- Build DOM ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML = '<p>Hi ' + firstName + '. The Awaiting Wade queue hit 6 cards -- one above the cap. Rather than six interruptions, here they are bundled. Work through what you can in one sitting, skip anything that needs more thought, and submit when you are ready.</p>'
+            + '<p>Section 1 is highest leverage: one test pass clears three cards. Sections 2 through 6 are independent -- any order is fine.</p>'
+            + '<p style="font-size:0.85rem;color:#6b7280;font-style:italic;border-top:1px dashed #e5e7eb;padding-top:0.75rem;margin-top:0.75rem;">Your answers save automatically as you go. Close the tab and come back any time -- the link picks up where you left off until you press Send my answers.</p>';
+        container.appendChild(opener);
+
+        // Draft restored notice
+        if (draft && draft._savedAt) {
+            showDraftRestoredNotice(container, draft._savedAt);
+        }
+
+        // Progress bar
+        var progressWrap = document.createElement('div');
+        progressWrap.className = 'progress-bar-wrap';
+        progressWrap.innerHTML = '<div class="progress-bar-label"><span>Progress</span><span id="progress-label-count">0 of 13 items answered</span></div>'
+            + '<div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>';
+        container.appendChild(progressWrap);
+
+        // ================================================================
+        // SECTION 1 -- Voice walk-through (clears 3 cards)
+        // ================================================================
+        var s1el = buildSectionEl({
+            badge: 'Section 1 -- clears 3 cards',
+            title: 'Voice walk-through',
+            sub: 'Open each URL, speak 2-3 sentences into the talk box, stop recording. Mark each pass or fail against the criteria below.'
+        });
+
+        var criteriaBox = document.createElement('div');
+        criteriaBox.className = 'context-box';
+        criteriaBox.innerHTML = '<strong>Criteria (same for all three URLs):</strong>'
+            + '<ul class="criteria-list">'
+            + '<li>Single talk box visible -- no second box appears below</li>'
+            + '<li>Cleaned text appears as unblurred prefix inside that single box</li>'
+            + '<li>No meta-chatter ("okay I\'ll clean that up for you...") leaks through</li>'
+            + '<li>Micro-chunks (fragments under 40 characters) do not ship</li>'
+            + '<li>Words do not vanish during round-trip</li>'
+            + '<li>Record button re-enables after stopping</li>'
+            + '<li>If offline: button still re-enables -- no stuck state</li>'
+            + '</ul>';
+        s1el.appendChild(criteriaBox);
+
+        var voiceURLs = [
+            { id: 'talk',  label: 'talk.croquetwade.com',    url: 'https://talk.croquetwade.com',    answerKey: 'voice_talk',  notesId: 'notes-talk' },
+            { id: 'share', label: 'share.croquetqld.org',    url: 'https://share.croquetqld.org',    answerKey: 'voice_share', notesId: 'notes-share' },
+            { id: 'reply', label: 'reply.croquetclaude.com', url: 'https://reply.croquetclaude.com', answerKey: 'voice_reply', notesId: 'notes-reply' }
+        ];
+
+        voiceURLs.forEach(function(vu) {
+            var card = document.createElement('div');
+            card.className = 'voice-url-card' + (answers[vu.answerKey].result ? ' answered' : '');
+            card.id = 'voice-card-' + vu.id;
+
+            var urlLbl = document.createElement('div');
+            urlLbl.className = 'voice-url-label';
+            urlLbl.innerHTML = '<a href="' + vu.url + '" target="_blank" rel="noopener">' + vu.label + '</a>';
+            card.appendChild(urlLbl);
+
+            var pfRow = document.createElement('div');
+            pfRow.className = 'pf-row';
+
+            var pfLbl = document.createElement('span');
+            pfLbl.className = 'pf-label';
+            pfLbl.textContent = 'Result:';
+
+            var pfSel = document.createElement('select');
+            pfSel.className = 'pf-select' + (answers[vu.answerKey].result ? ' val-' + answers[vu.answerKey].result : '');
+            pfSel.innerHTML = '<option value="">-- pick one</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="skip">Skip</option>';
+            pfSel.value = answers[vu.answerKey].result || '';
+
+            pfSel.addEventListener('change', function() {
+                answers[vu.answerKey].result = pfSel.value;
+                pfSel.className = 'pf-select' + (pfSel.value ? ' val-' + pfSel.value : '');
+                card.className = 'voice-url-card' + (pfSel.value ? ' answered' : '');
+                card.classList.remove('missing');
+                updateProgress();
+                if (autosave) autosave.save();
+            });
+
+            pfRow.appendChild(pfLbl);
+            pfRow.appendChild(pfSel);
+            card.appendChild(pfRow);
+
+            var notesLbl = document.createElement('label');
+            notesLbl.className = 'notes-label';
+            notesLbl.textContent = 'Notes (optional):';
+            var notesTA = document.createElement('textarea');
+            notesTA.className = 'notes-field';
+            notesTA.id = vu.notesId;
+            notesTA.placeholder = 'Any issues or observations...';
+            notesTA.value = answers[vu.answerKey].notes || '';
+            notesTA.addEventListener('input', function() {
+                answers[vu.answerKey].notes = notesTA.value;
+                if (autosave) autosave.save();
+            });
+            card.appendChild(notesLbl);
+            card.appendChild(notesTA);
+
+            s1el.appendChild(card);
+        });
+
+        container.appendChild(s1el);
+
+        // ================================================================
+        // SECTION 2 -- Dick Byres breakfast email
+        // ================================================================
+        var s2el = buildSectionEl({
+            badge: 'Section 2',
+            title: 'Dick Byres Sunshine Coast breakfast email',
+            sub: 'Six answers that unblock Writer Claude to draft this email. All six are required before submit.'
+        });
+
+        var s2questions = [
+            { id: 'fq-noosa-outcome',   answerKey: 'noosa_outcome',   num: '1', q: 'Noosa outcome', hint: 'One-liner on what happened there and the result. We are referencing it in the email -- what is the truthful headline?' },
+            { id: 'fq-coolum-venue',    answerKey: 'coolum_venue',    num: '2', q: 'Coolum venue', hint: 'Confirmed? If yes, venue name and any quirks to name. If no, state of play.' },
+            { id: 'fq-date-window',     answerKey: 'date_window',     num: '3', q: 'Date window', hint: 'Earliest and latest acceptable breakfast dates for the Coolum kickoff.' },
+            { id: 'fq-project-name',    answerKey: 'project_name',    num: '4', q: 'Project name', hint: 'What do we call this in the email? "Sunshine Coast kickoff", "North Coast initiative", something specific?' },
+            { id: 'fq-nambour-framing', answerKey: 'nambour_framing', num: '5', q: 'Nambour framing', hint: 'How does Nambour fit the story? Parallel pilot, next stop, or not mentioned?' },
+            { id: 'fq-speaker-lineup',  answerKey: 'speaker_lineup',  num: '6', q: 'Speaker lineup', hint: 'Who speaks on the day? Just you, or someone else alongside?' }
+        ];
+
+        s2questions.forEach(function(q) {
+            var card = document.createElement('div');
+            card.className = 'fq-card' + (answers[q.answerKey] ? ' answered' : '');
+            card.id = 'fq-card-' + q.id;
+
+            card.innerHTML = '<div class="fq-num">Question ' + q.num + '</div>'
+                + '<div class="fq-question">' + q.q + '</div>';
+
+            var ta = document.createElement('textarea');
+            ta.className = 'fq-textarea';
+            ta.id = q.id;
+            ta.placeholder = q.hint;
+            ta.value = answers[q.answerKey] || '';
+
+            ta.addEventListener('input', function() {
+                answers[q.answerKey] = ta.value;
+                card.className = 'fq-card' + (ta.value.trim() ? ' answered' : '');
+                card.classList.remove('missing');
+                updateProgress();
+                if (autosave) autosave.save();
+            });
+
+            card.appendChild(ta);
+            s2el.appendChild(card);
+        });
+
+        container.appendChild(s2el);
+
+        // ================================================================
+        // SECTION 3 -- Research brief review
+        // ================================================================
+        s3el = buildSectionEl({
+            badge: 'Section 3',
+            title: 'QLD membership research brief',
+            sub: 'Vault research -- step 1 output. Approve to advance to step 2, revise if something is wrong, or park it.'
+        });
+
+        var researchDoc = document.createElement('div');
+        researchDoc.className = 'doc-preview';
+        researchDoc.innerHTML = renderMarkdown(RESEARCH_CONTENT);
+        s3el.appendChild(researchDoc);
+
+        buildRadioGroupInto(s3el, [
+            { value: 'approve', label: 'Approve',  sub: 'Research pipeline advances to step 2',    selClass: 'sel-approve' },
+            { value: 'revise',  label: 'Revise',   sub: 'Something is missing or wrong -- explain below', selClass: 'sel-revise' },
+            { value: 'park',    label: 'Park',     sub: 'No longer relevant -- explain below',     selClass: 'sel-park' }
+        ], 'research_decision', answers, ['revise','park'], 'research-notes', 'What needs changing / why park?', updateProgress);
+
+        container.appendChild(s3el);
+
+        // ================================================================
+        // SECTION 4 -- GC Worlds Hoopla article
+        // ================================================================
+        s4el = buildSectionEl({
+            badge: 'Section 4',
+            title: 'GC Worlds Hoopla article',
+            sub: 'Draft complete, proofread done. Green light to publish, ask for revisions, or hold.'
+        });
+
+        var articleDoc = document.createElement('div');
+        articleDoc.className = 'doc-preview';
+        articleDoc.innerHTML = renderMarkdown(ARTICLE_CONTENT);
+        s4el.appendChild(articleDoc);
+
+        buildRadioGroupInto(s4el, [
+            { value: 'approve', label: 'Approve to publish', sub: 'Article proceeds to Hoopla publish pipeline', selClass: 'sel-approve' },
+            { value: 'revise',  label: 'Revise',             sub: 'Specific changes needed -- list below',        selClass: 'sel-revise' },
+            { value: 'hold',    label: 'Hold',               sub: 'Not yet -- explain below',                     selClass: 'sel-park' }
+        ], 'article_decision', answers, ['revise','hold'], 'article-notes', 'What needs changing / why hold?', updateProgress);
+
+        container.appendChild(s4el);
+
+        // ================================================================
+        // SECTION 5 -- Better Skills pilot
+        // ================================================================
+        s5el = buildSectionEl({
+            badge: 'Section 5',
+            title: 'Better Skills pilot',
+            sub: 'Diagnostic ranked three reshape targets by impact. Pick which to pilot, or park the lot.'
+        });
+
+        var skillItems = [
+            { rank: 'Highest impact', name: 'Research Claude',       detail: 'Add research-filter.py -- pre-filtering and ranked summaries instead of raw web snippets.' },
+            { rank: 'Second',         name: 'Writer Claude',         detail: 'Add proofread-antiai.py -- regex/heuristic anti-AI proofread.' },
+            { rank: 'Third',          name: 'Email tier classifier', detail: 'Add email-classifier.py -- hardcoded tier rules returning JSON.' }
+        ];
+        skillItems.forEach(function(sk) {
+            var sc = document.createElement('div');
+            sc.className = 'skill-card';
+            sc.innerHTML = '<div class="skill-rank">' + sk.rank + '</div>'
+                + '<div class="skill-name">' + sk.name + '</div>'
+                + '<div class="skill-detail">' + sk.detail + '</div>';
+            s5el.appendChild(sc);
+        });
+
+        buildRadioGroupInto(s5el, [
+            { value: 'research-only', label: 'Pilot highest only', sub: 'Research Claude only',                        selClass: 'sel-pilot' },
+            { value: 'all-three',     label: 'Pilot all three',    sub: 'Research + Writer + Email tier',               selClass: 'sel-pilot' },
+            { value: 'park',          label: 'Park entirely',       sub: 'Keep as future reference, no work now',        selClass: 'sel-park' },
+            { value: 'custom',        label: 'Custom',              sub: 'Describe the combination you want below',      selClass: 'sel-custom' }
+        ], 'skills_decision', answers, ['custom'], 'skills-notes', 'Which pilots, and any other instructions...', updateProgress);
+
+        container.appendChild(s5el);
+
+        // ================================================================
+        // SECTION 6 -- Phase 7c log-tail decision
+        // ================================================================
+        s6el = buildSectionEl({
+            badge: 'Section 6',
+            title: 'Phase 7c -- voice stack observation window',
+            sub: '24-hour window for voice-transcribe, newsroom-share, and reply deployments passed 2026-04-21. Did it reveal any alarms?'
+        });
+
+        var logUnavail = document.createElement('div');
+        logUnavail.className = 'log-tail-unavailable';
+        logUnavail.innerHTML = 'Log tail could not be fetched automatically (coolify-log-tail.py not present). '
+            + 'Check manually at <a href="https://coolify.croquetwade.com" target="_blank" rel="noopener">coolify.croquetwade.com</a> -- '
+            + 'services: <strong>voice-transcribe</strong>, <strong>newsroom-share</strong>, <strong>reply-croquetclaude-site</strong>, logs since 2026-04-20.';
+        s6el.appendChild(logUnavail);
+
+        buildRadioGroupInto(s6el, [
+            { value: 'clean', label: 'Clean', sub: 'No alarms spotted -- Phase 7c closes and the plan ships', selClass: 'sel-clean' },
+            { value: 'alarm', label: 'Alarm', sub: 'Something went wrong -- describe below, fix ticket opens',  selClass: 'sel-alarm' }
+        ], 'phase7c_decision', answers, ['alarm'], 'phase7c-notes', 'What went wrong?', updateProgress);
+
+        container.appendChild(s6el);
+
+        // ================================================================
+        // SUBMIT
+        // ================================================================
+        var savedIndicator = document.createElement('div');
+        savedIndicator.id = 'draft-saved-indicator';
+        savedIndicator.className = 'draft-saved-indicator';
+        savedIndicator.textContent = 'Saved';
+        container.appendChild(savedIndicator);
+
+        var validErr = document.createElement('div');
+        validErr.className = 'validation-error';
+        validErr.id = 'validation-error';
+        container.appendChild(validErr);
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var submitBtn = document.createElement('button');
+        submitBtn.className = 'btn-submit';
+        submitBtn.type = 'button';
+        submitBtn.textContent = 'Send my answers';
+
+        var errMsg = document.createElement('div');
+        errMsg.className = 'error-message';
+        errMsg.id = 'submit-error';
+
+        submitBtn.addEventListener('click', function() {
+            var missing = validate();
+            if (missing.length > 0) {
+                validErr.textContent = missing.length + ' item' + (missing.length !== 1 ? 's' : '') + ' still need your input -- scroll up to the highlighted sections.';
+                validErr.classList.add('visible');
+                var firstMissing = document.querySelector('.missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            validErr.classList.remove('visible');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            submitMission(tokenRecord, buildPayload(), respondentName).then(function(ok) {
+                if (!ok) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send my answers';
+                    errMsg.textContent = 'Something went wrong -- try again or email hello@croquetclaude.com';
+                    errMsg.classList.add('visible');
+                }
+            });
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errMsg);
+        container.appendChild(submitWrap);
+
+        app.appendChild(container);
+
+        // ---- Autosave ----
+        autosave = createAutosave(tokenRecord, buildPayload);
+        window._qd_autosave = autosave;
+
+        updateProgress();
+
+        // ---- Validate ----
+        function validate() {
+            var missing = [];
+
+            voiceURLs.forEach(function(vu) {
+                var card = document.getElementById('voice-card-' + vu.id);
+                if (!answers[vu.answerKey].result) {
+                    missing.push(vu.id);
+                    if (card) { card.classList.add('missing'); card.classList.remove('answered'); }
+                }
+            });
+
+            s2questions.forEach(function(q) {
+                var val = getFieldVal(q.id);
+                var card = document.getElementById('fq-card-' + q.id);
+                if (!val.trim()) {
+                    missing.push(q.id);
+                    if (card) { card.classList.add('missing'); card.classList.remove('answered'); }
+                }
+            });
+
+            if (!answers.research_decision) { missing.push('research'); if (s3el) { s3el.style.borderColor = '#b83227'; } }
+            if (!answers.article_decision)  { missing.push('article');  if (s4el) { s4el.style.borderColor = '#b83227'; } }
+            if (!answers.skills_decision)   { missing.push('skills');   if (s5el) { s5el.style.borderColor = '#b83227'; } }
+            if (!answers.phase7c_decision)  { missing.push('phase7c'); if (s6el) { s6el.style.borderColor = '#b83227'; } }
+
+            return missing;
+        }
+    };
+
+    // ---- Helper: build a section container ----
+    function buildSectionEl(opts) {
+        var el = document.createElement('div');
+        el.className = 'qd-section';
+        el.innerHTML = '<div class="qd-section-badge">' + opts.badge + '</div>'
+            + '<div class="qd-section-title">' + opts.title + '</div>'
+            + '<div class="qd-section-sub">' + opts.sub + '</div>'
+            + '<div class="qd-divider"></div>';
+        return el;
+    }
+
+    // ---- Helper: build radio group and append to parent ----
+    function buildRadioGroupInto(parent, options, answerKey, answers, conditionalOn, notesId, notesPlaceholder, updateProgressFn) {
+        var group = document.createElement('div');
+        group.className = 'radio-group';
+
+        options.forEach(function(opt) {
+            var lbl = document.createElement('label');
+            lbl.className = 'radio-option' + (answers[answerKey] === opt.value ? ' ' + opt.selClass : '');
+
+            var radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = answerKey;
+            radio.value = opt.value;
+            radio.checked = answers[answerKey] === opt.value;
+
+            var textDiv = document.createElement('div');
+            textDiv.innerHTML = '<div class="radio-option-text">' + opt.label + '</div>'
+                + (opt.sub ? '<div class="radio-option-sub">' + opt.sub + '</div>' : '');
+
+            radio.addEventListener('change', function() {
+                group.querySelectorAll('.radio-option').forEach(function(sib) { sib.className = 'radio-option'; });
+                lbl.classList.add(opt.selClass);
+                answers[answerKey] = opt.value;
+
+                var condWrap = document.getElementById(notesId + '-wrap');
+                if (condWrap) {
+                    var isConditional = conditionalOn.indexOf(opt.value) !== -1;
+                    condWrap.classList.toggle('visible', isConditional);
+                    if (isConditional) {
+                        var ta = document.getElementById(notesId);
+                        if (ta) ta.focus();
+                    }
+                }
+
+                if (updateProgressFn) updateProgressFn();
+                var as = window._qd_autosave;
+                if (as) as.save();
+            });
+
+            lbl.appendChild(radio);
+            lbl.appendChild(textDiv);
+            group.appendChild(lbl);
+        });
+
+        parent.appendChild(group);
+
+        // Conditional textarea
+        var isAlreadyConditional = conditionalOn.indexOf(answers[answerKey]) !== -1;
+        var condWrap = document.createElement('div');
+        condWrap.className = 'conditional-textarea' + (isAlreadyConditional ? ' visible' : '');
+        condWrap.id = notesId + '-wrap';
+
+        var condTA = document.createElement('textarea');
+        condTA.className = 'notes-field';
+        condTA.id = notesId;
+        condTA.placeholder = notesPlaceholder;
+        condTA.value = answers[answerKey.replace('_decision', '_notes')] || '';
+        condTA.addEventListener('input', function() {
+            answers[answerKey.replace('_decision', '_notes')] = condTA.value;
+            var as = window._qd_autosave;
+            if (as) as.save();
+        });
+
+        condWrap.appendChild(condTA);
+        parent.appendChild(condWrap);
+    }
+
+    // ---- Minimal markdown renderer ----
+    function renderMarkdown(md) {
+        if (!md) return '';
+        var s = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        s = s.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        s = s.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        s = s.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        s = s.replace(/^---$/gm, '<hr>');
+        var lines = s.split('\n');
+        var out = [], inList = false;
+        lines.forEach(function(line) {
+            if (/^- /.test(line)) {
+                if (!inList) { out.push('<ul>'); inList = true; }
+                out.push('<li>' + line.slice(2) + '</li>');
+            } else {
+                if (inList) { out.push('</ul>'); inList = false; }
+                if (line.trim() === '') {
+                    out.push('</p><p>');
+                } else if (/<(h[123]|hr)/.test(line)) {
+                    out.push(line);
+                } else {
+                    out.push(line);
+                }
+            }
+        });
+        if (inList) out.push('</ul>');
+        s = '<p>' + out.join('\n') + '</p>';
+        s = s.replace(/<p>\s*<\/p>/g, '');
+        s = s.replace(/<p>(<h[123]>)/g, '$1');
+        s = s.replace(/(<\/h[123]>)<\/p>/g, '$1');
+        s = s.replace(/<p>(<ul>)/g, '$1');
+        s = s.replace(/(<\/ul>)<\/p>/g, '$1');
+        s = s.replace(/<p>(<hr>)<\/p>/g, '$1');
+        return s;
+    }
+
+    // ---- Embedded content ----
+    var RESEARCH_CONTENT = "# QLD Croquet Membership -- Vault Research Brief\n\n## Key Findings\n\n**Current membership numbers (as at April 2026)**\n- RevSport (official CAQ register): 1,611 current members across 45 member organisations\n- MyCroquet database (synced 7 April 2026): 1,762 total records; 1,523 active, 239 inactive/lapsed\n- 42 Queensland clubs represented in MyCroquet (52 out-of-state/admin registrations excluded)\n- Club sizes range from 8 members (Isis) to 91 members (Eildon)\n- Retention rate: 96% season-on-season (RevSport statistics tab)\n\n**Trend: decline, not growth**\n- CAQ context brief: \"aging membership (average 72-75), declining numbers\"\n- Wade's article estimates membership dropping at close to 10% per annum\n- Most QLD clubs sit around 30 members -- identified as a subsistence threshold where all volunteer capacity goes to maintenance, leaving nothing for growth\n- 8 new members added in the April 2026 sync (across all clubs)\n\n**Structural problems driving decline**\n- Average member age 72-75; volunteer base aging out with no succession\n- Clubs at or below 25% committed-volunteer threshold cannot sustain cultural change\n- Zero recurrent federal funding; Bowls Australia receives ~$16/member by comparison\n- Most clubs on council land -- lease risk if membership stays low\n\n**Growth target set by CAQ**\n- Stated goal: 500 new members statewide (~30% growth, ~12 per club)\n- Lifetime value: $2M-$4M in fees over 10 years plus ~$1M/year in volunteer labour value\n- East Brisbane pilot: 6 of 16 Come and Try participants joined; club grew from 27 to 33 members on $135 marketing spend\n\n**Discipline breakdown by code (active members)**\n- Golf Croquet (GC): 1,253 members (82% of active)\n- Ricochet (RC): 412 (27%)\n- Association Croquet (AC): 358 (24%)\n\n## Gaps\n\n- No time-series membership data in the vault -- RevSport statistics tab shows seasons 2021-2026 but year-on-year figures have not been extracted\n- The ~10% annual decline figure is Wade's estimate in a published article, not a verified data extract\n- No club-level breakdown of growth vs decline trends (only current snapshot counts)\n- No AusPlay or Sport Australia participation data specifically for croquet in QLD\n- No data on Come and Try conversion rates beyond the East Brisbane pilot\n\n## Recommendation\n\nThe vault holds a solid current-state snapshot and a clear strategic narrative. The main gap is historical trend data. To close it: export the RevSport Historical insights chart data for seasons 2021-2026 -- the export button exists on that page and would give verified year-on-year numbers.\n\n**Key vault sources:**\n- resources/revsport-exploration-notes.md\n- inbox/mycroquet-data-report-2026-04-08.md\n- resources/articles/the-value-in-a-new-member.md\n- resources/caq-context-brief-for-ai.md";
+
+    var ARTICLE_CONTENT = "# From Your Club to the GC World Championships\n\nThe competitive ladder in Golf Croquet is shorter than it looks.\n\nMary McMahon is a Queensland club player. In 2023, she reached the semi-finals of the plate event at the WCF Over 50s Golf Croquet World Championship. That result earned her an invitation to the Egyptian Open. The field: roughly the top 50 GC players on the planet. She came up through local club, pennants, state team, national selection, and into international events.\n\n## Australia at the GC Worlds\n\nIn 2023, Jamie Gumbrell won the Women's GC World Championship with a perfect 11-0 record. She is one of the few Australian women to take the title.\n\nThe 2024 GC World Championship drew 120 players and lasted 14 days. Robert Fletcher, an Australian, reached the final. He lost to 18-year-old Blake Fields from the United States in five sets. In February 2025, eight nations competed in the Openshaw Shield in Tasmania.\n\n## Queensland's competitive machinery\n\nCAQ organises Queensland's competitive GC calendar. The state team competes annually in the Interstate Shield, most recently in New South Wales in 2025. The QLD GC Open Singles provide a ranking pathway. Players who compete build records. Selectors use these for state and national selection.\n\nPennants, state championships, representative selection, national squads. Selectors watch these events. A player who enters regularly can build a record within a season or two.\n\n## Cairo, November 2026\n\nThe 16th WCF GC World Singles Championship runs from 21 to 29 November 2026 in Cairo, Egypt. Entry is capped at 80 players worldwide. The fee is GBP189.\n\nSeven months away. Croquet Australia will finalise national squads in the coming months. State results feed that selection. Players competing seriously this year can push for national selection.\n\n## A ladder with fewer rungs\n\nThe state team needs depth. Selectors need results to work from. The timeline from first competition to state-level visibility is seasons, not decades. Clubs that produce competitive players build their profile and attract members who want more than a social roll-up.\n\nPlay regularly, enter events, improve, repeat. CAQ runs the competitions, selectors attend them, and Croquet Australia uses the results to build national squads. Australia is competitive at world level.\n\nMary McMahon joined a club, played well, entered the competitions available to her. That took her to a World Championship plate semi-final and an invitation to play against the world's best. Anyone willing to put their hand up can follow the same route.\n\n---\n\n*Review notes: CTA is Come and Try. Jamie Gumbrell is ACT-based -- referenced as Australian, not claimed as Queensland. Robert Fletcher's state of origin unconfirmed -- referenced as Australian only. No Queensland players confirmed on the 2026 national GC squad -- article does not claim any.*";
+
+    // Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
