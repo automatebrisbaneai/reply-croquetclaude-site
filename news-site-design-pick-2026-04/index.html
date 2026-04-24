@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News site design pick — CroquetClaude</title>
+    <meta name="description" content="Pick a look for the Queensland Croquet news site rebuild.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---------------------------------------------------------------
+           news-site-design-pick-2026-04 — per-mission styles
+           DO NOT touch app.js or styles.css — only this block.
+        --------------------------------------------------------------- */
+
+        :root {
+            --nsd-cream: #fefae0;
+            --nsd-green: #2d6a4f;
+            --nsd-terracotta: #bc6c25;
+            --nsd-red: #b83227;
+            --nsd-ink: #1c1916;
+            --nsd-muted: #6b6560;
+            --nsd-border: #e8e2d6;
+            --nsd-card-bg: #ffffff;
+            --nsd-page-bg: #f8f5ee;
+        }
+
+        body {
+            background: var(--nsd-page-bg);
+        }
+
+        /* Theme cards — thumbnail + body */
+        .nsd-theme-card {
+            background: var(--nsd-card-bg);
+            border: 1px solid var(--nsd-border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+        }
+
+        .nsd-theme-card-inner {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 0;
+            min-height: 140px;
+        }
+
+        @media (max-width: 600px) {
+            .nsd-theme-card-inner {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .nsd-theme-thumb {
+            background: var(--nsd-cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-right: 1px solid var(--nsd-border);
+            min-height: 140px;
+        }
+
+        @media (max-width: 600px) {
+            .nsd-theme-thumb {
+                border-right: none;
+                border-bottom: 1px solid var(--nsd-border);
+                min-height: 110px;
+            }
+        }
+
+        .nsd-theme-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .nsd-theme-thumb-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            min-height: 140px;
+            color: var(--nsd-muted);
+        }
+
+        .nsd-theme-body {
+            padding: 1.1rem 1.25rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .nsd-theme-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--nsd-ink);
+            margin: 0;
+        }
+
+        .nsd-theme-vibe {
+            font-size: 0.9rem;
+            color: var(--nsd-ink);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .nsd-theme-tradeoff {
+            font-size: 0.85rem;
+            color: var(--nsd-muted);
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .nsd-theme-tradeoff::before {
+            content: "Trade-off: ";
+            font-weight: 600;
+            color: var(--nsd-terracotta);
+        }
+
+        .nsd-theme-links {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .nsd-theme-link {
+            font-size: 0.8rem;
+            color: var(--nsd-green);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(45,106,79,0.3);
+            padding-bottom: 1px;
+        }
+
+        .nsd-theme-link:hover {
+            border-color: var(--nsd-green);
+        }
+
+        .nsd-theme-footer {
+            padding: 0.75rem 1.25rem 1rem;
+            border-top: 1px solid var(--nsd-border);
+            background: #fafaf8;
+        }
+
+        /* Stack card */
+        .nsd-stack-card {
+            background: var(--nsd-card-bg);
+            border: 1px solid var(--nsd-border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Proto cards */
+        .nsd-proto-card {
+            background: var(--nsd-card-bg);
+            border: 1px solid var(--nsd-border);
+            border-radius: 10px;
+            padding: 1.1rem 1.25rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .nsd-proto-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--nsd-ink);
+            margin: 0 0 0.3rem;
+        }
+
+        .nsd-proto-detail {
+            font-size: 0.875rem;
+            color: var(--nsd-muted);
+            margin: 0 0 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Autosave note in opener */
+        .nsd-autosave-note {
+            font-size: 0.82rem;
+            font-style: italic;
+            color: var(--nsd-muted);
+            border-top: 1px dashed var(--nsd-border);
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+        }
+
+        /* Section label pill */
+        .nsd-section-label {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--nsd-green);
+            background: rgba(45,106,79,0.08);
+            border-radius: 3px;
+            padding: 2px 7px;
+            margin-bottom: 0.4rem;
+        }
+
+        /* Pick / Skip buttons */
+        .btn-answer[data-value="pick"]:not(.selected) {
+            background: transparent;
+            color: var(--nsd-green);
+            border-color: var(--nsd-green);
+        }
+        .btn-answer[data-value="pick"].selected {
+            background: var(--nsd-green);
+            color: #fff;
+            border-color: var(--nsd-green);
+        }
+        .btn-answer[data-value="skip"]:not(.selected) {
+            background: transparent;
+            color: var(--nsd-terracotta);
+            border-color: var(--nsd-terracotta);
+        }
+        .btn-answer[data-value="skip"].selected {
+            background: var(--nsd-terracotta);
+            color: #fff;
+            border-color: var(--nsd-terracotta);
+        }
+
+        /* Stack buttons */
+        .btn-answer[data-value="keep-nextjs"]:not(.selected),
+        .btn-answer[data-value="swap-astro"]:not(.selected) {
+            background: transparent;
+            color: var(--nsd-green);
+            border-color: var(--nsd-green);
+        }
+        .btn-answer[data-value="keep-nextjs"].selected,
+        .btn-answer[data-value="swap-astro"].selected {
+            background: var(--nsd-green);
+            color: #fff;
+            border-color: var(--nsd-green);
+        }
+        .btn-answer[data-value="whatever-fits"]:not(.selected) {
+            background: transparent;
+            color: var(--nsd-terracotta);
+            border-color: var(--nsd-terracotta);
+        }
+        .btn-answer[data-value="whatever-fits"].selected {
+            background: var(--nsd-terracotta);
+            color: #fff;
+            border-color: var(--nsd-terracotta);
+        }
+
+        /* Keep / Drop / Unsure buttons */
+        .btn-answer[data-value="keep"]:not(.selected) {
+            background: transparent;
+            color: var(--nsd-green);
+            border-color: var(--nsd-green);
+        }
+        .btn-answer[data-value="keep"].selected {
+            background: var(--nsd-green);
+            color: #fff;
+            border-color: var(--nsd-green);
+        }
+        .btn-answer[data-value="drop"]:not(.selected) {
+            background: transparent;
+            color: var(--nsd-red);
+            border-color: var(--nsd-red);
+        }
+        .btn-answer[data-value="drop"].selected {
+            background: var(--nsd-red);
+            color: #fff;
+            border-color: var(--nsd-red);
+        }
+
+        /* Opener callout override */
+        .opener {
+            border-left: 4px solid var(--nsd-green);
+            background: var(--nsd-cream);
+            padding: 1.25rem 1.4rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+        }
+        .opener p {
+            margin: 0 0 0.75rem;
+            line-height: 1.65;
+        }
+        .opener p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">News site — pick a look</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: news-site-design-pick-2026-04
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed;
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var themes     = (seed && seed.sections && seed.sections['themes'])         || [];
+        var stackItems = (seed && seed.sections && seed.sections['stack'])          || [];
+        var protoBits  = (seed && seed.sections && seed.sections['prototype_bits']) || [];
+
+        // answers keyed by "<section>/<id>"
+        var answers = {};
+        themes.forEach(function(t) {
+            answers['themes/' + t.id] = { answer: null, notes: '' };
+        });
+        stackItems.forEach(function(s) {
+            answers['stack/' + s.id] = { answer: null, notes: '' };
+        });
+        protoBits.forEach(function(p) {
+            answers['proto/' + p.id] = { answer: null, notes: '' };
+        });
+
+        // Pre-load from saved draft
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (k && answers.hasOwnProperty(k)) {
+                    answers[k].answer = (entry.answer !== undefined) ? entry.answer : null;
+                    answers[k].notes = entry.notes || '';
+                }
+            });
+        }
+
+        // ---- Autosave plumbing ----
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = Object.keys(answers).map(function(k) {
+                return { key: k, answer: answers[k].answer, notes: answers[k].notes || '' };
+            });
+            return { cards: cards };
+        }
+
+        function updateValidationState() {
+            return Object.keys(answers).filter(function(k) { return answers[k].answer === null; });
+        }
+
+        // ---- Notes area factory ----
+        function buildNotesArea(key, placeholder) {
+            var wrap = document.createElement('div');
+            wrap.className = 'notes-area';
+            var label = document.createElement('label');
+            label.style.cssText = 'display:block;font-size:0.85rem;color:var(--nsd-muted);margin-bottom:0.3rem;margin-top:0.65rem;';
+            label.textContent = 'Notes (optional):';
+            var ta = document.createElement('textarea');
+            ta.placeholder = placeholder || 'Any context…';
+            ta.setAttribute('aria-label', 'Notes');
+            if (answers[key].notes) {
+                ta.value = answers[key].notes;
+            }
+            ta.addEventListener('input', function() {
+                answers[key].notes = ta.value;
+                if (autosave) autosave.save();
+            });
+            wrap.appendChild(label);
+            wrap.appendChild(ta);
+            return wrap;
+        }
+
+        // ---- Button row factory ----
+        function makeButtons(key, btns, cardEl, notesAlwaysOpen) {
+            var btnRow = document.createElement('div');
+            btnRow.className = 'answer-buttons';
+
+            btns.forEach(function(btn) {
+                var b = document.createElement('button');
+                b.className = 'btn-answer';
+                b.textContent = btn.label;
+                b.dataset.value = btn.value;
+                b.setAttribute('type', 'button');
+                if (btn.value === 'unsure') b.classList.add('unsure');
+                if (answers[key].answer === btn.value) b.classList.add('selected');
+
+                b.addEventListener('click', function() {
+                    btnRow.querySelectorAll('.btn-answer').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers[key].answer = btn.value;
+
+                    var notesArea = cardEl.querySelector('.notes-area');
+                    if (notesArea) {
+                        if (notesAlwaysOpen || btn.value === 'unsure') {
+                            notesArea.classList.add('visible');
+                            if (btn.value === 'unsure') notesArea.querySelector('textarea').focus();
+                        } else {
+                            notesArea.classList.remove('visible');
+                        }
+                    }
+
+                    cardEl.classList.add('answered');
+                    cardEl.classList.remove('missing');
+                    updateValidationState();
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            return btnRow;
+        }
+
+        // ---- Thumbnail placeholder ----
+        function buildPlaceholder() {
+            var wrap = document.createElement('div');
+            wrap.className = 'nsd-theme-thumb-placeholder';
+            wrap.innerHTML =
+                '<svg width="40" height="48" viewBox="0 0 28 34" aria-hidden="true">' +
+                '<path d="M3 1 H19 L25 7 V31 a2 2 0 0 1 -2 2 H3 a2 2 0 0 1 -2 -2 V3 a2 2 0 0 1 2 -2 z" ' +
+                'fill="none" stroke="#bc6c25" stroke-width="1.6"/>' +
+                '<path d="M19 1 V7 H25" fill="none" stroke="#bc6c25" stroke-width="1.6"/>' +
+                '<text x="13" y="22" font-size="11" text-anchor="middle" fill="#bc6c25" font-family="serif">?</text>' +
+                '</svg>';
+            return wrap;
+        }
+
+        // ---- Build DOM ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // ---- Opener ----
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Here’s six editorial themes worth cloning for the news-site rebuild, ' + firstName + '. Pick the one (or two) whose bones feel right for Queensland croquet — we’ll take the design, wire it to MyCroquet, and throw out whatever doesn’t fit. Six candidates, then two smaller follow-ups on stack and what from the old prototype is non-negotiable.</p>' +
+            '<p class="nsd-autosave-note">Your answers save automatically as you go. Close the tab and come back any time — the link picks up where you left off until you press <em>Send my picks</em>.</p>';
+        container.appendChild(opener);
+
+        // ================================================================
+        // SECTION A — Themes
+        // ================================================================
+        var divA = document.createElement('hr');
+        divA.className = 'section-divider';
+        container.appendChild(divA);
+
+        var labelA = document.createElement('div');
+        labelA.className = 'nsd-section-label';
+        labelA.textContent = 'Section A';
+        container.appendChild(labelA);
+
+        var headA = document.createElement('h2');
+        headA.className = 'section-heading';
+        headA.textContent = 'Pick the look (' + themes.length + ')';
+        container.appendChild(headA);
+
+        var subA = document.createElement('p');
+        subA.className = 'section-subtitle';
+        subA.textContent = 'One card per theme. Pick 1, or 2 if you’re torn. Each card has a thumbnail — click through to the demo if you want to wander before deciding.';
+        container.appendChild(subA);
+
+        var themeBtns = [
+            { label: 'Pick', value: 'pick' },
+            { label: 'Skip', value: 'skip' }
+        ];
+
+        themes.forEach(function(theme) {
+            var key = 'themes/' + theme.id;
+
+            var card = document.createElement('div');
+            card.className = 'card nsd-theme-card';
+            card.dataset.key = key;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', theme.name);
+            if (answers[key].answer !== null) card.classList.add('answered');
+
+            // Inner grid
+            var inner = document.createElement('div');
+            inner.className = 'nsd-theme-card-inner';
+
+            // Thumbnail
+            var thumb = document.createElement('div');
+            thumb.className = 'nsd-theme-thumb';
+            if (theme.thumbnail) {
+                var img = document.createElement('img');
+                img.src = 'images/' + theme.thumbnail;
+                img.alt = theme.name + ' demo screenshot';
+                img.loading = 'lazy';
+                img.onerror = function() {
+                    thumb.innerHTML = '';
+                    thumb.appendChild(buildPlaceholder());
+                };
+                thumb.appendChild(img);
+            } else {
+                thumb.appendChild(buildPlaceholder());
+            }
+            inner.appendChild(thumb);
+
+            // Body text
+            var body = document.createElement('div');
+            body.className = 'nsd-theme-body';
+
+            var nameEl = document.createElement('p');
+            nameEl.className = 'nsd-theme-name';
+            nameEl.textContent = theme.name;
+            body.appendChild(nameEl);
+
+            var vibeEl = document.createElement('p');
+            vibeEl.className = 'nsd-theme-vibe';
+            vibeEl.textContent = theme.vibe;
+            body.appendChild(vibeEl);
+
+            var tradeoffEl = document.createElement('p');
+            tradeoffEl.className = 'nsd-theme-tradeoff';
+            tradeoffEl.textContent = theme.tradeoff;
+            body.appendChild(tradeoffEl);
+
+            if (theme.demo || theme.repo) {
+                var links = document.createElement('div');
+                links.className = 'nsd-theme-links';
+                if (theme.demo) {
+                    var demoA = document.createElement('a');
+                    demoA.href = theme.demo;
+                    demoA.target = '_blank';
+                    demoA.rel = 'noopener noreferrer';
+                    demoA.className = 'nsd-theme-link';
+                    demoA.textContent = 'Open demo ↗';
+                    links.appendChild(demoA);
+                }
+                if (theme.repo) {
+                    var repoA = document.createElement('a');
+                    repoA.href = theme.repo;
+                    repoA.target = '_blank';
+                    repoA.rel = 'noopener noreferrer';
+                    repoA.className = 'nsd-theme-link';
+                    repoA.textContent = 'Repo ↗';
+                    links.appendChild(repoA);
+                }
+                body.appendChild(links);
+            }
+
+            inner.appendChild(body);
+            card.appendChild(inner);
+
+            // Footer — buttons + notes (notes always open on any answer)
+            var footer = document.createElement('div');
+            footer.className = 'nsd-theme-footer';
+
+            var btnRow = makeButtons(key, themeBtns, card, true);
+            footer.appendChild(btnRow);
+
+            var notesArea = buildNotesArea(key, 'What caught your eye, or what gave you pause…');
+            // Restore visibility: open if already answered
+            if (answers[key].answer !== null) notesArea.classList.add('visible');
+            footer.appendChild(notesArea);
+
+            card.appendChild(footer);
+            container.appendChild(card);
+        });
+
+        // ================================================================
+        // SECTION B — Stack
+        // ================================================================
+        var divB = document.createElement('hr');
+        divB.className = 'section-divider';
+        container.appendChild(divB);
+
+        var labelB = document.createElement('div');
+        labelB.className = 'nsd-section-label';
+        labelB.textContent = 'Section B';
+        container.appendChild(labelB);
+
+        var headB = document.createElement('h2');
+        headB.className = 'section-heading';
+        headB.textContent = 'Stack direction (1)';
+        container.appendChild(headB);
+
+        var subB = document.createElement('p');
+        subB.className = 'section-subtitle';
+        subB.textContent = 'Do we keep Next.js or swap to Astro? Astro is a static-site generator — simpler, faster, rebuilds on publish. For a site that gets one article a week, it fits better. But no strong reason to swap if the theme picked is a Next.js one.';
+        container.appendChild(subB);
+
+        var stackBtns = [
+            { label: 'Keep Next.js', value: 'keep-nextjs' },
+            { label: 'Swap to Astro', value: 'swap-astro' },
+            { label: 'Whatever fits the theme', value: 'whatever-fits' }
+        ];
+
+        stackItems.forEach(function(s) {
+            var key = 'stack/' + s.id;
+
+            var card = document.createElement('div');
+            card.className = 'card nsd-stack-card';
+            card.dataset.key = key;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', 'Stack direction');
+            if (answers[key].answer !== null) card.classList.add('answered');
+
+            var btnRow = makeButtons(key, stackBtns, card, true);
+            card.appendChild(btnRow);
+
+            var notesArea = buildNotesArea(key, 'Any strong feelings about the stack…');
+            if (answers[key].answer !== null) notesArea.classList.add('visible');
+            card.appendChild(notesArea);
+
+            container.appendChild(card);
+        });
+
+        // ================================================================
+        // SECTION C — Prototype bits
+        // ================================================================
+        var divC = document.createElement('hr');
+        divC.className = 'section-divider';
+        container.appendChild(divC);
+
+        var labelC = document.createElement('div');
+        labelC.className = 'nsd-section-label';
+        labelC.textContent = 'Section C';
+        container.appendChild(labelC);
+
+        var headC = document.createElement('h2');
+        headC.className = 'section-heading';
+        headC.textContent = 'From the old prototype, what’s non-negotiable? (' + protoBits.length + ')';
+        container.appendChild(headC);
+
+        var subC = document.createElement('p');
+        subC.className = 'section-subtitle';
+        subC.textContent = 'The April prototype had some distinctive bits. Some are cheap (pull them in easily), some need an ongoing supply chain. Pick Keep or Drop for each.';
+        container.appendChild(subC);
+
+        var protoBtns = [
+            { label: 'Keep', value: 'keep' },
+            { label: 'Drop', value: 'drop' },
+            { label: 'Unsure', value: 'unsure' }
+        ];
+
+        protoBits.forEach(function(p) {
+            var key = 'proto/' + p.id;
+
+            var card = document.createElement('div');
+            card.className = 'card nsd-proto-card';
+            card.dataset.key = key;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', p.name);
+            if (answers[key].answer !== null) card.classList.add('answered');
+
+            var nameEl = document.createElement('p');
+            nameEl.className = 'nsd-proto-name';
+            nameEl.textContent = p.name;
+            card.appendChild(nameEl);
+
+            var detailEl = document.createElement('p');
+            detailEl.className = 'nsd-proto-detail';
+            detailEl.textContent = p.detail;
+            card.appendChild(detailEl);
+
+            var btnRow = makeButtons(key, protoBtns, card, false);
+            card.appendChild(btnRow);
+
+            var notesArea = buildNotesArea(key, 'What’s your thinking on this…');
+            if (answers[key].answer === 'unsure') notesArea.classList.add('visible');
+            card.appendChild(notesArea);
+
+            container.appendChild(card);
+        });
+
+        // ---- Validation error ----
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // ---- Submit ----
+        var divFinal = document.createElement('hr');
+        divFinal.className = 'section-divider';
+        container.appendChild(divFinal);
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my picks';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var unanswered = updateValidationState();
+
+            document.querySelectorAll('.card').forEach(function(card) {
+                var k = card.dataset.key;
+                if (k && answers[k] && answers[k].answer === null) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (unanswered.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One question still needs an answer — it’s highlighted above.'
+                    : unanswered.length + ' questions still need answers — they’re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.card.missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            var ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            // Build structured response payload
+            var picks = [];
+            themes.forEach(function(t) {
+                var k = 'themes/' + t.id;
+                picks.push({ section: 'themes', id: t.id, name: t.name, answer: answers[k].answer, notes: answers[k].notes || '' });
+            });
+            stackItems.forEach(function(s) {
+                var k = 'stack/' + s.id;
+                picks.push({ section: 'stack', id: s.id, answer: answers[k].answer, notes: answers[k].notes || '' });
+            });
+            protoBits.forEach(function(p) {
+                var k = 'proto/' + p.id;
+                picks.push({ section: 'prototype_bits', id: p.id, name: p.name, answer: answers[k].answer, notes: answers[k].notes || '' });
+            });
+
+            var responsePayload = { picks: picks };
+
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my picks';
+                document.getElementById('error-message').classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Start autosave ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // ---- Restore draft state into rendered DOM ----
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (!k || entry.answer === null || entry.answer === undefined) return;
+                var card = container.querySelector('[data-key="' + k + '"]');
+                if (!card) return;
+                var btnRow = card.querySelector('.answer-buttons');
+                if (btnRow) {
+                    var btn = btnRow.querySelector('[data-value="' + entry.answer + '"]');
+                    if (btn) {
+                        btn.classList.add('selected');
+                        card.classList.add('answered');
+                    }
+                }
+                if (entry.notes) {
+                    var notesArea = card.querySelector('.notes-area');
+                    var notesTA = notesArea && notesArea.querySelector('textarea');
+                    if (notesTA) {
+                        notesTA.value = entry.notes;
+                        notesArea.classList.add('visible');
+                    }
+                }
+            });
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
