@@ -10,13 +10,20 @@
     <style>
         /* ---- Mission-specific styles — knife-blade-hoops-design-pick ---- */
 
+        /* Engineering drawings need more room than the default 780px container */
+        :root {
+            --max-width: 1100px;
+        }
+
+
         .kbh-hero-img {
             width: 100%;
-            max-width: 620px;
+            max-width: 100%;
             border-radius: 8px;
             border: 1px solid var(--border, #e0ddd4);
             display: block;
             margin: 1rem 0 0.5rem 0;
+            cursor: zoom-in;
         }
 
         .kbh-design-card {
@@ -25,6 +32,26 @@
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            /* Break out of any max-width container for full-width images */
+        }
+
+        .kbh-img-link {
+            display: block;
+            text-decoration: none;
+        }
+
+        .kbh-img-link:focus {
+            outline: 2px solid var(--accent, #2d6a4f);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        .kbh-enlarge-hint {
+            font-size: 0.78rem;
+            color: var(--text-secondary, #888);
+            font-style: italic;
+            margin: -0.8rem 0 1.2rem 0;
+            display: block;
         }
 
         .kbh-design-card h3 {
@@ -43,11 +70,12 @@
 
         .kbh-design-img {
             width: 100%;
-            max-width: 680px;
+            max-width: 100%;
             border-radius: 6px;
             border: 1px solid var(--border, #e0ddd4);
             display: block;
             margin: 0 0 1.2rem 0;
+            cursor: zoom-in;
         }
 
         .kbh-choice-label {
@@ -327,11 +355,22 @@
             card.appendChild(h3);
 
             if (opts.imgSrc) {
+                var imgLink = document.createElement('a');
+                imgLink.href = opts.imgSrc;
+                imgLink.target = '_blank';
+                imgLink.rel = 'noopener';
+                imgLink.className = 'kbh-img-link';
+                imgLink.title = 'Click to open full-size in a new tab';
                 var img = document.createElement('img');
                 img.src = opts.imgSrc;
                 img.alt = opts.imgAlt || opts.heading;
                 img.className = 'kbh-design-img';
-                card.appendChild(img);
+                imgLink.appendChild(img);
+                card.appendChild(imgLink);
+                var hint = document.createElement('span');
+                hint.className = 'kbh-enlarge-hint';
+                hint.textContent = 'Click the drawing to open it full-size in a new tab.';
+                card.appendChild(hint);
             }
 
             var preamble = document.createElement('p');
@@ -425,11 +464,22 @@
         h3c1.textContent = 'Your plate is 25× too thin — exactly where you suspected';
         card1.appendChild(h3c1);
 
+        var img1Link = document.createElement('a');
+        img1Link.href = 'img/card1-hero.png';
+        img1Link.target = '_blank';
+        img1Link.rel = 'noopener';
+        img1Link.className = 'kbh-img-link';
+        img1Link.title = 'Click to open full-size in a new tab';
         var img1 = document.createElement('img');
         img1.src = 'img/card1-hero.png';
         img1.alt = 'Side-view sketch of the stated spec showing plate FAIL and blade dimensions';
         img1.className = 'kbh-hero-img';
-        card1.appendChild(img1);
+        img1Link.appendChild(img1);
+        card1.appendChild(img1Link);
+        var hint1 = document.createElement('span');
+        hint1.className = 'kbh-enlarge-hint';
+        hint1.textContent = 'Click the image to open it full-size in a new tab.';
+        card1.appendChild(hint1);
 
         var p1a = document.createElement('p');
         p1a.textContent = 'You asked us to look for a major fault, especially the plate for welding the below-surface blade. We found one, in exactly that place.';
