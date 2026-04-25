@@ -333,6 +333,126 @@
             margin: 0.25rem 0 0;
         }
 
+        /* ---- Engineering panels (collapsible details) ---- */
+        .kbh-eng-panels {
+            margin: 1.5rem 0;
+        }
+
+        .kbh-eng-panel {
+            border: 1px solid var(--border, #e0ddd4);
+            border-radius: 8px;
+            background: var(--surface, #fff);
+            overflow: hidden;
+        }
+
+        .kbh-eng-panel + .kbh-eng-panel {
+            margin-top: 1rem;
+        }
+
+        .kbh-eng-panel summary {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent, #2d6a4f);
+            background: rgba(45,106,79,0.04);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            user-select: none;
+        }
+
+        .kbh-eng-panel summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .kbh-eng-panel summary::before {
+            content: '+';
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent, #2d6a4f);
+            transition: transform 0.15s;
+            display: inline-block;
+            width: 1rem;
+            text-align: center;
+        }
+
+        .kbh-eng-panel[open] summary::before {
+            content: '-';
+        }
+
+        .kbh-eng-panel summary:hover {
+            background: rgba(45,106,79,0.09);
+        }
+
+        .kbh-eng-panel-body {
+            padding: 1rem 1.25rem 1.25rem 1.25rem;
+            border-top: 1px solid var(--border, #e0ddd4);
+        }
+
+        .kbh-eng-panel-body p,
+        .kbh-eng-panel-body li {
+            font-size: 0.9rem;
+            line-height: 1.65;
+            color: var(--text-primary, #333);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .kbh-eng-panel-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .kbh-eng-panel-body ul {
+            margin: 0 0 0.75rem 1.25rem;
+            padding: 0;
+        }
+
+        .kbh-eng-panel-body li {
+            margin-bottom: 0.3rem;
+        }
+
+        .kbh-eng-panel-body strong {
+            color: var(--text-primary, #1a1a1a);
+        }
+
+        .kbh-eng-panel-body .kbh-ep-section {
+            margin-bottom: 1rem;
+        }
+
+        .kbh-eng-panel-body .kbh-ep-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .kbh-eng-panel-body .kbh-ep-heading {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary, #666);
+            margin: 0 0 0.4rem 0;
+        }
+
+        .kbh-eng-panel-body .kbh-ep-mono {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .kbh-eng-panel-body .kbh-ep-fail {
+            color: #b83227;
+            font-weight: 600;
+        }
+
+        .kbh-eng-panel-body .kbh-ep-warn {
+            background: rgba(188,108,37,0.07);
+            border-left: 3px solid #bc6c25;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0 4px 4px 0;
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary, #555);
+            font-style: italic;
+        }
+
         /* ---- Responsive ---- */
         @media (max-width: 600px) {
             .kbh-btn-choice {
@@ -616,6 +736,92 @@
         card1.appendChild(p1c);
 
         container.appendChild(card1);
+
+        // ---- Engineering panels (static HTML, no template logic needed) ----
+        var engPanelsWrap = document.createElement('div');
+        engPanelsWrap.className = 'kbh-eng-panels';
+        engPanelsWrap.innerHTML = [
+            '<details class="kbh-eng-panel">',
+            '<summary>Show the engineering working</summary>',
+            '<div class="kbh-eng-panel-body">',
+
+            '<div class="kbh-ep-section">',
+            '<p class="kbh-ep-heading">The inputs</p>',
+            '<ul>',
+            '<li>Ball mass: 454 g (WCF laws)</li>',
+            '<li>Design ball speed: 10 m/s (top GC power hitter)</li>',
+            '<li>Upright: 16 mm round mild steel rod (WCF spec, yields at ~275 MPa)</li>',
+            '</ul>',
+            '</div>',
+
+            '<div class="kbh-ep-section">',
+            '<p class="kbh-ep-heading">Two ways to size the foundation</p>',
+
+            '<p><strong>Lower bound &mdash; capacity-design (upright-as-fuse): 173 N&middot;m</strong></p>',
+            '<ul>',
+            '<li>Upright bends elastically at 110.6 N&middot;m (= &sigma;<sub>y</sub> &times; &pi; &times; d&sup3; / 32)</li>',
+            '<li>&times; 1.25 dynamic amplification = 138 N&middot;m</li>',
+            '<li>&times; 1.25 target safety margin = 173 N&middot;m design demand at the ground line</li>',
+            '<li>Logic: the upright should bend visibly <em>before</em> the foundation moves. The foundation only needs to outlast upright yield. The upright is the fuse.</li>',
+            '</ul>',
+
+            '<p><strong>Upper bound &mdash; raw impulse: 7,320 N&middot;m (53&times; the lower bound)</strong></p>',
+            '<ul>',
+            '<li>Peak ball-impact force &times; upright height &times; 1.5 dynamic factor</li>',
+            '<li>Logic: if the foundation has to absorb the full ball impulse with no fuse behaviour</li>',
+            '</ul>',
+
+            '<p><strong>All three designs A/B/C clear the lower bound at margin 2.04&times; (governed by the weld). None clear the upper bound. Real performance sits somewhere between &mdash; only a real power hit on a real green tells us where.</strong></p>',
+            '</div>',
+
+            '<div class="kbh-ep-section">',
+            '<p class="kbh-ep-heading">Where your stated spec fails</p>',
+            '<ul>',
+            '<li><span class="kbh-ep-mono">Plate (1in &times; 1in &times; 0.1in):</span> capacity 7.5 N&middot;m vs demand 173 N&middot;m &rarr; margin 0.04 &rarr; <span class="kbh-ep-fail">FAIL by ~25&times;</span></li>',
+            '<li><span class="kbh-ep-mono">Single-side fillet weld at 0.1in plate:</span> capacity ~56 N&middot;m vs 173 N&middot;m &rarr; margin 0.32 &rarr; <span class="kbh-ep-fail">FAIL</span></li>',
+            '<li>Blade dimensions also concerning: 12in star at 2.5mm thickness bends before soil engages</li>',
+            '</ul>',
+            '</div>',
+
+            '</div>',
+            '</details>',
+
+            '<details class="kbh-eng-panel">',
+            '<summary>What\'s behind these numbers</summary>',
+            '<div class="kbh-eng-panel-body">',
+
+            '<div class="kbh-ep-section">',
+            '<p class="kbh-ep-heading">Domain knowledge I have</p>',
+            '<ul>',
+            '<li>Formulas from established sources: Hetenyi (1946) for beam-on-elastic-foundation, Broms cohesive method for soil lateral capacity, AS 4100 (Australian Steel Code) for fillet weld design, capacity-design principle from earthquake engineering practice</li>',
+            '<li>Cross-checked the calculation through two internal review rounds (caught a Hetenyi formula error and a missing weld phi factor in the first pass)</li>',
+            '<li>Ball mass and upright spec from the WCF Laws of Association Croquet</li>',
+            '<li>Queensland bowling-green soil profile from research (sandy loam over drainage stone, c ~70-100 kPa)</li>',
+            '</ul>',
+            '</div>',
+
+            '<div class="kbh-ep-section">',
+            '<p class="kbh-ep-heading">Domain knowledge I don\'t have</p>',
+            '<ul>',
+            '<li>I am not a structural engineer. I have not designed a hoop, a foundation, a weld, or anything that goes in the ground</li>',
+            '<li>Capacity-design is a real principle but I have not found anyone validating it on croquet hoops specifically</li>',
+            '<li>I cannot tell from a calculation whether something will survive a season of repeated sub-yield hits (cumulative tilt) &mdash; only single-event failure</li>',
+            '<li>I have no field data. Orangewood and the UK manufacturers design empirically; I have designed analytically</li>',
+            '</ul>',
+            '</div>',
+
+            '<div class="kbh-ep-section">',
+            '<p class="kbh-ep-heading">What that means</p>',
+            '<ul>',
+            '<li>The calculation tells you a design is <em>worth testing</em>, not that it will <em>survive in service</em></li>',
+            '<li>Any production version should be either sized by a qualified structural engineer or field-tested with a power hitter on a real green before scaling up</li>',
+            '</ul>',
+            '</div>',
+
+            '</div>',
+            '</details>'
+        ].join('');
+        container.appendChild(engPanelsWrap);
 
         // ---- Card 2 — Honest position + sketch upload ----
         var divC2 = document.createElement('hr');
