@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knife-blade hoops — three first-pass designs — CroquetClaude</title>
+    <meta name="description" content="Round 2 — show us what's wrong with them so we can do better.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---- Mission-specific styles — knife-blade-hoops-design-pick ---- */
+
+        .kbh-hero-img {
+            width: 100%;
+            max-width: 620px;
+            border-radius: 8px;
+            border: 1px solid var(--border, #e0ddd4);
+            display: block;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .kbh-design-card {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border, #e0ddd4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kbh-design-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary, #1a1a1a);
+            margin: 0 0 0.6rem 0;
+        }
+
+        .kbh-design-card .kbh-preamble {
+            font-size: 0.95rem;
+            color: var(--text-secondary, #555);
+            line-height: 1.6;
+            margin: 0 0 1rem 0;
+        }
+
+        .kbh-design-img {
+            width: 100%;
+            max-width: 680px;
+            border-radius: 6px;
+            border: 1px solid var(--border, #e0ddd4);
+            display: block;
+            margin: 0 0 1.2rem 0;
+        }
+
+        .kbh-choice-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary, #555);
+            margin: 0 0 0.6rem 0;
+            display: block;
+        }
+
+        .kbh-voice-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary, #555);
+            margin: 1rem 0 0.4rem 0;
+            display: block;
+        }
+
+        .kbh-voice-ta {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--border, #e0ddd4);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text-primary, #1a1a1a);
+            resize: vertical;
+            box-sizing: border-box;
+            background: var(--bg, #fafaf8);
+        }
+
+        .kbh-voice-ta:focus {
+            outline: none;
+            border-color: var(--accent, #2d6a4f);
+            box-shadow: 0 0 0 2px rgba(45,106,79,0.12);
+        }
+
+        .kbh-upload-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary, #555);
+            margin: 0.25rem 0 0.5rem 0;
+            display: block;
+        }
+
+        .kbh-file-input {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-primary, #1a1a1a);
+            margin-bottom: 0.5rem;
+        }
+
+        .kbh-file-hint {
+            font-size: 0.82rem;
+            color: var(--text-secondary, #888);
+            margin: 0.25rem 0 0;
+        }
+
+        .kbh-info-card {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border, #e0ddd4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kbh-info-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary, #1a1a1a);
+            margin: 0 0 0.75rem 0;
+        }
+
+        .kbh-info-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary, #444);
+            line-height: 1.7;
+            margin: 0 0 0.75rem 0;
+        }
+
+        .kbh-info-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .kbh-missed-card {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border, #e0ddd4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kbh-missed-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary, #1a1a1a);
+            margin: 0 0 0.6rem 0;
+        }
+
+        .kbh-missed-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary, #444);
+            line-height: 1.7;
+            margin: 0 0 0.75rem 0;
+        }
+
+        .kbh-section-divider {
+            border: none;
+            border-top: 1px solid var(--border, #e0ddd4);
+            margin: 2rem 0;
+        }
+
+        /* Answer button row for design choice */
+        .kbh-answer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .kbh-btn-choice {
+            padding: 0.5rem 0.9rem;
+            border-radius: 6px;
+            border: 1.5px solid var(--accent, #2d6a4f);
+            background: transparent;
+            color: var(--accent, #2d6a4f);
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+            line-height: 1.4;
+        }
+
+        .kbh-btn-choice:hover {
+            background: rgba(45,106,79,0.06);
+        }
+
+        .kbh-btn-choice.selected {
+            background: var(--accent, #2d6a4f);
+            color: #fff;
+            border-color: var(--accent, #2d6a4f);
+        }
+
+        .kbh-btn-choice.btn-wrong {
+            border-color: #b83227;
+            color: #b83227;
+        }
+
+        .kbh-btn-choice.btn-wrong.selected {
+            background: #b83227;
+            color: #fff;
+            border-color: #b83227;
+        }
+
+        .kbh-btn-choice.btn-neutral {
+            border-color: var(--text-secondary, #888);
+            color: var(--text-secondary, #888);
+        }
+
+        .kbh-btn-choice.btn-neutral.selected {
+            background: var(--text-secondary, #888);
+            color: #fff;
+            border-color: var(--text-secondary, #888);
+        }
+
+        /* Missing card highlight */
+        .kbh-design-card.missing {
+            border-color: #b83227;
+            box-shadow: 0 0 0 2px rgba(184,50,39,0.15);
+        }
+
+        @media (max-width: 600px) {
+            .kbh-btn-choice {
+                font-size: 0.82rem;
+                padding: 0.45rem 0.7rem;
+            }
+            .kbh-design-card,
+            .kbh-info-card,
+            .kbh-missed-card {
+                padding: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Knife-blade hoops — designs</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — knife-blade-hoops-design-pick
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed || {};
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        // Answer state for the three design cards
+        var answers = {
+            'design-a': { choice: null, voice: '' },
+            'design-b': { choice: null, voice: '' },
+            'design-c': { choice: null, voice: '' }
+        };
+
+        // Sketch file (kept client-side until submit)
+        var sketchFile = null;
+
+        // Missed card voice
+        var missedVoice = '';
+
+        // Autosave controller — assigned after DOM is built
+        var autosave = null;
+
+        // Pre-load answers from draft if present
+        if (draft) {
+            if (draft['design-a']) {
+                answers['design-a'].choice = draft['design-a'].choice || null;
+                answers['design-a'].voice = draft['design-a'].voice || '';
+            }
+            if (draft['design-b']) {
+                answers['design-b'].choice = draft['design-b'].choice || null;
+                answers['design-b'].voice = draft['design-b'].voice || '';
+            }
+            if (draft['design-c']) {
+                answers['design-c'].choice = draft['design-c'].choice || null;
+                answers['design-c'].voice = draft['design-c'].voice || '';
+            }
+            missedVoice = draft.missed_voice || '';
+        }
+
+        function buildPayload() {
+            return {
+                'design-a': { choice: answers['design-a'].choice, voice: answers['design-a'].voice },
+                'design-b': { choice: answers['design-b'].choice, voice: answers['design-b'].voice },
+                'design-c': { choice: answers['design-c'].choice, voice: answers['design-c'].voice },
+                missed_voice: missedVoice
+            };
+        }
+
+        function getUnansweredCards() {
+            var missing = [];
+            if (!answers['design-a'].choice) missing.push('design-a');
+            if (!answers['design-b'].choice) missing.push('design-b');
+            if (!answers['design-c'].choice) missing.push('design-c');
+            return missing;
+        }
+
+        var choiceButtons = [
+            { label: 'Closest to what I had in mind', value: 'closest', cls: '' },
+            { label: 'Workable but not what I had in mind', value: 'workable', cls: '' },
+            { label: 'Wrong direction — see notes', value: 'wrong', cls: 'btn-wrong' },
+            { label: 'I don’t have a strong view', value: 'no-view', cls: 'btn-neutral' }
+        ];
+
+        function buildDesignCard(opts) {
+            var key = opts.key;
+            var card = document.createElement('div');
+            card.className = 'kbh-design-card card';
+            card.dataset.key = key;
+
+            var h3 = document.createElement('h3');
+            h3.textContent = opts.heading;
+            card.appendChild(h3);
+
+            if (opts.imgSrc) {
+                var img = document.createElement('img');
+                img.src = opts.imgSrc;
+                img.alt = opts.imgAlt || opts.heading;
+                img.className = 'kbh-design-img';
+                card.appendChild(img);
+            }
+
+            var preamble = document.createElement('p');
+            preamble.className = 'kbh-preamble';
+            preamble.textContent = opts.preamble;
+            card.appendChild(preamble);
+
+            var choiceLabel = document.createElement('span');
+            choiceLabel.className = 'kbh-choice-label';
+            choiceLabel.textContent = 'How does this fit?';
+            card.appendChild(choiceLabel);
+
+            var btnRow = document.createElement('div');
+            btnRow.className = 'kbh-answer-buttons answer-buttons';
+
+            choiceButtons.forEach(function(btn) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'kbh-btn-choice btn-answer' + (btn.cls ? ' ' + btn.cls : '');
+                b.dataset.value = btn.value;
+                b.textContent = btn.label;
+
+                b.addEventListener('click', function() {
+                    btnRow.querySelectorAll('.kbh-btn-choice').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers[key].choice = btn.value;
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            card.appendChild(btnRow);
+
+            var voiceLabel = document.createElement('span');
+            voiceLabel.className = 'kbh-voice-label';
+            voiceLabel.textContent = opts.voicePrompt || 'Anything you’d change about this design?';
+            card.appendChild(voiceLabel);
+
+            var voiceTA = document.createElement('textarea');
+            voiceTA.className = 'kbh-voice-ta';
+            voiceTA.placeholder = 'Width, thickness, depth, how it’s installed — anything.';
+            voiceTA.setAttribute('aria-label', 'Notes for ' + opts.heading);
+            voiceTA.addEventListener('input', function() {
+                answers[key].voice = voiceTA.value;
+                if (autosave) autosave.save();
+            });
+            card.appendChild(voiceTA);
+
+            return { card: card, voiceTA: voiceTA };
+        }
+
+        // ---- Build full page ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Page heading
+        var pageHeading = document.createElement('h1');
+        pageHeading.style.cssText = 'font-size:1.5rem;font-weight:800;color:var(--text-primary,#1a1a1a);margin:0 0 0.25rem 0;';
+        pageHeading.textContent = 'Knife-blade hoops — three first-pass designs';
+        container.appendChild(pageHeading);
+
+        var pageSubtitle = document.createElement('p');
+        pageSubtitle.style.cssText = 'font-size:1rem;color:var(--text-secondary,#666);margin:0 0 1.5rem 0;font-style:italic;';
+        pageSubtitle.textContent = 'Round 2 — show us what’s wrong with them so we can do better';
+        container.appendChild(pageSubtitle);
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + ' — below are the results of the engineering review and three first-pass hoop designs based on your brief.</p>' +
+            '<p>Work through the six sections. There’s no right answer — your reactions to the designs are the most useful thing we can get right now. The page asks you to pick the closest design to what you had in mind, or tell us where they’re off.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically as you go. Close the tab and come back any time — the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        // ---- Card 1 — Major fault ----
+        var divC1 = document.createElement('hr');
+        divC1.className = 'kbh-section-divider';
+        container.appendChild(divC1);
+
+        var card1 = document.createElement('div');
+        card1.className = 'kbh-info-card';
+
+        var h3c1 = document.createElement('h3');
+        h3c1.textContent = 'Your plate is 25× too thin — exactly where you suspected';
+        card1.appendChild(h3c1);
+
+        var img1 = document.createElement('img');
+        img1.src = 'img/card1-hero.png';
+        img1.alt = 'Side-view sketch of the stated spec showing plate FAIL and blade dimensions';
+        img1.className = 'kbh-hero-img';
+        card1.appendChild(img1);
+
+        var p1a = document.createElement('p');
+        p1a.textContent = 'You asked us to look for a major fault, especially the plate for welding the below-surface blade. We found one, in exactly that place.';
+        card1.appendChild(p1a);
+
+        var p1b = document.createElement('p');
+        p1b.innerHTML = 'A 1in × 1in × 0.1in plate is roughly <strong>25 times too thin</strong> to hold the upright steady when a power hitter strikes the hoop. The weld at that thickness is also about half what’s needed. The blade dimensions described (0.1in × 12in star) are also concerning — too long for a typical Queensland bowling green root zone, and the blades themselves would bend before the soil engaged.';
+        card1.appendChild(p1b);
+
+        var p1c = document.createElement('p');
+        p1c.innerHTML = '<strong>The good news is the geometry is right.</strong> Knife blades into the ground (not carrots) is the correct principle. We just need to scale the dimensions up to handle the load.';
+        card1.appendChild(p1c);
+
+        container.appendChild(card1);
+
+        // ---- Card 2 — Honest position + sketch upload ----
+        var divC2 = document.createElement('hr');
+        divC2.className = 'kbh-section-divider';
+        container.appendChild(divC2);
+
+        var card2 = document.createElement('div');
+        card2.className = 'kbh-info-card';
+
+        var h3c2 = document.createElement('h3');
+        h3c2.textContent = 'Honest position before you look at the designs';
+        card2.appendChild(h3c2);
+
+        var p2a = document.createElement('p');
+        p2a.textContent = 'We’re good at polishing up a design when there’s a clear example to work from. We’re less good at inventing one from scratch with only a few sentences of brief.';
+        card2.appendChild(p2a);
+
+        var p2b = document.createElement('p');
+        p2b.textContent = 'The three designs below are first-pass attempts based on your email, the WCF spec photos, and the Tamborine photo. None of them may be quite what you had in mind. That’s fine — show us what’s wrong with them and we’ll iterate.';
+        card2.appendChild(p2b);
+
+        var p2c = document.createElement('p');
+        p2c.innerHTML = '<strong>Two ways you can help us most:</strong>';
+        card2.appendChild(p2c);
+
+        var ul2 = document.createElement('ul');
+        ul2.style.cssText = 'margin:0.25rem 0 0.75rem 1.5rem;padding:0;';
+        var li2a = document.createElement('li');
+        li2a.style.cssText = 'margin-bottom:0.4rem;font-size:0.95rem;line-height:1.6;color:var(--text-secondary,#444);';
+        li2a.innerHTML = '<strong>Send a sketch.</strong> Even a rough phone-photo of a hand-drawn sketch is gold. We can polish it.';
+        var li2b = document.createElement('li');
+        li2b.style.cssText = 'margin-bottom:0;font-size:0.95rem;line-height:1.6;color:var(--text-secondary,#444);';
+        li2b.innerHTML = '<strong>Mark up our drawings.</strong> Print the designs, draw on them with a pen, photograph and upload. Tell us where we’re off.';
+        ul2.appendChild(li2a);
+        ul2.appendChild(li2b);
+        card2.appendChild(ul2);
+
+        var uploadLabel = document.createElement('label');
+        uploadLabel.className = 'kbh-upload-label';
+        uploadLabel.setAttribute('for', 'sketch-upload');
+        uploadLabel.textContent = 'Sketch or photo of what you had in mind (optional but very helpful)';
+        card2.appendChild(uploadLabel);
+
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.id = 'sketch-upload';
+        fileInput.className = 'kbh-file-input';
+        fileInput.accept = 'image/*,.pdf';
+        fileInput.setAttribute('aria-describedby', 'sketch-hint');
+        fileInput.addEventListener('change', function() {
+            sketchFile = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+        });
+        card2.appendChild(fileInput);
+
+        var fileHint = document.createElement('p');
+        fileHint.id = 'sketch-hint';
+        fileHint.className = 'kbh-file-hint';
+        fileHint.textContent = 'JPG, PNG, PDF accepted. No limit on how rough.';
+        card2.appendChild(fileHint);
+
+        container.appendChild(card2);
+
+        // ---- Card 3 — Design A ----
+        var divC3 = document.createElement('hr');
+        divC3.className = 'kbh-section-divider';
+        container.appendChild(divC3);
+
+        var cardAResult = buildDesignCard({
+            key: 'design-a',
+            heading: 'Design A — Single Flat Blade',
+            imgSrc: 'img/design-A.png',
+            imgAlt: 'Design A: Single Flat Blade — isometric, side, and plan views with specifications',
+            preamble: 'One blade per upright, 80mm wide × 8mm thick × 200mm long. Drives like a long butter knife perpendicular to the line of play. Simplest to build. The plate has to be marked so the installer knows which way to face it.',
+            voicePrompt: 'Anything you’d change about A — width, thickness, depth, how it’s installed, anything'
+        });
+        container.appendChild(cardAResult.card);
+
+        // ---- Card 4 — Design B ----
+        var divC4 = document.createElement('hr');
+        divC4.className = 'kbh-section-divider';
+        container.appendChild(divC4);
+
+        var cardBResult = buildDesignCard({
+            key: 'design-b',
+            heading: 'Design B — 4-Fin Cross (your original geometry)',
+            imgSrc: 'img/design-B.png',
+            imgAlt: 'Design B: 4-Fin Cross — isometric, side, and plan views with specifications',
+            preamble: 'Your original idea — four blades welded in a cross. 40mm × 6mm × 200mm each. Works equally well from any angle the ball comes from. Hardest of the three to fabricate (four cuts, four welds per upright). Hardest to extract because soil packs into the four pockets between fins. We’ve made the fins thicker and shorter than the original spec so the structural check passes.',
+            voicePrompt: 'Anything you’d change about B — width, thickness, depth, number of fins, anything'
+        });
+        container.appendChild(cardBResult.card);
+
+        // ---- Card 5 — Design C ----
+        var divC5 = document.createElement('hr');
+        divC5.className = 'kbh-section-divider';
+        container.appendChild(divC5);
+
+        var cardCResult = buildDesignCard({
+            key: 'design-c',
+            heading: 'Design C — 3-Fin Y-Star',
+            imgSrc: 'img/design-C.png',
+            imgAlt: 'Design C: 3-Fin Y-Star — isometric, side, and plan views with specifications',
+            preamble: 'Three blades at 120 degrees. Same blade dimensions as B (40 × 6 × 200mm) but only three of them. Less metal than the cross, easier to extract, slightly more directional asymmetry but we design for the worst case.',
+            voicePrompt: 'Anything you’d change about C — angles, number of fins, dimensions, anything'
+        });
+        container.appendChild(cardCResult.card);
+
+        // ---- Card 6 — Anything we missed ----
+        var divC6 = document.createElement('hr');
+        divC6.className = 'kbh-section-divider';
+        container.appendChild(divC6);
+
+        var card6 = document.createElement('div');
+        card6.className = 'kbh-missed-card';
+
+        var h3c6 = document.createElement('h3');
+        h3c6.textContent = 'What’s in your head about this that we haven’t asked?';
+        card6.appendChild(h3c6);
+
+        var p6 = document.createElement('p');
+        p6.textContent = 'The brief was light. There’s almost certainly something you’re seeing that we’re not. Tell us.';
+        card6.appendChild(p6);
+
+        var missedTA = document.createElement('textarea');
+        missedTA.className = 'kbh-voice-ta';
+        missedTA.placeholder = 'Anything at all — materials, installation method, how the hoop attaches to the anchor, what the Men’s Shed can actually make, or anything else.';
+        missedTA.setAttribute('aria-label', 'Open feedback');
+        missedTA.addEventListener('input', function() {
+            missedVoice = missedTA.value;
+            if (autosave) autosave.save();
+        });
+        card6.appendChild(missedTA);
+
+        container.appendChild(card6);
+
+        // ---- Validation error ----
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // ---- Submit ----
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var missing = getUnansweredCards();
+
+            document.querySelectorAll('.kbh-design-card').forEach(function(card) {
+                var k = card.dataset.key;
+                if (k && missing.indexOf(k) !== -1) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (missing.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = missing.length === 1
+                    ? 'One design still needs a pick — it’s highlighted above.'
+                    : missing.length + ' designs still need a pick — they’re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.kbh-design-card.missing');
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            var ve2 = document.getElementById('validation-error');
+            ve2.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            var responsePayload = buildPayload();
+            var attachments = sketchFile ? [sketchFile] : [];
+
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName, attachments);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answers';
+                var em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Autosave ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // ---- Restore draft state ----
+        if (draft) {
+            if (answers['design-a'].choice) {
+                var btnA = cardAResult.card.querySelector('[data-value="' + answers['design-a'].choice + '"]');
+                if (btnA) { btnA.classList.add('selected'); cardAResult.card.classList.add('answered'); }
+                if (answers['design-a'].voice) cardAResult.voiceTA.value = answers['design-a'].voice;
+            }
+            if (answers['design-b'].choice) {
+                var btnB = cardBResult.card.querySelector('[data-value="' + answers['design-b'].choice + '"]');
+                if (btnB) { btnB.classList.add('selected'); cardBResult.card.classList.add('answered'); }
+                if (answers['design-b'].voice) cardBResult.voiceTA.value = answers['design-b'].voice;
+            }
+            if (answers['design-c'].choice) {
+                var btnC = cardCResult.card.querySelector('[data-value="' + answers['design-c'].choice + '"]');
+                if (btnC) { btnC.classList.add('selected'); cardCResult.card.classList.add('answered'); }
+                if (answers['design-c'].voice) cardCResult.voiceTA.value = answers['design-c'].voice;
+            }
+            if (missedVoice) missedTA.value = missedVoice;
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
