@@ -10,31 +10,35 @@
     <style>
         /* ---- Mission-specific styles — knife-blade-hoops-design-pick ---- */
 
-        /* Engineering drawings need more room than the default 780px container */
+        /* Give engineering content more breathing room */
         :root {
             --max-width: 1100px;
         }
 
-
-        .kbh-hero-img {
-            width: 100%;
-            max-width: 100%;
-            border-radius: 8px;
-            border: 1px solid var(--border, #e0ddd4);
-            display: block;
-            margin: 1rem 0 0.5rem 0;
-            cursor: zoom-in;
-        }
-
+        /* ---- Design cards ---- */
         .kbh-design-card {
             background: var(--surface, #fff);
             border: 1px solid var(--border, #e0ddd4);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            /* Break out of any max-width container for full-width images */
         }
 
+        .kbh-design-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary, #1a1a1a);
+            margin: 0 0 0.25rem 0;
+        }
+
+        .kbh-design-card .kbh-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary, #666);
+            font-style: italic;
+            margin: 0 0 1rem 0;
+        }
+
+        /* ---- Hero image (click-to-enlarge) ---- */
         .kbh-img-link {
             display: block;
             text-decoration: none;
@@ -46,38 +50,70 @@
             border-radius: 6px;
         }
 
-        .kbh-enlarge-hint {
-            font-size: 0.78rem;
-            color: var(--text-secondary, #888);
-            font-style: italic;
-            margin: -0.8rem 0 1.2rem 0;
-            display: block;
-        }
-
-        .kbh-design-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-primary, #1a1a1a);
-            margin: 0 0 0.6rem 0;
-        }
-
-        .kbh-design-card .kbh-preamble {
-            font-size: 0.95rem;
-            color: var(--text-secondary, #555);
-            line-height: 1.6;
-            margin: 0 0 1rem 0;
-        }
-
         .kbh-design-img {
             width: 100%;
             max-width: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid var(--border, #e0ddd4);
             display: block;
-            margin: 0 0 1.2rem 0;
+            margin: 0 0 0.4rem 0;
             cursor: zoom-in;
+            background: #1a1a1a; /* OpenSCAD renders are on dark bg */
         }
 
+        .kbh-enlarge-hint {
+            font-size: 0.78rem;
+            color: var(--text-secondary, #999);
+            font-style: italic;
+            margin: 0 0 1.25rem 0;
+            display: block;
+        }
+
+        /* ---- Spec table ---- */
+        .kbh-spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 1.5rem 0;
+            font-size: 0.93rem;
+        }
+
+        .kbh-spec-table tr {
+            border-bottom: 1px solid var(--border, #e0ddd4);
+        }
+
+        .kbh-spec-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .kbh-spec-table td {
+            padding: 0.55rem 0.5rem;
+            vertical-align: top;
+            line-height: 1.55;
+            color: var(--text-primary, #1a1a1a);
+        }
+
+        .kbh-spec-table td:first-child {
+            font-weight: 700;
+            color: var(--text-secondary, #555);
+            white-space: nowrap;
+            width: 1%;
+            padding-right: 1.2rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .kbh-spec-table tr.kbh-verdict-pass td:last-child {
+            color: #2d6a4f;
+            font-weight: 600;
+        }
+
+        .kbh-spec-table tr.kbh-verdict-tradeoff td:last-child {
+            color: var(--text-secondary, #555);
+            font-style: italic;
+        }
+
+        /* ---- Choice section ---- */
         .kbh-choice-label {
             font-size: 0.85rem;
             font-weight: 600;
@@ -114,82 +150,7 @@
             box-shadow: 0 0 0 2px rgba(45,106,79,0.12);
         }
 
-        .kbh-upload-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary, #555);
-            margin: 0.25rem 0 0.5rem 0;
-            display: block;
-        }
-
-        .kbh-file-input {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-primary, #1a1a1a);
-            margin-bottom: 0.5rem;
-        }
-
-        .kbh-file-hint {
-            font-size: 0.82rem;
-            color: var(--text-secondary, #888);
-            margin: 0.25rem 0 0;
-        }
-
-        .kbh-info-card {
-            background: var(--surface, #fff);
-            border: 1px solid var(--border, #e0ddd4);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .kbh-info-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-primary, #1a1a1a);
-            margin: 0 0 0.75rem 0;
-        }
-
-        .kbh-info-card p {
-            font-size: 0.95rem;
-            color: var(--text-secondary, #444);
-            line-height: 1.7;
-            margin: 0 0 0.75rem 0;
-        }
-
-        .kbh-info-card p:last-child {
-            margin-bottom: 0;
-        }
-
-        .kbh-missed-card {
-            background: var(--surface, #fff);
-            border: 1px solid var(--border, #e0ddd4);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .kbh-missed-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-primary, #1a1a1a);
-            margin: 0 0 0.6rem 0;
-        }
-
-        .kbh-missed-card p {
-            font-size: 0.95rem;
-            color: var(--text-secondary, #444);
-            line-height: 1.7;
-            margin: 0 0 0.75rem 0;
-        }
-
-        .kbh-section-divider {
-            border: none;
-            border-top: 1px solid var(--border, #e0ddd4);
-            margin: 2rem 0;
-        }
-
-        /* Answer button row for design choice */
+        /* ---- Answer buttons ---- */
         .kbh-answer-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -243,12 +204,136 @@
             border-color: var(--text-secondary, #888);
         }
 
-        /* Missing card highlight */
+        /* ---- Missing card highlight ---- */
         .kbh-design-card.missing {
             border-color: #b83227;
             box-shadow: 0 0 0 2px rgba(184,50,39,0.15);
         }
 
+        /* ---- Info / missed cards ---- */
+        .kbh-info-card,
+        .kbh-missed-card {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border, #e0ddd4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kbh-info-card h3,
+        .kbh-missed-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary, #1a1a1a);
+            margin: 0 0 0.75rem 0;
+        }
+
+        .kbh-info-card p,
+        .kbh-missed-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary, #444);
+            line-height: 1.7;
+            margin: 0 0 0.75rem 0;
+        }
+
+        .kbh-info-card p:last-child,
+        .kbh-missed-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ---- Hero image on info cards ---- */
+        .kbh-hero-img {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border, #e0ddd4);
+            display: block;
+            margin: 1rem 0 0.5rem 0;
+            cursor: zoom-in;
+        }
+
+        /* ---- Common engineering caveats block ---- */
+        .kbh-caveat-block {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px dashed var(--border, #e0ddd4);
+        }
+
+        .kbh-caveat-block h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-secondary, #555);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin: 0 0 0.6rem 0;
+        }
+
+        .kbh-caveat-block dl {
+            margin: 0;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.3rem 1rem;
+        }
+
+        .kbh-caveat-block dt {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-secondary, #666);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding-top: 0.1rem;
+            white-space: nowrap;
+        }
+
+        .kbh-caveat-block dd {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-primary, #333);
+            line-height: 1.6;
+        }
+
+        .kbh-caveat-block .kbh-caveat-note {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary, #666);
+            font-style: italic;
+            line-height: 1.6;
+            background: rgba(188,108,37,0.07);
+            border-left: 3px solid #bc6c25;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* ---- Section divider ---- */
+        .kbh-section-divider {
+            border: none;
+            border-top: 1px solid var(--border, #e0ddd4);
+            margin: 2rem 0;
+        }
+
+        /* ---- Upload section ---- */
+        .kbh-upload-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary, #555);
+            margin: 0.25rem 0 0.5rem 0;
+            display: block;
+        }
+
+        .kbh-file-input {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-primary, #1a1a1a);
+            margin-bottom: 0.5rem;
+        }
+
+        .kbh-file-hint {
+            font-size: 0.82rem;
+            color: var(--text-secondary, #888);
+            margin: 0.25rem 0 0;
+        }
+
+        /* ---- Responsive ---- */
         @media (max-width: 600px) {
             .kbh-btn-choice {
                 font-size: 0.82rem;
@@ -258,6 +343,17 @@
             .kbh-info-card,
             .kbh-missed-card {
                 padding: 1.1rem;
+            }
+            .kbh-spec-table td:first-child {
+                white-space: normal;
+                width: auto;
+            }
+            .kbh-caveat-block dl {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .kbh-caveat-block dt {
+                margin-top: 0.5rem;
             }
         }
     </style>
@@ -344,63 +440,89 @@
             { label: 'I don’t have a strong view', value: 'no-view', cls: 'btn-neutral' }
         ];
 
+        function buildSpecTable(rows) {
+            // rows: array of { label, value, cls }
+            var table = document.createElement(‘table’);
+            table.className = ‘kbh-spec-table’;
+            rows.forEach(function(row) {
+                var tr = document.createElement(‘tr’);
+                if (row.cls) tr.className = row.cls;
+                var tdLabel = document.createElement(‘td’);
+                tdLabel.textContent = row.label;
+                var tdValue = document.createElement(‘td’);
+                tdValue.innerHTML = row.value;
+                tr.appendChild(tdLabel);
+                tr.appendChild(tdValue);
+                table.appendChild(tr);
+            });
+            return table;
+        }
+
         function buildDesignCard(opts) {
             var key = opts.key;
-            var card = document.createElement('div');
-            card.className = 'kbh-design-card card';
+            var card = document.createElement(‘div’);
+            card.className = ‘kbh-design-card card’;
             card.dataset.key = key;
 
-            var h3 = document.createElement('h3');
+            var h3 = document.createElement(‘h3’);
             h3.textContent = opts.heading;
             card.appendChild(h3);
 
+            if (opts.subtitle) {
+                var sub = document.createElement(‘p’);
+                sub.className = ‘kbh-subtitle’;
+                sub.textContent = opts.subtitle;
+                card.appendChild(sub);
+            }
+
+            // Hero image (click-to-enlarge)
             if (opts.imgSrc) {
-                var imgLink = document.createElement('a');
+                var imgLink = document.createElement(‘a’);
                 imgLink.href = opts.imgSrc;
-                imgLink.target = '_blank';
-                imgLink.rel = 'noopener';
-                imgLink.className = 'kbh-img-link';
-                imgLink.title = 'Click to open full-size in a new tab';
-                var img = document.createElement('img');
+                imgLink.target = ‘_blank’;
+                imgLink.rel = ‘noopener’;
+                imgLink.className = ‘kbh-img-link’;
+                imgLink.title = ‘Click to open full-size in a new tab’;
+                var img = document.createElement(‘img’);
                 img.src = opts.imgSrc;
                 img.alt = opts.imgAlt || opts.heading;
-                img.className = 'kbh-design-img';
+                img.className = ‘kbh-design-img’;
                 imgLink.appendChild(img);
                 card.appendChild(imgLink);
-                var hint = document.createElement('span');
-                hint.className = 'kbh-enlarge-hint';
-                hint.textContent = 'Click the drawing to open it full-size in a new tab.';
+                var hint = document.createElement(‘span’);
+                hint.className = ‘kbh-enlarge-hint’;
+                hint.textContent = ‘Click image to open full-size in a new tab.’;
                 card.appendChild(hint);
             }
 
-            var preamble = document.createElement('p');
-            preamble.className = 'kbh-preamble';
-            preamble.textContent = opts.preamble;
-            card.appendChild(preamble);
+            // Native-HTML spec table
+            if (opts.specRows) {
+                card.appendChild(buildSpecTable(opts.specRows));
+            }
 
-            var choiceLabel = document.createElement('span');
-            choiceLabel.className = 'kbh-choice-label';
-            choiceLabel.textContent = 'How does this fit?';
+            var choiceLabel = document.createElement(‘span’);
+            choiceLabel.className = ‘kbh-choice-label’;
+            choiceLabel.textContent = ‘How does this fit?’;
             card.appendChild(choiceLabel);
 
-            var btnRow = document.createElement('div');
-            btnRow.className = 'kbh-answer-buttons answer-buttons';
+            var btnRow = document.createElement(‘div’);
+            btnRow.className = ‘kbh-answer-buttons answer-buttons’;
 
             choiceButtons.forEach(function(btn) {
-                var b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'kbh-btn-choice btn-answer' + (btn.cls ? ' ' + btn.cls : '');
+                var b = document.createElement(‘button’);
+                b.type = ‘button’;
+                b.className = ‘kbh-btn-choice btn-answer’ + (btn.cls ? ‘ ‘ + btn.cls : ‘’);
                 b.dataset.value = btn.value;
                 b.textContent = btn.label;
 
-                b.addEventListener('click', function() {
-                    btnRow.querySelectorAll('.kbh-btn-choice').forEach(function(x) {
-                        x.classList.remove('selected');
+                b.addEventListener(‘click’, function() {
+                    btnRow.querySelectorAll(‘.kbh-btn-choice’).forEach(function(x) {
+                        x.classList.remove(‘selected’);
                     });
-                    b.classList.add('selected');
+                    b.classList.add(‘selected’);
                     answers[key].choice = btn.value;
-                    card.classList.add('answered');
-                    card.classList.remove('missing');
+                    card.classList.add(‘answered’);
+                    card.classList.remove(‘missing’);
                     if (autosave) autosave.save();
                 });
 
@@ -409,16 +531,16 @@
 
             card.appendChild(btnRow);
 
-            var voiceLabel = document.createElement('span');
-            voiceLabel.className = 'kbh-voice-label';
-            voiceLabel.textContent = opts.voicePrompt || 'Anything you’d change about this design?';
+            var voiceLabel = document.createElement(‘span’);
+            voiceLabel.className = ‘kbh-voice-label’;
+            voiceLabel.textContent = opts.voicePrompt || ‘Anything you’d change about this design?’;
             card.appendChild(voiceLabel);
 
-            var voiceTA = document.createElement('textarea');
-            voiceTA.className = 'kbh-voice-ta';
-            voiceTA.placeholder = 'Width, thickness, depth, how it’s installed — anything.';
-            voiceTA.setAttribute('aria-label', 'Notes for ' + opts.heading);
-            voiceTA.addEventListener('input', function() {
+            var voiceTA = document.createElement(‘textarea’);
+            voiceTA.className = ‘kbh-voice-ta’;
+            voiceTA.placeholder = ‘Width, thickness, depth, how it’s installed — anything.’;
+            voiceTA.setAttribute(‘aria-label’, ‘Notes for ‘ + opts.heading);
+            voiceTA.addEventListener(‘input’, function() {
                 answers[key].voice = voiceTA.value;
                 if (autosave) autosave.save();
             });
@@ -554,6 +676,37 @@
         fileHint.textContent = 'JPG, PNG, PDF accepted. No limit on how rough.';
         card2.appendChild(fileHint);
 
+        // ---- Engineering caveats common to all three designs ----
+        var caveatBlock = document.createElement('div');
+        caveatBlock.className = 'kbh-caveat-block';
+
+        var caveatH4 = document.createElement('h4');
+        caveatH4.textContent = 'Engineering context — applies to all three designs';
+        caveatBlock.appendChild(caveatH4);
+
+        var caveatDl = document.createElement('dl');
+        var caveatRows = [
+            { dt: 'Design philosophy', dd: 'Capacity-design — the upright is the fuse. The foundation must clear upright yield × 1.25 dynamic factor.' },
+            { dt: 'Design load', dd: 'Top GC power hit, 454 g ball at 10 m/s, design moment 173 N·m at ground line.' },
+            { dt: 'Material', dd: 'Mild steel S275 (cheaper) or stainless 304 (corrosion-immune) — both clear the structural check.' }
+        ];
+        caveatRows.forEach(function(row) {
+            var dt = document.createElement('dt');
+            dt.textContent = row.dt;
+            var dd = document.createElement('dd');
+            dd.textContent = row.dd;
+            caveatDl.appendChild(dt);
+            caveatDl.appendChild(dd);
+        });
+        caveatBlock.appendChild(caveatDl);
+
+        var caveatNote = document.createElement('p');
+        caveatNote.className = 'kbh-caveat-note';
+        caveatNote.innerHTML = '<strong>Important:</strong> The engineering check tells us a design is worth testing — not that it will survive in service. Real validation means a real hit on a real green. All three designs clear the capacity-design case (Case A, 2.04× margin). None of them clear the upper-bound raw-impulse case (Case B, 53× larger). The truth is somewhere in between. Only field testing tells us where.';
+        caveatBlock.appendChild(caveatNote);
+
+        card2.appendChild(caveatBlock);
+
         container.appendChild(card2);
 
         // ---- Card 3 — Design A ----
@@ -562,12 +715,22 @@
         container.appendChild(divC3);
 
         var cardAResult = buildDesignCard({
-            key: 'design-a',
-            heading: 'Design A — Single Flat Blade',
-            imgSrc: 'img/design-A.png',
-            imgAlt: 'Design A: Single Flat Blade — isometric, side, and plan views with specifications',
-            preamble: 'One blade per upright, 80mm wide × 8mm thick × 200mm long. Drives like a long butter knife perpendicular to the line of play. Simplest to build. The plate has to be marked so the installer knows which way to face it.',
-            voicePrompt: 'Anything you’d change about A — width, thickness, depth, how it’s installed, anything'
+            key: ‘design-a’,
+            heading: ‘Design A — Single Flat Blade (true knife-blade)’,
+            subtitle: ‘Slices straight in like a knife — leaves a thin slit that closes’,
+            imgSrc: ‘img/A-iso-focus.png’,
+            imgAlt: ‘Design A: Single Flat Blade — 3D isometric view’,
+            specRows: [
+                { label: ‘Install’, value: ‘Knife-blade slice — one thin slit ~640 mm² in cross-section’ },
+                { label: ‘Soil disturbance’, value: ‘~640 mm² — slit closes within days’ },
+                { label: ‘Above ground’, value: ‘12 in upright (305 mm), 16 mm round, mild steel S275 — WCF spec’ },
+                { label: ‘Plate’, value: ‘100 × 100 × 10 mm mild steel S275, sits 10 mm below turf’ },
+                { label: ‘Blade’, value: ‘1 fin, 80 mm wide × 8 mm thick × 200 mm long, knife-edge sloping tip’ },
+                { label: ‘Weld’, value: ‘Socket joint mandatory — upright passes through plate, 8 mm fillet welds top + bottom’ },
+                { label: ‘Engineering’, value: ‘<strong>PASS</strong> — governing mode is socket weld at 2.04× margin’, cls: ‘kbh-verdict-pass’ },
+                { label: ‘Trade-off’, value: ‘Simplest to fabricate. Installer must orient plate perpendicular to line of play — mark the plate so they can\’t get it wrong.’, cls: ‘kbh-verdict-tradeoff’ }
+            ],
+            voicePrompt: ‘Anything you’d change about A — width, thickness, depth, how it’s installed, anything’
         });
         container.appendChild(cardAResult.card);
 
@@ -577,12 +740,22 @@
         container.appendChild(divC4);
 
         var cardBResult = buildDesignCard({
-            key: 'design-b',
-            heading: 'Design B — 4-Fin Cross (your original geometry)',
-            imgSrc: 'img/design-B.png',
-            imgAlt: 'Design B: 4-Fin Cross — isometric, side, and plan views with specifications',
-            preamble: 'Your original idea — four blades welded in a cross. 40mm × 6mm × 200mm each. Works equally well from any angle the ball comes from. Hardest of the three to fabricate (four cuts, four welds per upright). Hardest to extract because soil packs into the four pockets between fins. We’ve made the fins thicker and shorter than the original spec so the structural check passes.',
-            voicePrompt: 'Anything you’d change about B — width, thickness, depth, number of fins, anything'
+            key: ‘design-b’,
+            heading: ‘Design B — 4-Fin Cross (star anchor)’,
+            subtitle: ‘Marilyn\’s original geometry — four blades welded in a cross’,
+            imgSrc: ‘img/B-iso-focus.png’,
+            imgAlt: ‘Design B: 4-Fin Cross — 3D isometric view’,
+            specRows: [
+                { label: ‘Install’, value: ‘Star-anchor punch — four blades drive simultaneously, soil packs between fins’ },
+                { label: ‘Soil disturbance’, value: ‘~2,500 mm² (4 slits + packed core between fins) — ~4× design A’ },
+                { label: ‘Above ground’, value: ‘Same as A (12 in upright, 16 mm round)’ },
+                { label: ‘Plate’, value: ‘100 × 100 × 10 mm mild steel S275’ },
+                { label: ‘Blade’, value: ‘4 fins at 90°, each 40 mm wide × 6 mm thick × 200 mm long’ },
+                { label: ‘Weld’, value: ‘Socket joint mandatory’ },
+                { label: ‘Engineering’, value: ‘<strong>PASS</strong> — same margin as A (2.04×)’, cls: ‘kbh-verdict-pass’ },
+                { label: ‘Trade-off’, value: ‘Works equally from any ball-approach angle. Hardest to fabricate (4 cuts, 4 welds). Hardest to extract — soil packs into pockets between fins.’, cls: ‘kbh-verdict-tradeoff’ }
+            ],
+            voicePrompt: ‘Anything you’d change about B — width, thickness, depth, number of fins, anything’
         });
         container.appendChild(cardBResult.card);
 
@@ -592,12 +765,22 @@
         container.appendChild(divC5);
 
         var cardCResult = buildDesignCard({
-            key: 'design-c',
-            heading: 'Design C — 3-Fin Y-Star',
-            imgSrc: 'img/design-C.png',
-            imgAlt: 'Design C: 3-Fin Y-Star — isometric, side, and plan views with specifications',
-            preamble: 'Three blades at 120 degrees. Same blade dimensions as B (40 × 6 × 200mm) but only three of them. Less metal than the cross, easier to extract, slightly more directional asymmetry but we design for the worst case.',
-            voicePrompt: 'Anything you’d change about C — angles, number of fins, dimensions, anything'
+            key: ‘design-c’,
+            heading: ‘Design C — 3-Fin Y-Star (star anchor)’,
+            subtitle: ‘Three blades at 120° — middle ground between A and B’,
+            imgSrc: ‘img/C-iso-focus.png’,
+            imgAlt: ‘Design C: 3-Fin Y-Star — 3D isometric view’,
+            specRows: [
+                { label: ‘Install’, value: ‘Star-anchor punch — three blades drive simultaneously’ },
+                { label: ‘Soil disturbance’, value: ‘~1,800 mm² (3 slits + packed core) — ~3× design A’ },
+                { label: ‘Above ground’, value: ‘Same as A (12 in upright, 16 mm round)’ },
+                { label: ‘Plate’, value: ‘100 × 100 × 10 mm mild steel S275’ },
+                { label: ‘Blade’, value: ‘3 fins at 120°, each 40 mm wide × 6 mm thick × 200 mm long’ },
+                { label: ‘Weld’, value: ‘Socket joint mandatory’ },
+                { label: ‘Engineering’, value: ‘<strong>PASS</strong> — same margin as A’, cls: ‘kbh-verdict-pass’ },
+                { label: ‘Trade-off’, value: ‘Less metal than B, easier to extract (wider gaps between fins). Slight directional asymmetry but designed for worst case.’, cls: ‘kbh-verdict-tradeoff’ }
+            ],
+            voicePrompt: ‘Anything you’d change about C — angles, number of fins, dimensions, anything’
         });
         container.appendChild(cardCResult.card);
 
