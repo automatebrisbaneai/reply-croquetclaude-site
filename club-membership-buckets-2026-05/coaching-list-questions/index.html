@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach list reconciliation — CroquetClaude</title>
+    <meta name="description" content="A quick one-click check on your coaching records.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Coach list reconciliation</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission #1 — coaching-list-questions
+    // -----------------------------------------------------------------------
+
+    // Called by app.js after token is validated
+    window.renderMission = function(tokenRecord) {
+        const seed = tokenRecord.payload_seed;
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+
+        const sectionA = (seed && seed.sections && seed.sections['pending-new']) || [];
+        const sectionB = (seed && seed.sections && seed.sections['pending-include']) || [];
+        const sectionC = (seed && seed.sections && seed.sections['pending-no-aca']) || [];
+
+        const totalCount = sectionA.length + sectionB.length + sectionC.length;
+
+        // Track answers in memory: key = "<section>/<index>", value = { answer, notes }
+        const answers = {};
+
+        // Initialise all cards as unanswered
+        function keyFor(section, idx) { return section + '/' + idx; }
+
+        sectionA.forEach((_, i) => { answers[keyFor('pending-new', i)] = { answer: null, notes: '' }; });
+        sectionB.forEach((_, i) => { answers[keyFor('pending-include', i)] = { answer: null, notes: '' }; });
+        sectionC.forEach((_, i) => { answers[keyFor('pending-no-aca', i)] = { answer: null, notes: '' }; });
+
+        // Pre-load answers from draft if present
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (k && answers.hasOwnProperty(k)) {
+                    answers[k].answer = entry.answer !== undefined ? entry.answer : null;
+                    answers[k].notes = entry.notes || '';
+                }
+            });
+        }
+
+        // ---- Build the DOM ----
+
+        function formatDisciplines(str) {
+            if (!str || str === '(no levels recorded)') return str || '';
+            // Pretty-print: "Golf:1,2,3" stays as-is; just ensure readable spacing
+            return str.replace(/,/g, ', ');
+        }
+
+        function buildCard(coach, section, idx, buttonsConfig) {
+            const k = keyFor(section, idx);
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.key = k;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', coach.name);
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'card-name';
+            nameEl.textContent = coach.name;
+            card.appendChild(nameEl);
+
+            const meta = document.createElement('div');
+            meta.className = 'card-meta';
+
+            const clubSpan = document.createElement('span');
+            clubSpan.textContent = coach.club || '';
+            meta.appendChild(clubSpan);
+
+            if (coach.disciplines) {
+                const dispSpan = document.createElement('span');
+                dispSpan.textContent = formatDisciplines(coach.disciplines);
+                meta.appendChild(dispSpan);
+            }
+
+            if (coach.aca) {
+                const acaSpan = document.createElement('span');
+                acaSpan.textContent = 'ACA ' + coach.aca;
+                meta.appendChild(acaSpan);
+            }
+
+            card.appendChild(meta);
+
+            // Button row
+            const btnRow = document.createElement('div');
+            btnRow.className = 'answer-buttons';
+
+            buttonsConfig.forEach(function(btn) {
+                const b = document.createElement('button');
+                b.className = 'btn-answer';
+                b.textContent = btn.label;
+                b.dataset.value = btn.value;
+                b.setAttribute('type', 'button');
+
+                if (btn.value === 'unsure') {
+                    b.classList.add('unsure');
+                }
+
+                b.addEventListener('click', function() {
+                    // Deselect all in this card
+                    btnRow.querySelectorAll('.btn-answer').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers[k].answer = btn.value;
+
+                    // Notes area
+                    const notesArea = card.querySelector('.notes-area');
+                    if (notesArea) {
+                        if (btn.value === 'unsure') {
+                            notesArea.classList.add('visible');
+                            notesArea.querySelector('textarea').focus();
+                        } else {
+                            notesArea.classList.remove('visible');
+                        }
+                    }
+
+                    // Mark card as answered
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+
+                    updateValidationState();
+
+                    // Autosave
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            card.appendChild(btnRow);
+
+            // Notes area (shown when Unsure is selected)
+            const notesArea = document.createElement('div');
+            notesArea.className = 'notes-area';
+            const notesLabel = document.createElement('label');
+            notesLabel.style.cssText = 'display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;';
+            notesLabel.textContent = 'Notes (optional):';
+            const notesTA = document.createElement('textarea');
+            notesTA.placeholder = 'Any context that would help…';
+            notesTA.setAttribute('aria-label', 'Notes for ' + coach.name);
+            notesTA.addEventListener('input', function() {
+                answers[k].notes = notesTA.value;
+                if (autosave) autosave.save();
+            });
+            notesArea.appendChild(notesLabel);
+            notesArea.appendChild(notesTA);
+            card.appendChild(notesArea);
+
+            return card;
+        }
+
+        // Standard 3-button set
+        const stdButtons = [
+            { label: 'Include', value: 'include' },
+            { label: 'Drop', value: 'drop' },
+            { label: 'Unsure — tell me more', value: 'unsure' }
+        ];
+
+        // Section C 4-button set
+        const noAcaButtons = [
+            { label: 'Include — has ACA we can find', value: 'include-has-aca' },
+            { label: 'Include — needs registration', value: 'include-needs-reg' },
+            { label: 'Drop', value: 'drop' },
+            { label: 'Unsure — tell me more', value: 'unsure' }
+        ];
+
+        // ---- Validation helper ----
+        function updateValidationState() {
+            const allKeys = Object.keys(answers);
+            const unanswered = allKeys.filter(function(k) { return answers[k].answer === null; });
+            return unanswered;
+        }
+
+        // ---- Autosave setup ----
+        // Declared here so buildCard closures can reference it; assigned after DOM is built.
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = Object.keys(answers).map(function(k) {
+                return {
+                    key: k,
+                    answer: answers[k].answer,
+                    notes: answers[k].notes || ''
+                };
+            });
+            var gnTA = document.getElementById('general-notes');
+            return {
+                cards: cards,
+                general_notes: gnTA ? gnTA.value : ''
+            };
+        }
+
+        // ---- Build full page ----
+        const app = document.getElementById('app');
+
+        const container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        const opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + ' — I cross-checked your February spreadsheet against the live RevSport records and the CAQ website.</p>' +
+            '<p><strong>101 coaches appear on all sources</strong> — those are confirmed on the master list, no action needed from you.</p>' +
+            '<p><strong>The ' + totalCount + ' below are the gaps</strong> — each appears on one source but not the other. For each one, tell me whether to <em>Include</em> them on the master list or <em>Drop</em> them.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">\u270e</span> Your answers save automatically as you go. Close the tab and come back any time \u2014 the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        // Section graphic — animated arrow from the source list (RevSport or Your list)
+        // to the New master list. The destination is always the master list — the answer
+        // each card decides whether the coach lands on it.
+        function buildSectionGraphic(source) {
+            // source: 'revsport' | 'your-list' | 'your-list-no-aca'
+            const wrap = document.createElement('div');
+            wrap.className = 'section-graphic';
+            wrap.setAttribute('aria-hidden', 'true');
+
+            function docEl(label, state, sublabel) {
+                // state: 'source' | 'destination'
+                const d = document.createElement('div');
+                d.className = 'doc doc-' + state;
+                d.innerHTML =
+                    '<svg viewBox="0 0 28 34" width="22" height="28" aria-hidden="true">' +
+                    '<path d="M3 1 H19 L25 7 V31 a2 2 0 0 1 -2 2 H3 a2 2 0 0 1 -2 -2 V3 a2 2 0 0 1 2 -2 z" ' +
+                    'fill="none" stroke="currentColor" stroke-width="1.6" ' +
+                    (state === 'destination' ? 'stroke-dasharray="3 2"' : '') + '/>' +
+                    '<path d="M19 1 V7 H25" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+                    (state === 'destination'
+                        ? '<text x="13" y="22" font-size="11" text-anchor="middle" fill="currentColor" font-family="serif">?</text>'
+                        : '<line x1="6" y1="14" x2="20" y2="14" stroke="currentColor" stroke-width="1.4"/><line x1="6" y1="19" x2="20" y2="19" stroke="currentColor" stroke-width="1.4"/><line x1="6" y1="24" x2="16" y2="24" stroke="currentColor" stroke-width="1.4"/>') +
+                    '</svg>' +
+                    '<span class="doc-label">' + label + '</span>' +
+                    (sublabel ? '<span class="doc-sublabel">' + sublabel + '</span>' : '');
+                return d;
+            }
+
+            function arrowEl() {
+                const a = document.createElement('div');
+                a.className = 'doc-arrow';
+                a.innerHTML =
+                    '<svg viewBox="0 0 60 16" width="60" height="16" aria-hidden="true">' +
+                    '<line x1="2" y1="8" x2="52" y2="8" stroke="currentColor" stroke-width="2" ' +
+                    'stroke-dasharray="4 4" stroke-linecap="round" class="doc-arrow-line"/>' +
+                    '<polyline points="46,3 54,8 46,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+                    '</svg>';
+                return a;
+            }
+
+            if (source === 'revsport') {
+                wrap.appendChild(docEl('RevSport only', 'source'));
+            } else if (source === 'your-list-no-aca') {
+                wrap.appendChild(docEl('Your list only', 'source', 'no ACA'));
+            } else {
+                wrap.appendChild(docEl('Your list only', 'source'));
+            }
+            wrap.appendChild(arrowEl());
+            wrap.appendChild(docEl('New master list', 'destination'));
+            return wrap;
+        }
+
+        // ---- Section A ----
+        if (sectionA.length > 0) {
+            const divA = document.createElement('hr');
+            divA.className = 'section-divider';
+            container.appendChild(divA);
+
+            container.appendChild(buildSectionGraphic('revsport'));
+
+            const headA = document.createElement('h2');
+            headA.className = 'section-heading';
+            headA.textContent = 'Section A — In RevSport, not on your February list (' + sectionA.length + ')';
+            container.appendChild(headA);
+
+            const subA = document.createElement('p');
+            subA.className = 'section-subtitle';
+            subA.textContent = 'RevSport flags these ' + sectionA.length + ' as active coaches, but they didn\u2019t make it onto your February list. Should they be on the master list?';
+            container.appendChild(subA);
+
+            const gridA = document.createElement('div');
+            gridA.className = 'cards-grid';
+            sectionA.forEach(function(coach, i) {
+                gridA.appendChild(buildCard(coach, 'pending-new', i, stdButtons));
+            });
+            container.appendChild(gridA);
+        }
+
+        // ---- Section B ----
+        if (sectionB.length > 0) {
+            const divB = document.createElement('hr');
+            divB.className = 'section-divider';
+            container.appendChild(divB);
+
+            container.appendChild(buildSectionGraphic('your-list'));
+
+            const headB = document.createElement('h2');
+            headB.className = 'section-heading';
+            headB.textContent = 'Section B — On your February list, not in RevSport (' + sectionB.length + ')';
+            container.appendChild(headB);
+
+            const subB = document.createElement('p');
+            subB.className = 'section-subtitle';
+            subB.textContent = 'These ' + sectionB.length + ' are on your February list but RevSport no longer flags them as coaches. Was the flag cleared in error, or have they actually stopped coaching?';
+            container.appendChild(subB);
+
+            const gridB = document.createElement('div');
+            gridB.className = 'cards-grid';
+            sectionB.forEach(function(coach, i) {
+                gridB.appendChild(buildCard(coach, 'pending-include', i, stdButtons));
+            });
+            container.appendChild(gridB);
+        }
+
+        // ---- Section C ----
+        if (sectionC.length > 0) {
+            const divC = document.createElement('hr');
+            divC.className = 'section-divider';
+            container.appendChild(divC);
+
+            const headC = document.createElement('h2');
+            headC.className = 'section-heading';
+            container.appendChild(buildSectionGraphic('your-list-no-aca'));
+
+            headC.textContent = 'Section C — On your list with no ACA number (' + sectionC.length + ')';
+            container.appendChild(headC);
+
+            const subC = document.createElement('p');
+            subC.className = 'section-subtitle';
+            subC.textContent = 'These ' + sectionC.length + ' are on your February list but don\u2019t have ACA numbers, so I couldn\u2019t match them against RevSport. Are they current CAQ members under a different name? New coaches pending registration? Or something else?';
+            container.appendChild(subC);
+
+            const gridC = document.createElement('div');
+            gridC.className = 'cards-grid';
+            sectionC.forEach(function(coach, i) {
+                gridC.appendChild(buildCard(coach, 'pending-no-aca', i, noAcaButtons));
+            });
+            container.appendChild(gridC);
+        }
+
+        // ---- General notes ----
+        const divFinal = document.createElement('hr');
+        divFinal.className = 'section-divider';
+        container.appendChild(divFinal);
+
+        const generalWrap = document.createElement('div');
+        generalWrap.className = 'general-notes-wrap';
+
+        const generalLabel = document.createElement('label');
+        generalLabel.setAttribute('for', 'general-notes');
+        generalLabel.textContent = 'Anything else I should know?';
+        generalWrap.appendChild(generalLabel);
+
+        const generalTA = document.createElement('textarea');
+        generalTA.id = 'general-notes';
+        generalTA.placeholder = 'Optional — any extra context, corrections, or questions for Wade.';
+        generalTA.addEventListener('input', function() {
+            if (autosave) autosave.save();
+        });
+        generalWrap.appendChild(generalTA);
+
+        container.appendChild(generalWrap);
+
+        // ---- Validation error ----
+        const validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // ---- Submit ----
+        const submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        const draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            // Validate: all cards must be answered
+            const unanswered = updateValidationState();
+
+            // Highlight missing cards
+            document.querySelectorAll('.card').forEach(function(card) {
+                const k = card.dataset.key;
+                if (k && answers[k] && answers[k].answer === null) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (unanswered.length > 0) {
+                const ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One record still needs an answer — it\'s highlighted above.'
+                    : unanswered.length + ' records still need answers — they\'re highlighted above.';
+                ve.classList.add('visible');
+                // Scroll to first missing card
+                const firstMissing = document.querySelector('.card.missing');
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            // Clear validation error
+            const ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            // Disable button + show spinner
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            // Build payload
+            const coaches = [];
+
+            sectionA.forEach(function(coach, i) {
+                const k = keyFor('pending-new', i);
+                coaches.push({
+                    aca: coach.aca,
+                    name: coach.name,
+                    section: 'pending-new',
+                    answer: answers[k].answer,
+                    notes: answers[k].notes || ''
+                });
+            });
+
+            sectionB.forEach(function(coach, i) {
+                const k = keyFor('pending-include', i);
+                coaches.push({
+                    aca: coach.aca,
+                    name: coach.name,
+                    section: 'pending-include',
+                    answer: answers[k].answer,
+                    notes: answers[k].notes || ''
+                });
+            });
+
+            sectionC.forEach(function(coach, i) {
+                const k = keyFor('pending-no-aca', i);
+                coaches.push({
+                    aca: coach.aca,
+                    name: coach.name,
+                    section: 'pending-no-aca',
+                    answer: answers[k].answer,
+                    notes: answers[k].notes || ''
+                });
+            });
+
+            const responsePayload = {
+                coaches: coaches,
+                general_notes: generalTA.value
+            };
+
+            const ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answers';
+                const em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Initialise autosave (after DOM is mounted so general-notes is available) ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // ---- Restore draft state into the rendered DOM ----
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (!k || entry.answer === null || entry.answer === undefined) return;
+                var card = container.querySelector('[data-key="' + k + '"]');
+                if (!card) return;
+                var btnRow = card.querySelector('.answer-buttons');
+                if (btnRow) {
+                    var btn = btnRow.querySelector('[data-value="' + entry.answer + '"]');
+                    if (btn) {
+                        btn.classList.add('selected');
+                        card.classList.add('answered');
+                    }
+                }
+                // Restore notes
+                if (entry.notes) {
+                    var notesArea = card.querySelector('.notes-area');
+                    var notesTA = notesArea && notesArea.querySelector('textarea');
+                    if (notesTA) {
+                        notesTA.value = entry.notes;
+                        if (entry.answer === 'unsure') {
+                            notesArea.classList.add('visible');
+                        }
+                    }
+                }
+            });
+            // Restore general_notes
+            if (draft.general_notes && generalTA) {
+                generalTA.value = draft.general_notes;
+            }
+            // Show restored notice — use token's updated field as timestamp proxy
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
