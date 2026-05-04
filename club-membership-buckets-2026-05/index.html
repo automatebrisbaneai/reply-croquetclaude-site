@@ -13,40 +13,43 @@
        All scoped to .mission-buckets to avoid touching shared styles.css
     ----------------------------------------------------------------------- */
 
-    /* RevSport die-hard — terracotta */
+    /* CroquetClaude palette — kept off CAQ maroon (which the official org will use).
+       Cream paper #FAF6E8 · dark green #1a3c2e · soft green #5b6f5e · orange #b9742a. */
+
+    /* RevSport die-hard — Claude dark green (brand-prominent) */
     .mission-buckets .btn-answer[data-value="revsport"] {
-        color: #bc6c25;
-        border-color: #bc6c25;
+        color: #1a3c2e;
+        border-color: #1a3c2e;
     }
     .mission-buckets .btn-answer[data-value="revsport"].selected,
     .mission-buckets .btn-answer[data-value="revsport"]:hover {
-        background: #bc6c25;
+        background: #1a3c2e;
         color: #fff;
-        border-color: #bc6c25;
+        border-color: #1a3c2e;
     }
 
-    /* Goes with the flow — lawn green */
+    /* Goes with the flow — soft green (the default, muted) */
     .mission-buckets .btn-answer[data-value="flow"] {
-        color: #2d6a4f;
-        border-color: #2d6a4f;
+        color: #5b6f5e;
+        border-color: #5b6f5e;
     }
     .mission-buckets .btn-answer[data-value="flow"].selected,
     .mission-buckets .btn-answer[data-value="flow"]:hover {
-        background: #2d6a4f;
+        background: #5b6f5e;
         color: #fff;
-        border-color: #2d6a4f;
+        border-color: #5b6f5e;
     }
 
-    /* Paper / allergic — dusty slate */
+    /* Paper / allergic — warm orange (the "let's be patient" choice) */
     .mission-buckets .btn-answer[data-value="paper"] {
-        color: #5c7a8c;
-        border-color: #5c7a8c;
+        color: #b9742a;
+        border-color: #b9742a;
     }
     .mission-buckets .btn-answer[data-value="paper"].selected,
     .mission-buckets .btn-answer[data-value="paper"]:hover {
-        background: #5c7a8c;
+        background: #b9742a;
         color: #fff;
-        border-color: #5c7a8c;
+        border-color: #b9742a;
     }
 
     /* Not sure — small, muted skip affordance */
@@ -63,9 +66,9 @@
         border-color: #bbb;
     }
 
-    /* Cards with a non-default answer get a green left border */
+    /* Cards with a non-default answer get a dark-green left border */
     .mission-buckets .card.explicitly-set {
-        border-left: 3px solid #2d6a4f;
+        border-left: 3px solid #1a3c2e;
     }
 
     /* Default (flow) cards dimmed so changed ones stand out */
