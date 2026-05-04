@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting clubs into membership-tooling buckets &mdash; CroquetClaude</title>
+    <meta name="description" content="Help Wade sort CAQ clubs by how they handle membership data.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* -----------------------------------------------------------------------
+       Mission-scoped styles: club-membership-buckets-2026-05
+       All scoped to .mission-buckets to avoid touching shared styles.css
+    ----------------------------------------------------------------------- */
+
+    /* RevSport die-hard — terracotta */
+    .mission-buckets .btn-answer[data-value="revsport"] {
+        color: #bc6c25;
+        border-color: #bc6c25;
+    }
+    .mission-buckets .btn-answer[data-value="revsport"].selected,
+    .mission-buckets .btn-answer[data-value="revsport"]:hover {
+        background: #bc6c25;
+        color: #fff;
+        border-color: #bc6c25;
+    }
+
+    /* Goes with the flow — lawn green */
+    .mission-buckets .btn-answer[data-value="flow"] {
+        color: #2d6a4f;
+        border-color: #2d6a4f;
+    }
+    .mission-buckets .btn-answer[data-value="flow"].selected,
+    .mission-buckets .btn-answer[data-value="flow"]:hover {
+        background: #2d6a4f;
+        color: #fff;
+        border-color: #2d6a4f;
+    }
+
+    /* Paper / allergic — dusty slate */
+    .mission-buckets .btn-answer[data-value="paper"] {
+        color: #5c7a8c;
+        border-color: #5c7a8c;
+    }
+    .mission-buckets .btn-answer[data-value="paper"].selected,
+    .mission-buckets .btn-answer[data-value="paper"]:hover {
+        background: #5c7a8c;
+        color: #fff;
+        border-color: #5c7a8c;
+    }
+
+    /* Not sure — small, muted skip affordance */
+    .mission-buckets .btn-answer[data-value="skip"] {
+        color: #999;
+        border-color: #ddd;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.7rem;
+    }
+    .mission-buckets .btn-answer[data-value="skip"].selected,
+    .mission-buckets .btn-answer[data-value="skip"]:hover {
+        background: #eee;
+        color: #555;
+        border-color: #bbb;
+    }
+
+    /* Cards with a non-default answer get a green left border */
+    .mission-buckets .card.explicitly-set {
+        border-left: 3px solid #2d6a4f;
+    }
+
+    /* Default (flow) cards dimmed so changed ones stand out */
+    .mission-buckets .card.defaulted { opacity: 0.82; }
+    .mission-buckets .card.defaulted:hover { opacity: 1; }
+
+    /* Button row wraps on small screens */
+    .mission-buckets .answer-buttons { flex-wrap: wrap; gap: 0.5rem; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Sorting clubs into membership-tooling buckets</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: club-membership-buckets-2026-05
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        const seed = tokenRecord.payload_seed;
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+
+        const clubs = (seed && seed.sections && seed.sections['clubs']) || [];
+        const totalCount = clubs.length;
+
+        // answers: key = "clubs/<index>", value = { answer, notes, defaulted }
+        // Default = 'flow' (middle bucket). Helen only touches non-defaults.
+        const answers = {};
+        function keyFor(idx) { return 'clubs/' + idx; }
+
+        clubs.forEach(function(_, i) {
+            answers[keyFor(i)] = { answer: 'flow', notes: '', defaulted: true };
+        });
+
+        // Pre-load from saved draft
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (k && answers.hasOwnProperty(k)) {
+                    if (entry.answer !== undefined && entry.answer !== null) {
+                        answers[k].answer = entry.answer;
+                        answers[k].defaulted = (entry.explicitly_set === false);
+                    }
+                    answers[k].notes = entry.notes || '';
+                }
+            });
+        }
+
+        // Button config
+        const bucketButtons = [
+            { label: 'RevSport die-hard',  value: 'revsport' },
+            { label: 'Goes with the flow', value: 'flow'     },
+            { label: 'Paper / allergic',   value: 'paper'    },
+            { label: 'Not sure',           value: 'skip'     }
+        ];
+
+        // All cards pre-answered by default; nothing blocks submit
+        function updateValidationState() { return []; }
+
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = Object.keys(answers).map(function(k) {
+                return {
+                    key: k,
+                    answer: answers[k].answer,
+                    explicitly_set: !answers[k].defaulted,
+                    notes: answers[k].notes || ''
+                };
+            });
+            var gnTA = document.getElementById('general-notes');
+            return { cards: cards, general_notes: gnTA ? gnTA.value : '' };
+        }
+
+        function buildCard(club, idx) {
+            const k = keyFor(idx);
+            const card = document.createElement('div');
+            card.className = 'card answered' + (answers[k].defaulted ? ' defaulted' : ' explicitly-set');
+            card.dataset.key = k;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', club.name);
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'card-name';
+            nameEl.textContent = club.name;
+            card.appendChild(nameEl);
+
+            const btnRow = document.createElement('div');
+            btnRow.className = 'answer-buttons';
+
+            bucketButtons.forEach(function(btn) {
+                const b = document.createElement('button');
+                b.className = 'btn-answer';
+                b.textContent = btn.label;
+                b.dataset.value = btn.value;
+                b.setAttribute('type', 'button');
+                if (answers[k].answer === btn.value) { b.classList.add('selected'); }
+
+                b.addEventListener('click', function() {
+                    btnRow.querySelectorAll('.btn-answer').forEach(function(x) { x.classList.remove('selected'); });
+                    b.classList.add('selected');
+                    answers[k].answer = btn.value;
+                    answers[k].defaulted = false;
+
+                    const notesArea = card.querySelector('.notes-area');
+                    if (notesArea) { notesArea.classList.add('visible'); }
+
+                    card.classList.add('answered');
+                    card.classList.remove('defaulted');
+                    card.classList.add('explicitly-set');
+                    card.classList.remove('missing');
+
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            card.appendChild(btnRow);
+
+            // Notes area: optional, revealed on first click or if notes already saved
+            const notesArea = document.createElement('div');
+            notesArea.className = 'notes-area';
+            if (answers[k].notes) { notesArea.classList.add('visible'); }
+            const notesLabel = document.createElement('label');
+            notesLabel.style.cssText = 'display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;';
+            notesLabel.textContent = 'Notes (optional):';
+            const notesTA = document.createElement('textarea');
+            notesTA.placeholder = 'Any context that would help…';
+            notesTA.setAttribute('aria-label', 'Notes for ' + club.name);
+            if (answers[k].notes) { notesTA.value = answers[k].notes; }
+            notesTA.addEventListener('input', function() {
+                answers[k].notes = notesTA.value;
+                if (autosave) autosave.save();
+            });
+            notesArea.appendChild(notesLabel);
+            notesArea.appendChild(notesTA);
+            card.appendChild(notesArea);
+
+            return card;
+        }
+
+        // Build the page
+        const app = document.getElementById('app');
+        const container = document.createElement('div');
+        container.className = 'container mission-buckets';
+
+        // Opener
+        const opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>' + firstName + ' — easier if you slide each club into a bucket than try to name them from memory. Three buttons per club:</p>' +
+            '<ul style="margin:0.5rem 0 0.75rem 1.2rem;padding:0;line-height:1.8;">' +
+            '<li><strong>RevSport die-hard</strong> — they live in RevSport and will resist anything else</li>' +
+            '<li><strong>Goes with the flow</strong> — basic computer literacy, will use whatever CAQ asks</li>' +
+            '<li><strong>Paper / allergic</strong> — wait for them to come to us with a new member</li>' +
+            '</ul>' +
+            '<p>Default’s the middle one, so you only have to touch the ones that aren’t. Skip any you’re unsure about.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically. Close the tab and come back any time — the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        // Section divider + heading
+        const divMain = document.createElement('hr');
+        divMain.className = 'section-divider';
+        container.appendChild(divMain);
+
+        const headMain = document.createElement('h2');
+        headMain.className = 'section-heading';
+        headMain.textContent = 'All CAQ clubs (' + totalCount + ')';
+        container.appendChild(headMain);
+
+        // Cards grid
+        const grid = document.createElement('div');
+        grid.className = 'cards-grid';
+        clubs.forEach(function(club, i) { grid.appendChild(buildCard(club, i)); });
+        container.appendChild(grid);
+
+        // General notes
+        const divFinal = document.createElement('hr');
+        divFinal.className = 'section-divider';
+        container.appendChild(divFinal);
+
+        const generalWrap = document.createElement('div');
+        generalWrap.className = 'general-notes-wrap';
+
+        const generalLabel = document.createElement('label');
+        generalLabel.setAttribute('for', 'general-notes');
+        generalLabel.textContent = 'Anything else that would help?';
+        generalWrap.appendChild(generalLabel);
+
+        const generalTA = document.createElement('textarea');
+        generalTA.id = 'general-notes';
+        generalTA.placeholder = 'Optional — edge cases, clubs you’re unsure about, or anything else for Wade.';
+        generalTA.addEventListener('input', function() { if (autosave) autosave.save(); });
+        generalWrap.appendChild(generalTA);
+        container.appendChild(generalWrap);
+
+        // Validation placeholder (won't fire; all cards have defaults)
+        const validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit
+        const submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        const draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            const ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            const clubsPayload = [];
+            clubs.forEach(function(club, i) {
+                const k = keyFor(i);
+                clubsPayload.push({
+                    name: club.name,
+                    key: k,
+                    answer: answers[k].answer,
+                    explicitly_set: !answers[k].defaulted,
+                    notes: answers[k].notes || ''
+                });
+            });
+
+            const responsePayload = { clubs: clubsPayload, general_notes: generalTA.value };
+            const ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answers';
+                const em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Autosave (after DOM mount so general-notes is available)
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft into DOM
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (!k) return;
+                var card = container.querySelector('[data-key="' + k + '"]');
+                if (!card) return;
+                var btnRow = card.querySelector('.answer-buttons');
+                if (entry.answer && btnRow) {
+                    btnRow.querySelectorAll('.btn-answer').forEach(function(b) {
+                        b.classList.remove('selected');
+                        if (b.dataset.value === entry.answer) { b.classList.add('selected'); }
+                    });
+                }
+                if (entry.explicitly_set) {
+                    card.classList.remove('defaulted');
+                    card.classList.add('explicitly-set');
+                } else {
+                    card.classList.add('defaulted');
+                    card.classList.remove('explicitly-set');
+                }
+                if (entry.notes) {
+                    var notesArea = card.querySelector('.notes-area');
+                    var notesTA = notesArea && notesArea.querySelector('textarea');
+                    if (notesTA) { notesTA.value = entry.notes; notesArea.classList.add('visible'); }
+                }
+            });
+            if (draft.general_notes && generalTA) { generalTA.value = draft.general_notes; }
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
