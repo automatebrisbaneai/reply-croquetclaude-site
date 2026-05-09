@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Catalogue Prune &mdash; Phase 1 Decision &mdash; CroquetClaude</title>
+    <meta name="description" content="Wade prunes the 15-service consultancy catalogue. Phase 1 hard gate for the consultancy-craft-toolkit project.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* -----------------------------------------------------------------------
+       service-catalogue-prune-2026-05 mission-scoped styles only.
+       Does not touch any class that app.js depends on.
+    ----------------------------------------------------------------------- */
+    .scp-card {
+        background: #fff;
+        border: 1.5px solid #d8cbb0;
+        border-radius: 6px;
+        margin-bottom: 1.1rem;
+        overflow: hidden;
+    }
+    .scp-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.2rem 0.7rem;
+        cursor: pointer;
+        user-select: none;
+        gap: 0.8rem;
+    }
+    .scp-card-header:hover { background: #faf5e4; }
+    .scp-card-name {
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a3a2a;
+        flex: 1;
+        line-height: 1.3;
+    }
+    .scp-accordion-icon {
+        font-size: 1rem;
+        color: #8a7a5a;
+        flex-shrink: 0;
+        transition: transform 0.18s ease;
+        width: 20px;
+        text-align: center;
+    }
+    .scp-card.open .scp-accordion-icon { transform: rotate(180deg); }
+    .scp-decision-row {
+        display: flex;
+        gap: 0.9rem;
+        padding: 0 1.2rem 0.8rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .scp-btn {
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        padding: 0.5rem 1.15rem;
+        border-radius: 4px;
+        border: 2px solid;
+        cursor: pointer;
+        background: transparent;
+        transition: background 0.13s, color 0.13s;
+        letter-spacing: 0.01em;
+    }
+    .scp-btn-keep { border-color: #2d6a4f; color: #2d6a4f; }
+    .scp-btn-keep:hover, .scp-btn-keep.scp-selected { background: #2d6a4f; color: #fff; }
+    .scp-btn-cut { border-color: #b83227; color: #b83227; }
+    .scp-btn-cut:hover, .scp-btn-cut.scp-selected { background: #b83227; color: #fff; }
+    .scp-btn-reshape { border-color: #bc6c25; color: #bc6c25; }
+    .scp-btn-reshape:hover, .scp-btn-reshape.scp-selected { background: #bc6c25; color: #fff; }
+    .scp-notes-wrap { padding: 0 1.2rem 1rem; }
+    .scp-notes-label {
+        display: block;
+        font-size: 0.85rem;
+        color: #6b5e40;
+        margin-bottom: 0.3rem;
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+    }
+    .scp-notes-area {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 0.92rem;
+        color: #1a1a1a;
+        background: #fefae0;
+        border: 1.5px solid #c8b888;
+        border-radius: 4px;
+        padding: 0.55rem 0.75rem;
+        resize: vertical;
+        min-height: 68px;
+        line-height: 1.5;
+    }
+    .scp-notes-area:focus { outline: 2px solid #2d6a4f; outline-offset: 1px; border-color: #2d6a4f; }
+    .scp-accordion-body {
+        display: none;
+        padding: 0 1.2rem 1.1rem;
+        border-top: 1px solid #e8dfc8;
+        margin-top: 0.2rem;
+    }
+    .scp-card.open .scp-accordion-body { display: block; }
+    .scp-accordion-body dl { margin: 0; padding: 0; }
+    .scp-accordion-body dt {
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6b5e40;
+        margin-top: 1rem;
+        margin-bottom: 0.25rem;
+    }
+    .scp-accordion-body dd { margin: 0; font-size: 0.97rem; line-height: 1.6; color: #2a2a2a; }
+    .scp-accordion-body ul { margin: 0.2rem 0 0; padding-left: 1.3rem; }
+    .scp-accordion-body ul li { margin-bottom: 0.2rem; line-height: 1.55; }
+    .scp-accordion-body a { color: #2d6a4f; text-underline-offset: 2px; }
+    .scp-accordion-body a:hover { color: #1a3a2a; }
+    .scp-card.scp-answered { border-left: 4px solid #8ab89a; }
+    .scp-card.scp-missing { border-left: 4px solid #b83227; background: #fff8f8; }
+    .scp-footer-wrap { margin-top: 2rem; padding-top: 1.5rem; border-top: 1.5px solid #d8cbb0; }
+    .scp-footer-label {
+        display: block;
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1a3a2a;
+        margin-bottom: 0.6rem;
+    }
+    .scp-footer-textarea {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 0.97rem;
+        color: #1a1a1a;
+        background: #fefae0;
+        border: 1.5px solid #c8b888;
+        border-radius: 4px;
+        padding: 0.7rem 0.9rem;
+        resize: vertical;
+        min-height: 110px;
+        line-height: 1.55;
+    }
+    .scp-footer-textarea:focus { outline: 2px solid #2d6a4f; outline-offset: 1px; border-color: #2d6a4f; }
+    .scp-section-heading {
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a3a2a;
+        margin: 1.8rem 0 0.9rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #2d6a4f;
+    }
+    .scp-legend {
+        display: flex;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.2rem;
+        font-size: 0.88rem;
+        color: #5a5040;
+        font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+    }
+    .scp-legend-item { display: flex; align-items: center; gap: 0.4rem; }
+    .scp-legend-dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+    @media (max-width: 600px) {
+        .scp-btn { font-size: 0.88rem; padding: 0.45rem 0.9rem; }
+        .scp-card-header { padding: 0.8rem 0.9rem 0.6rem; }
+        .scp-decision-row { padding: 0 0.9rem 0.7rem; gap: 0.6rem; }
+        .scp-notes-wrap { padding: 0 0.9rem 0.85rem; }
+        .scp-accordion-body { padding: 0 0.9rem 0.9rem; }
+    }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Service Catalogue Prune &mdash; Phase 1 Decision</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: service-catalogue-prune-2026-05
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed;
+        var respondentName = tokenRecord.respondent_name || 'Wade';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var services = (seed && seed.sections && seed.sections.services) || [];
+        var totalCount = services.length;
+
+        // Track answers in memory: key = "service/<index>", value = { answer, notes }
+        var answers = {};
+        services.forEach(function(svc, i) {
+            answers['service/' + i] = { answer: null, notes: '' };
+        });
+
+        // Pre-load from draft if present
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (k && answers.hasOwnProperty(k)) {
+                    answers[k].answer = entry.answer !== undefined ? entry.answer : null;
+                    answers[k].notes = entry.notes || '';
+                }
+            });
+        }
+
+        // Autosave declared early so card closures can reference it
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = Object.keys(answers).map(function(k) {
+                return { key: k, answer: answers[k].answer, notes: answers[k].notes || '' };
+            });
+            var footerTA = document.getElementById('scp-missing-services');
+            return { cards: cards, missing_services: footerTA ? footerTA.value : '' };
+        }
+
+        function updateValidationState() {
+            return Object.keys(answers).filter(function(k) { return answers[k].answer === null; });
+        }
+
+        function buildServiceCard(service, idx) {
+            var k = 'service/' + idx;
+
+            var card = document.createElement('div');
+            card.className = 'scp-card';
+            card.dataset.key = k;
+
+            // Header - click to expand accordion
+            var header = document.createElement('div');
+            header.className = 'scp-card-header';
+            header.setAttribute('role', 'button');
+            header.setAttribute('tabindex', '0');
+            header.setAttribute('aria-expanded', 'false');
+            header.setAttribute('aria-label', 'Expand details for ' + service.name);
+
+            var nameEl = document.createElement('div');
+            nameEl.className = 'scp-card-name';
+            nameEl.textContent = service.name;
+
+            var icon = document.createElement('span');
+            icon.className = 'scp-accordion-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = '▾'; // small down triangle
+
+            header.appendChild(nameEl);
+            header.appendChild(icon);
+
+            header.addEventListener('click', function() {
+                var isOpen = card.classList.contains('open');
+                card.classList.toggle('open', !isOpen);
+                header.setAttribute('aria-expanded', String(!isOpen));
+            });
+            header.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); header.click(); }
+            });
+            card.appendChild(header);
+
+            // Decision buttons - always visible
+            var decisionRow = document.createElement('div');
+            decisionRow.className = 'scp-decision-row';
+
+            var buttons = [
+                { label: 'Keep', value: 'keep', cls: 'scp-btn-keep' },
+                { label: 'Cut', value: 'cut', cls: 'scp-btn-cut' },
+                { label: 'Reshape', value: 'reshape', cls: 'scp-btn-reshape' }
+            ];
+
+            buttons.forEach(function(btnDef) {
+                var b = document.createElement('button');
+                b.className = 'scp-btn ' + btnDef.cls;
+                b.textContent = btnDef.label;
+                b.dataset.value = btnDef.value;
+                b.setAttribute('type', 'button');
+                b.addEventListener('click', function() {
+                    decisionRow.querySelectorAll('.scp-btn').forEach(function(x) { x.classList.remove('scp-selected'); });
+                    b.classList.add('scp-selected');
+                    answers[k].answer = btnDef.value;
+                    card.classList.add('scp-answered');
+                    card.classList.remove('scp-missing');
+                    updateValidationState();
+                    if (autosave) autosave.save();
+                });
+                decisionRow.appendChild(b);
+            });
+            card.appendChild(decisionRow);
+
+            // Notes - always visible (not gated on any button)
+            var notesWrap = document.createElement('div');
+            notesWrap.className = 'scp-notes-wrap';
+
+            var notesId = 'scp-notes-' + idx;
+            var notesLabel = document.createElement('label');
+            notesLabel.className = 'scp-notes-label';
+            notesLabel.setAttribute('for', notesId);
+            notesLabel.textContent = 'Notes (optional):';
+
+            var notesTA = document.createElement('textarea');
+            notesTA.id = notesId;
+            notesTA.className = 'scp-notes-area';
+            notesTA.rows = 3;
+            notesTA.placeholder = 'Any context, conditions, or how you’d reshape this…';
+            notesTA.setAttribute('aria-label', 'Notes for ' + service.name);
+            notesTA.addEventListener('input', function() {
+                answers[k].notes = notesTA.value;
+                if (autosave) autosave.save();
+            });
+
+            notesWrap.appendChild(notesLabel);
+            notesWrap.appendChild(notesTA);
+            card.appendChild(notesWrap);
+
+            // Accordion body - collapsed by default
+            var body = document.createElement('div');
+            body.className = 'scp-accordion-body';
+            body.setAttribute('aria-hidden', 'true');
+
+            var dl = document.createElement('dl');
+
+            function addField(label, content, type) {
+                var dt = document.createElement('dt');
+                dt.textContent = label;
+                dl.appendChild(dt);
+                var dd = document.createElement('dd');
+                if (type === 'bullets' && Array.isArray(content)) {
+                    var ul = document.createElement('ul');
+                    content.forEach(function(item) {
+                        var li = document.createElement('li');
+                        li.textContent = item;
+                        ul.appendChild(li);
+                    });
+                    dd.appendChild(ul);
+                } else if (type === 'links' && Array.isArray(content)) {
+                    var ul2 = document.createElement('ul');
+                    content.forEach(function(ex) {
+                        var li2 = document.createElement('li');
+                        var a = document.createElement('a');
+                        a.href = ex.url;
+                        a.textContent = ex.name;
+                        a.target = '_blank';
+                        a.rel = 'noopener';
+                        li2.appendChild(a);
+                        ul2.appendChild(li2);
+                    });
+                    dd.appendChild(ul2);
+                } else {
+                    dd.textContent = content;
+                }
+                dl.appendChild(dd);
+            }
+
+            addField('What it is:', service.what_it_is, 'text');
+            addField('When a client needs this:', service.when_needed, 'bullets');
+            addField('Typical deliverable(s):', service.deliverables, 'bullets');
+            addField('Typical engagement length:', service.engagement_length, 'text');
+            addField('Effort split:', service.effort_split, 'text');
+            addField('Pricing posture:', service.pricing_posture, 'text');
+            addField('Out of scope under this service:', service.out_of_scope, 'bullets');
+            addField('Sector examples:', service.sector_examples, 'links');
+
+            body.appendChild(dl);
+            card.appendChild(body);
+            return card;
+        }
+
+        // Build full page
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + ' — this is the sector-sourced strawman of 15 consultancy services I drafted from real Australian and New Zealand sport-community-volunteer practice. Phase 2 of the consultancy-craft-toolkit project (document templates) is hard-gated on you locking which services to keep, so this is the load-bearing decision.</p>' +
+            '<p>For each service: <strong>Keep</strong> if you want it on your menu, <strong>Cut</strong> if it’s outside what you’ll offer, <strong>Reshape</strong> if the framing needs work (use the notes box to say how). Click any service header to expand the full description, sector examples, and effort split.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically as you go. Close the tab and come back any time — the link picks up where you left off until you press <em>Lock the catalogue</em>.</p>';
+        container.appendChild(opener);
+
+        // Section heading
+        var sectionHeading = document.createElement('h2');
+        sectionHeading.className = 'scp-section-heading';
+        sectionHeading.textContent = 'The 15 services (' + totalCount + ')';
+        container.appendChild(sectionHeading);
+
+        // Colour legend
+        var legend = document.createElement('div');
+        legend.className = 'scp-legend';
+        legend.setAttribute('aria-label', 'Button colour legend');
+        [
+            { color: '#2d6a4f', label: 'Keep — on your menu' },
+            { color: '#b83227', label: 'Cut — out of scope' },
+            { color: '#bc6c25', label: 'Reshape — framing needs work' }
+        ].forEach(function(li) {
+            var item = document.createElement('div');
+            item.className = 'scp-legend-item';
+            var dot = document.createElement('span');
+            dot.className = 'scp-legend-dot';
+            dot.style.background = li.color;
+            var txt = document.createElement('span');
+            txt.textContent = li.label;
+            item.appendChild(dot);
+            item.appendChild(txt);
+            legend.appendChild(item);
+        });
+        container.appendChild(legend);
+
+        // Service cards grid
+        var cardsGrid = document.createElement('div');
+        cardsGrid.className = 'cards-grid';
+        services.forEach(function(service, i) {
+            cardsGrid.appendChild(buildServiceCard(service, i));
+        });
+        container.appendChild(cardsGrid);
+
+        // Footer: missing services
+        var footerWrap = document.createElement('div');
+        footerWrap.className = 'scp-footer-wrap';
+        var footerLabel = document.createElement('label');
+        footerLabel.className = 'scp-footer-label';
+        footerLabel.setAttribute('for', 'scp-missing-services');
+        footerLabel.textContent = 'Anything missing from the menu?';
+        footerWrap.appendChild(footerLabel);
+        var footerTA = document.createElement('textarea');
+        footerTA.id = 'scp-missing-services';
+        footerTA.className = 'scp-footer-textarea';
+        footerTA.rows = 5;
+        footerTA.placeholder = 'Optional — any service types you want added that aren’t in this list.';
+        footerTA.addEventListener('input', function() { if (autosave) autosave.save(); });
+        footerWrap.appendChild(footerTA);
+        container.appendChild(footerWrap);
+
+        // Validation error div
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit area
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Lock the catalogue';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please contact <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var unanswered = updateValidationState();
+            container.querySelectorAll('.scp-card').forEach(function(card) {
+                var k = card.dataset.key;
+                if (k && answers[k] && answers[k].answer === null) {
+                    card.classList.add('scp-missing');
+                } else {
+                    card.classList.remove('scp-missing');
+                }
+            });
+            if (unanswered.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One service still needs a decision — it’s highlighted above.'
+                    : unanswered.length + ' services still need decisions — they’re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = container.querySelector('.scp-card.scp-missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            var ve2 = document.getElementById('validation-error');
+            ve2.classList.remove('visible');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Locking…';
+
+            var serviceResults = [];
+            services.forEach(function(service, i) {
+                var k = 'service/' + i;
+                serviceResults.push({
+                    name: service.name,
+                    answer: answers[k].answer,
+                    notes: answers[k].notes || ''
+                });
+            });
+
+            var responsePayload = { services: serviceResults, missing_services: footerTA.value };
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Lock the catalogue';
+                var em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Init autosave after DOM is mounted
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft state into the rendered DOM
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (!k || entry.answer === null || entry.answer === undefined) return;
+                var card = container.querySelector('[data-key="' + k + '"]');
+                if (!card) return;
+                var row = card.querySelector('.scp-decision-row');
+                if (row) {
+                    var btn = row.querySelector('[data-value="' + entry.answer + '"]');
+                    if (btn) { btn.classList.add('scp-selected'); card.classList.add('scp-answered'); }
+                }
+                if (entry.notes) {
+                    var ta = card.querySelector('.scp-notes-area');
+                    if (ta) ta.value = entry.notes;
+                }
+            });
+            if (draft.missing_services) footerTA.value = draft.missing_services;
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
