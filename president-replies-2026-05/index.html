@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Replies to your introduction email</title>
+<style>
+  :root {
+    --paper: #f6f1e7;
+    --ink: #1c1c1c;
+    --muted: #6b6357;
+    --rule: #d8cdb6;
+    --accent: #8a3324;
+    --accent-soft: #f1e3df;
+    --done: #4a6b3a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Spectral", Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--paper);
+    padding: 48px 24px 96px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 32px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; font-weight: 600; letter-spacing: -0.01em; }
+  .subtitle { color: var(--muted); font-size: 15px; margin: 0; }
+  .legend {
+    margin: 20px 0 0;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 24px 28px 20px;
+    margin-bottom: 22px;
+    transition: opacity 200ms ease, background 200ms ease;
+    position: relative;
+  }
+  .card.priority {
+    border-left: 4px solid var(--accent);
+    padding-left: 25px;
+  }
+  .card.priority .priority-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--paper);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+  }
+  .callout {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-left-width: 4px;
+    padding: 16px 20px;
+    margin: 24px 0 32px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .callout strong { color: var(--accent); }
+  .card.replied {
+    background: #faf7ee;
+    opacity: 0.62;
+  }
+  .card.replied .name { text-decoration: line-through; text-decoration-thickness: 1px; }
+  .name {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 2px;
+    line-height: 1.25;
+  }
+  .role { color: var(--muted); font-size: 15px; margin: 0 0 2px; }
+  .meta { color: var(--muted); font-size: 13px; margin: 0 0 16px; font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace; }
+  .meta a { color: var(--muted); text-decoration: none; }
+  .meta a:hover { color: var(--accent); }
+  .background {
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+    background: #faf6ec;
+    border-left: 3px solid var(--rule);
+    padding: 10px 14px;
+    margin: 0 0 16px;
+  }
+  .background em { font-style: normal; font-weight: 600; color: var(--ink); }
+  .body { white-space: pre-wrap; margin: 0 0 18px; }
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+  }
+  .reply-btn {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 18px;
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    transition: background 100ms ease, color 100ms ease;
+  }
+  .reply-btn:hover { background: var(--accent); border-color: var(--accent); }
+  .card.replied .reply-btn { background: transparent; color: var(--muted); border-color: var(--rule); }
+  .check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  .check input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--done);
+  }
+  .check.is-checked { color: var(--done); font-weight: 600; }
+  footer {
+    margin-top: 48px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .progress {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .progress strong { color: var(--ink); }
+  @media (max-width: 540px) {
+    body { padding: 24px 12px 64px; font-size: 17px; }
+    .card { padding: 20px 18px 16px; }
+    .actions { flex-direction: column; align-items: flex-start; }
+  }
+  @media print {
+    body { background: #fff; }
+    .card { break-inside: avoid; }
+    .reply-btn, .check { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Replies to your introduction email</h1>
+  <p class="subtitle">10 replies received between 11 and 13 May 2026 — ordered by substance, most actionable first.</p>
+  <div class="progress" id="progress">Replied: <strong><span id="count">0</span></strong> of 10</div>
+  <div class="legend">
+    Each card has a <strong>Reply</strong> button that opens your email client with a draft to that person, and a <strong>Replied</strong> tick to mark it done. Ticks are remembered on this device.
+  </div>
+</header>
+
+<div class="callout">
+  <strong>Two replies stand out.</strong> Kathie Grant proposes a regional spokesperson structure and offers to be a background sounding-board on coaching and growth. Magda Cawthorne offers a newcomer's perspective and patterns from another sport. Both are flagged below.
+</div>
+
+<div class="card priority" data-id="kathie">
+  <span class="priority-tag">Priority reply</span>
+  <h2 class="name">Kathie Grant</h2>
+  <p class="role">Southport Croquet Club · coach &amp; referee, all 4 codes; recently trained as a trainer-of-coaches</p>
+  <p class="meta"><a href="mailto:kathie@grant.net.nz">kathie@grant.net.nz</a> · Tue, 12 May 2026 07:52</p>
+  <div class="body">Thank you John,
+
+Welcome to your new position as President of CAQ.
+
+I am very active in my role as coach and referee in all 4 codes of croquet.
+
+I have recently been trained, along with other QLD's, to be a person who can train coaches. I carry out these roles mainly on the Gold Coast and to a lesser extent in Brisbane.
+
+I prefer not to attend meetings but to network with relevant people in these roles to organise my activities.
+
+I would like to see the regions take on a greater responsibility for organising coaching and maintaining the updates for referees, along with regional tournaments and pennants. I feel that it would be beneficial to you to have one spokes person per region to report to you and to pass on questions that the regional person is unable to answer.
+
+If you would like more suggestions on why's to encourage clubs to increase and encourage for players to improve I am happy to offer my suggestions.
+
+So in the background I become your support person, not directly communicating with you.
+
+Regards,
+Kathie Grant
+Southport Croquet Club</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:kathie@grant.net.nz?subject=Re:%20New%20CAQ%20President%20Introduction&body=Hi%20Kathie%2C%0A%0AThank%20you%20for%20taking%20the%20time%20to%20write%20back%20with%20such%20substance.%20The%20regional%20spokesperson%20idea%20is%20one%20I%27d%20like%20to%20think%20through%20with%20you%20%E2%80%94%20it%20sits%20with%20what%20I%27m%20trying%20to%20do%20on%20the%20admin%20side.%0A%0AYes%20please%20to%20your%20offer%20of%20more%20suggestions%20on%20encouraging%20clubs%20to%20grow%20and%20players%20to%20improve.%20Send%20them%20through%20whenever%20they%20come%20to%20you.%20I%27ll%20respect%20your%20preference%20to%20work%20in%20the%20background.%0A%0ABest%20wishes%2C%0AJohn">Reply to Kathie</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card priority" data-id="magda">
+  <span class="priority-tag">Priority reply</span>
+  <h2 class="name">Magda Cawthorne</h2>
+  <p class="role">Headland-Buderim Croquet Club · newcomer, joined 10 months ago</p>
+  <p class="meta"><a href="mailto:magdacawthorne@gmail.com">magdacawthorne@gmail.com</a> · Tue, 12 May 2026 08:52</p>
+  <div class="background">
+    <em>Background.</em> Writer and photographer (Twin Waters, Sunshine Coast). Author of <em>Hidden History of the Blue Mountains</em> (two editions); currently writing a Sunshine Coast book. Co-founded a Blue Mountains local-history magazine, <em>The Mountains Blueberry</em>. Studied photography at Sturt University; freelance writer with newspaper and research-paper background. Lived in the Blue Mountains 20+ years before moving north. Joined CAQ 2025-07-23, so a genuine newcomer. Same club as Sherry Tusler. The "another sport with similar challenges" she mentions isn't on the public record — worth asking.
+  </div>
+  <div class="body">Hi John,
+
+I am a newcomer to croquet and aged around 60ish!
+
+Are you interested in hearing from new players what their experience has been? If so, let me know.
+
+I have worked in another sport with similar challenges to croquet and can see some of the common barriers for people entering the sport.
+
+All the best in your new role.
+
+Magda Cawthorne</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:magdacawthorne@gmail.com?subject=Re:%20New%20CAQ%20President%20Introduction&body=Hi%20Magda%2C%0A%0AThank%20you%20for%20the%20welcome%20and%20for%20the%20offer.%0A%0AYes%2C%20please%20tell%20me%20more.%20I%27d%20value%20hearing%20both%20about%20your%20newcomer%20experience%20and%20about%20the%20patterns%20you%20noticed%20in%20another%20sport%20that%20you%20think%20might%20apply%20here.%0A%0AHow%20would%20you%20see%20yourself%20helping%3F%0A%0ABest%20wishes%2C%0AJohn">Reply to Magda</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="geoff">
+  <h2 class="name">Geoff Hull</h2>
+  <p class="meta"><a href="mailto:geoff.hull1@icloud.com">geoff.hull1@icloud.com</a> · Tue, 12 May 2026 08:01</p>
+  <div class="body">Morning John. I wish you well but hold little hope of change unless the team we currently have is bought to order sooner rather than later. Desperate changes are required if you are to succeed. The current draw for the GC Mens Open Singles appearing on CS is a classic example. Cheers and good luck.
+
+Geoff.</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:geoff.hull1@icloud.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Geoff</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="sherry">
+  <h2 class="name">Sherry Tusler</h2>
+  <p class="role">President, Headland-Buderim Croquet Club</p>
+  <p class="meta"><a href="mailto:sherry@tusler.com">sherry@tusler.com</a> · Tue, 12 May 2026 08:53</p>
+  <div class="body">Welcome John. Great to see CAQ has two clear goals to support clubs.
+
+We are already finding Revsport has simplified our membership admin and we look forward with enthusiasm to the rollout of the membership drive.
+
+All the best
+Sherry Tusler
+President
+Headland-Buderim Croquet Club</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:sherry@tusler.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Sherry</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="frances">
+  <h2 class="name">Frances Gray</h2>
+  <p class="role">Toombul Croquet Club</p>
+  <p class="meta"><a href="mailto:contactfran@gmail.com">contactfran@gmail.com</a> · Tue, 12 May 2026 18:18</p>
+  <div class="body">Congratulations John and all the best. Feel free to join us at Toombul CC in Nundah anytime for a game or try a game of Mahjong which we run on Tuesdays from 9am — a lot more mind bending than CAQ meetings lol.
+
+Cheers
+Frances Gray
+Toombul Croquet Club</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:contactfran@gmail.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Frances</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="ianmichele">
+  <h2 class="name">Ian and Michele Reed</h2>
+  <p class="role">Twin Rivers</p>
+  <p class="meta"><a href="mailto:ausreeds@gmail.com">ausreeds@gmail.com</a> · Tue, 12 May 2026 10:08</p>
+  <div class="body">Dear John,
+
+Great to see you are now the President of CAQ and we know we are in good hands! Just love reading what your plans are for the next few months. We support everything you plan to do! The "Cinderella sport" of croquet needs to be exposed to all ages! People don't realise just what they are missing out on by not playing!
+
+We wish you every success and hope to see you at Twin Rivers soon!
+
+Regards,
+Ian and Michele</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:ausreeds@gmail.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Ian and Michele</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="murray">
+  <h2 class="name">Murray Tinker</h2>
+  <p class="role">Club Captain, Caloundra Mallet Sports Club</p>
+  <p class="meta"><a href="mailto:2tinkers@gmail.com">2tinkers@gmail.com</a> · Tue, 12 May 2026 07:44</p>
+  <div class="body">Hi John,
+
+Welcome aboard. Best wishes in your role.
+
+Murray Tinker
+Club Captain
+Caloundra Mallet Sports Club</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:2tinkers@gmail.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Murray</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="peter">
+  <h2 class="name">Peter Wright</h2>
+  <p class="role">Laurel Bank</p>
+  <p class="meta"><a href="mailto:peterwright4350@gmail.com">peterwright4350@gmail.com</a> · Tue, 12 May 2026 09:48</p>
+  <div class="body">Hi John, Congratulations on taking on the role of President. I trust you have an enjoyable time and achieve lots for Croquet Queensland.
+
+Regards
+Peter Wright
+Laurel Bank</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:peterwright4350@gmail.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Peter</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="esme">
+  <h2 class="name">Esme Lucas Havens</h2>
+  <p class="meta"><a href="mailto:elucashavens@gmail.com">elucashavens@gmail.com</a> · Wed, 13 May 2026</p>
+  <div class="body">Congratulations and the best of luck in everything.</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:elucashavens@gmail.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Esme</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<div class="card" data-id="shell">
+  <h2 class="name">Shell</h2>
+  <p class="meta"><a href="mailto:shells992002@yahoo.com">shells992002@yahoo.com</a> · Mon, 11 May 2026 23:53</p>
+  <div class="body">Congrats John and well said.</div>
+  <div class="actions">
+    <a class="reply-btn" href="mailto:shells992002@yahoo.com?subject=Re:%20New%20CAQ%20President%20Introduction">Reply to Shell</a>
+    <label class="check"><input type="checkbox"> Replied</label>
+  </div>
+</div>
+
+<footer>
+  Original email sent 11 May 2026 by Croquet Qld &lt;hello@croquetqld.org&gt;.
+</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = "caq-pres-replies-v1";
+  const cards = document.querySelectorAll(".card");
+  const countEl = document.getElementById("count");
+  const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+  function refreshCount() {
+    let n = 0;
+    cards.forEach(c => { if (c.classList.contains("replied")) n++; });
+    countEl.textContent = n;
+  }
+
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const checkbox = card.querySelector("input[type=checkbox]");
+    const label = card.querySelector(".check");
+
+    if (state[id]) {
+      checkbox.checked = true;
+      card.classList.add("replied");
+      label.classList.add("is-checked");
+    }
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        card.classList.add("replied");
+        label.classList.add("is-checked");
+        state[id] = true;
+      } else {
+        card.classList.remove("replied");
+        label.classList.remove("is-checked");
+        delete state[id];
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      refreshCount();
+    });
+  });
+
+  refreshCount();
+</script>
+</body>
+</html>

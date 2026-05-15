@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup feedback — CroquetClaude</title>
+    <meta name="description" content="Rank three refinements of an upcoming Queensland Croquet site.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---------------------------------------------------------------
+           mockup-feedback-template — per-mission styles
+           DO NOT touch app.js or styles.css — only this block.
+        --------------------------------------------------------------- */
+
+        :root {
+            --mfb-cream: #fefae0;
+            --mfb-green: #2d6a4f;
+            --mfb-terracotta: #bc6c25;
+            --mfb-red: #b83227;
+            --mfb-ink: #1c1916;
+            --mfb-muted: #6b6560;
+            --mfb-border: #e8e2d6;
+            --mfb-card-bg: #ffffff;
+            --mfb-page-bg: #f8f5ee;
+            --mfb-rank-1: #2d6a4f;
+            --mfb-rank-2: #6b8e5a;
+            --mfb-rank-3: #a89968;
+        }
+
+        body {
+            background: var(--mfb-page-bg);
+        }
+
+        /* Variant card layout */
+        .mfb-variant-card {
+            background: var(--mfb-card-bg);
+            border: 1px solid var(--mfb-border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+        }
+
+        .mfb-variant-inner {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 0;
+        }
+
+        @media (max-width: 640px) {
+            .mfb-variant-inner {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mfb-variant-thumb {
+            background: var(--mfb-cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-right: 1px solid var(--mfb-border);
+            min-height: 160px;
+        }
+
+        @media (max-width: 640px) {
+            .mfb-variant-thumb {
+                border-right: none;
+                border-bottom: 1px solid var(--mfb-border);
+                min-height: 140px;
+            }
+        }
+
+        .mfb-variant-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .mfb-thumb-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: var(--mfb-muted);
+            font-size: 0.85rem;
+            gap: 0.4rem;
+        }
+
+        .mfb-variant-body {
+            padding: 1.1rem 1.25rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .mfb-rank-label {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--mfb-green);
+            background: rgba(45,106,79,0.08);
+            border-radius: 3px;
+            padding: 2px 7px;
+            margin-bottom: 0.1rem;
+            align-self: flex-start;
+        }
+
+        .mfb-variant-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--mfb-ink);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .mfb-variant-tagline {
+            font-size: 0.95rem;
+            color: var(--mfb-ink);
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        .mfb-variant-diff {
+            font-size: 0.85rem;
+            color: var(--mfb-muted);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .mfb-variant-diff::before {
+            content: "What's different: ";
+            font-weight: 600;
+            color: var(--mfb-terracotta);
+        }
+
+        .mfb-variant-link {
+            display: inline-block;
+            margin-top: 0.3rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--mfb-green);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(45,106,79,0.3);
+            padding-bottom: 1px;
+            align-self: flex-start;
+        }
+
+        .mfb-variant-link:hover {
+            border-color: var(--mfb-green);
+        }
+
+        .mfb-variant-footer {
+            padding: 1rem 1.25rem 1.1rem;
+            border-top: 1px solid var(--mfb-border);
+            background: #fafaf8;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        /* Rank buttons */
+        .mfb-rank-row-label {
+            font-size: 0.85rem;
+            color: var(--mfb-ink);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .mfb-rank-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .mfb-rank-btn {
+            flex: 1 1 0;
+            min-width: 0;
+            background: transparent;
+            color: var(--mfb-green);
+            border: 1.5px solid var(--mfb-green);
+            border-radius: 6px;
+            padding: 0.55rem 0.4rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 480px) {
+            .mfb-rank-btn {
+                font-size: 0.85rem;
+                padding: 0.55rem 0.25rem;
+            }
+        }
+
+        .mfb-rank-btn:hover {
+            background: rgba(45,106,79,0.06);
+        }
+
+        .mfb-rank-btn.selected[data-rank="1"] {
+            background: var(--mfb-rank-1);
+            color: #fff;
+            border-color: var(--mfb-rank-1);
+        }
+
+        .mfb-rank-btn.selected[data-rank="2"] {
+            background: var(--mfb-rank-2);
+            color: #fff;
+            border-color: var(--mfb-rank-2);
+        }
+
+        .mfb-rank-btn.selected[data-rank="3"] {
+            background: var(--mfb-rank-3);
+            color: #fff;
+            border-color: var(--mfb-rank-3);
+        }
+
+        /* Voice textarea wrapper */
+        .mfb-voice-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .mfb-voice-label {
+            font-size: 0.85rem;
+            color: var(--mfb-ink);
+            font-weight: 600;
+        }
+
+        .mfb-voice-block textarea {
+            width: 100%;
+            min-height: 70px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--mfb-border);
+            border-radius: 6px;
+            background: #fff;
+            color: var(--mfb-ink);
+            resize: vertical;
+        }
+
+        .mfb-voice-block textarea:focus {
+            outline: 2px solid rgba(45,106,79,0.25);
+            border-color: var(--mfb-green);
+        }
+
+        /* Final catch-all cards */
+        .mfb-final-card {
+            background: var(--mfb-card-bg);
+            border: 1px solid var(--mfb-border);
+            border-radius: 10px;
+            padding: 1.25rem 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .mfb-final-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--mfb-ink);
+            margin: 0;
+        }
+
+        .mfb-final-prompt {
+            font-size: 0.9rem;
+            color: var(--mfb-muted);
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        /* Card validation/answered state */
+        .card.missing {
+            border-color: var(--mfb-red);
+            box-shadow: 0 0 0 2px rgba(184,50,39,0.12);
+        }
+
+        /* Opener override */
+        .opener {
+            border-left: 4px solid var(--mfb-green);
+            background: var(--mfb-cream);
+            padding: 1.25rem 1.4rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+        }
+        .opener p {
+            margin: 0 0 0.75rem;
+            line-height: 1.65;
+        }
+        .opener p:last-child {
+            margin-bottom: 0;
+        }
+
+        .mfb-autosave-note {
+            font-size: 0.82rem;
+            font-style: italic;
+            color: var(--mfb-muted);
+            border-top: 1px dashed var(--mfb-border);
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Mockup feedback</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/shared/voice-to-text.js"></script>
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: mockup-feedback-template (Phase 3.1/3.2 forks this per surface)
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed || {};
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var variants = (seed.variants) || [];
+        var openerHtml = seed.opener_html || '<p>Three refinements to rank.</p>';
+
+        // ---- State ----
+        // answers["variants/<id>"] = { rank: 1|2|3|null, what_works: '', what_doesnt: '' }
+        // answers["final/dealbreakers"] = { value: '' }
+        // answers["final/comments"] = { value: '' }
+        var answers = {};
+        variants.forEach(function(v) {
+            answers['variants/' + v.id] = { rank: null, what_works: '', what_doesnt: '' };
+        });
+        answers['final/dealbreakers'] = { value: '' };
+        answers['final/comments'] = { value: '' };
+
+        // Pre-load from saved draft
+        if (draft && draft.cards && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (!k || !answers.hasOwnProperty(k)) return;
+                if (k.indexOf('variants/') === 0) {
+                    answers[k].rank = (entry.rank === 1 || entry.rank === 2 || entry.rank === 3) ? entry.rank : null;
+                    answers[k].what_works = entry.what_works || '';
+                    answers[k].what_doesnt = entry.what_doesnt || '';
+                } else {
+                    answers[k].value = entry.value || '';
+                }
+            });
+        }
+
+        // ---- Autosave ----
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = [];
+            variants.forEach(function(v) {
+                var k = 'variants/' + v.id;
+                cards.push({
+                    key: k,
+                    rank: answers[k].rank,
+                    what_works: answers[k].what_works || '',
+                    what_doesnt: answers[k].what_doesnt || ''
+                });
+            });
+            cards.push({ key: 'final/dealbreakers', value: answers['final/dealbreakers'].value || '' });
+            cards.push({ key: 'final/comments', value: answers['final/comments'].value || '' });
+            return { cards: cards };
+        }
+
+        function unrankedVariants() {
+            return variants.filter(function(v) {
+                return answers['variants/' + v.id].rank === null;
+            });
+        }
+
+        // ---- Voice textarea factory ----
+        function buildVoiceArea(stateKey, subKey, label, placeholder) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mfb-voice-block';
+
+            var lab = document.createElement('label');
+            lab.className = 'mfb-voice-label';
+            lab.textContent = label;
+            wrap.appendChild(lab);
+
+            var ta = document.createElement('textarea');
+            ta.className = 'voice-textarea';
+            ta.placeholder = placeholder || '';
+            ta.setAttribute('aria-label', label);
+
+            // Pre-fill from state
+            var initial = subKey ? (answers[stateKey][subKey] || '') : (answers[stateKey].value || '');
+            if (initial) ta.value = initial;
+
+            ta.addEventListener('input', function() {
+                if (subKey) {
+                    answers[stateKey][subKey] = ta.value;
+                } else {
+                    answers[stateKey].value = ta.value;
+                }
+                if (autosave) autosave.save();
+            });
+
+            lab.htmlFor = '';
+            wrap.appendChild(ta);
+
+            // Wire voice-to-text if available
+            if (window.VoiceToText && typeof window.VoiceToText.init === 'function') {
+                try {
+                    window.VoiceToText.init({
+                        target: ta,
+                        cleanUrl: 'https://talk.croquetwade.com/clean'
+                    });
+                } catch (e) { /* fall back to typing only */ }
+            }
+
+            return wrap;
+        }
+
+        // ---- Rank button row factory ----
+        // Mutex across cards: setting rank N on variant X clears rank N from any other variant.
+        function buildRankRow(variant, cardEl, container) {
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'display:flex;flex-direction:column;gap:0.45rem;';
+
+            var rowLabel = document.createElement('p');
+            rowLabel.className = 'mfb-rank-row-label';
+            rowLabel.textContent = 'Rank this variant';
+            wrap.appendChild(rowLabel);
+
+            var btnRow = document.createElement('div');
+            btnRow.className = 'mfb-rank-buttons';
+
+            [1, 2, 3].forEach(function(rank) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'mfb-rank-btn';
+                b.dataset.rank = String(rank);
+                b.textContent = rank === 1 ? '1st pick' : (rank === 2 ? '2nd pick' : '3rd pick');
+
+                if (answers['variants/' + variant.id].rank === rank) b.classList.add('selected');
+
+                b.addEventListener('click', function() {
+                    setRank(variant.id, rank, container);
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            wrap.appendChild(btnRow);
+            return wrap;
+        }
+
+        function setRank(variantId, rank, container) {
+            // Clear this rank from any other variant
+            variants.forEach(function(v) {
+                if (v.id === variantId) return;
+                var k = 'variants/' + v.id;
+                if (answers[k].rank === rank) {
+                    answers[k].rank = null;
+                    var otherCard = container.querySelector('[data-key="' + k + '"]');
+                    if (otherCard) {
+                        otherCard.querySelectorAll('.mfb-rank-btn').forEach(function(btn) {
+                            btn.classList.remove('selected');
+                        });
+                        // Card no longer answered if rank cleared
+                        otherCard.classList.remove('answered');
+                    }
+                }
+            });
+
+            // Set rank on this variant
+            var thisKey = 'variants/' + variantId;
+            answers[thisKey].rank = rank;
+
+            var thisCard = container.querySelector('[data-key="' + thisKey + '"]');
+            if (thisCard) {
+                thisCard.querySelectorAll('.mfb-rank-btn').forEach(function(btn) {
+                    btn.classList.toggle('selected', Number(btn.dataset.rank) === rank);
+                });
+                thisCard.classList.add('answered');
+                thisCard.classList.remove('missing');
+            }
+
+            if (autosave) autosave.save();
+        }
+
+        // ---- Thumbnail placeholder ----
+        function buildPlaceholder() {
+            var wrap = document.createElement('div');
+            wrap.className = 'mfb-thumb-placeholder';
+            wrap.innerHTML =
+                '<svg width="36" height="44" viewBox="0 0 28 34" aria-hidden="true">' +
+                '<path d="M3 1 H19 L25 7 V31 a2 2 0 0 1 -2 2 H3 a2 2 0 0 1 -2 -2 V3 a2 2 0 0 1 2 -2 z" ' +
+                'fill="none" stroke="#bc6c25" stroke-width="1.6"/>' +
+                '<path d="M19 1 V7 H25" fill="none" stroke="#bc6c25" stroke-width="1.6"/>' +
+                '</svg>' +
+                '<span>preview</span>';
+            return wrap;
+        }
+
+        // ---- Build DOM ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML = openerHtml +
+            '<p class="mfb-autosave-note">Hi ' + firstName + ' — your answers save automatically as you go. Close the tab and come back any time. Send when you’re done.</p>';
+        container.appendChild(opener);
+
+        // Section A — variant cards
+        var divA = document.createElement('hr');
+        divA.className = 'section-divider';
+        container.appendChild(divA);
+
+        var headA = document.createElement('h2');
+        headA.className = 'section-heading';
+        headA.textContent = 'Rank the three';
+        container.appendChild(headA);
+
+        var subA = document.createElement('p');
+        subA.className = 'section-subtitle';
+        subA.textContent = 'Open each in a new tab, look around, then come back here. Each rank (1st / 2nd / 3rd) can only sit on one variant — picking 1st on a second variant clears it from the first.';
+        container.appendChild(subA);
+
+        variants.forEach(function(v) {
+            var key = 'variants/' + v.id;
+
+            var card = document.createElement('div');
+            card.className = 'card mfb-variant-card';
+            card.dataset.key = key;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', v.rank_label + ' — ' + v.name);
+            if (answers[key].rank !== null) card.classList.add('answered');
+
+            var inner = document.createElement('div');
+            inner.className = 'mfb-variant-inner';
+
+            // Thumb
+            var thumb = document.createElement('div');
+            thumb.className = 'mfb-variant-thumb';
+            if (v.thumbnail) {
+                var img = document.createElement('img');
+                img.src = 'images/' + v.thumbnail;
+                img.alt = v.name + ' preview';
+                img.loading = 'lazy';
+                img.onerror = function() {
+                    thumb.innerHTML = '';
+                    thumb.appendChild(buildPlaceholder());
+                };
+                thumb.appendChild(img);
+            } else {
+                thumb.appendChild(buildPlaceholder());
+            }
+            inner.appendChild(thumb);
+
+            // Body
+            var body = document.createElement('div');
+            body.className = 'mfb-variant-body';
+
+            var rankLabel = document.createElement('span');
+            rankLabel.className = 'mfb-rank-label';
+            rankLabel.textContent = v.rank_label || ('Variant ' + v.id.toUpperCase());
+            body.appendChild(rankLabel);
+
+            var nameEl = document.createElement('p');
+            nameEl.className = 'mfb-variant-name';
+            nameEl.textContent = v.name;
+            body.appendChild(nameEl);
+
+            if (v.tagline) {
+                var taglineEl = document.createElement('p');
+                taglineEl.className = 'mfb-variant-tagline';
+                taglineEl.textContent = v.tagline;
+                body.appendChild(taglineEl);
+            }
+
+            if (v.diff) {
+                var diffEl = document.createElement('p');
+                diffEl.className = 'mfb-variant-diff';
+                diffEl.textContent = v.diff;
+                body.appendChild(diffEl);
+            }
+
+            if (v.url) {
+                var linkEl = document.createElement('a');
+                linkEl.href = v.url;
+                linkEl.target = '_blank';
+                linkEl.rel = 'noopener noreferrer';
+                linkEl.className = 'mfb-variant-link';
+                linkEl.textContent = 'Open live mockup ↗';
+                body.appendChild(linkEl);
+            }
+
+            inner.appendChild(body);
+            card.appendChild(inner);
+
+            // Footer: rank buttons + two voice textareas
+            var footer = document.createElement('div');
+            footer.className = 'mfb-variant-footer';
+
+            footer.appendChild(buildRankRow(v, card, container));
+            footer.appendChild(buildVoiceArea(key, 'what_works', 'What works about this one (optional)',
+                'Anything that caught your eye — layout, type, photos, pacing…'));
+            footer.appendChild(buildVoiceArea(key, 'what_doesnt', "What doesn't (optional)",
+                'Anything that grated, felt off, or read wrong…'));
+
+            card.appendChild(footer);
+            container.appendChild(card);
+        });
+
+        // Section B — Deal-breakers
+        var divB = document.createElement('hr');
+        divB.className = 'section-divider';
+        container.appendChild(divB);
+
+        var dealCard = document.createElement('div');
+        dealCard.className = 'card mfb-final-card';
+        dealCard.dataset.key = 'final/dealbreakers';
+
+        var dealTitle = document.createElement('p');
+        dealTitle.className = 'mfb-final-title';
+        dealTitle.textContent = 'Deal-breakers?';
+        dealCard.appendChild(dealTitle);
+
+        var dealPrompt = document.createElement('p');
+        dealPrompt.className = 'mfb-final-prompt';
+        dealPrompt.textContent = "Anything in any of them you genuinely couldn't live with on the live site? Most replies leave this blank.";
+        dealCard.appendChild(dealPrompt);
+
+        dealCard.appendChild(buildVoiceArea('final/dealbreakers', null, '', 'A specific thing that would stop you using or recommending the site…'));
+        container.appendChild(dealCard);
+
+        // Section C — Open comments (T9 catch-all)
+        var commentsCard = document.createElement('div');
+        commentsCard.className = 'card mfb-final-card';
+        commentsCard.dataset.key = 'final/comments';
+
+        var commentsTitle = document.createElement('p');
+        commentsTitle.className = 'mfb-final-title';
+        commentsTitle.textContent = "Anything else in your head?";
+        commentsCard.appendChild(commentsTitle);
+
+        var commentsPrompt = document.createElement('p');
+        commentsPrompt.className = 'mfb-final-prompt';
+        commentsPrompt.textContent = "Anything we haven't asked that you want Wade to know.";
+        commentsCard.appendChild(commentsPrompt);
+
+        commentsCard.appendChild(buildVoiceArea('final/comments', null, '', 'Anything at all…'));
+        container.appendChild(commentsCard);
+
+        // Validation banner
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit
+        var divFinal = document.createElement('hr');
+        divFinal.className = 'section-divider';
+        container.appendChild(divFinal);
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.type = 'button';
+        submitBtn.textContent = 'Send my ranking';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var unranked = unrankedVariants();
+
+            // Highlight unranked variant cards
+            variants.forEach(function(v) {
+                var k = 'variants/' + v.id;
+                var card = container.querySelector('[data-key="' + k + '"]');
+                if (!card) return;
+                if (answers[k].rank === null) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (unranked.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unranked.length === 1
+                    ? 'One variant still needs a rank — it’s highlighted above.'
+                    : unranked.length + ' variants still need ranks — they’re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = container.querySelector('.card.missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            document.getElementById('validation-error').classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            // Build response payload
+            var ranks = variants.map(function(v) {
+                return { variant_id: v.id, rank: answers['variants/' + v.id].rank };
+            });
+            var perVariant = variants.map(function(v) {
+                var k = 'variants/' + v.id;
+                return {
+                    variant_id: v.id,
+                    what_works: answers[k].what_works || '',
+                    what_doesnt: answers[k].what_doesnt || ''
+                };
+            });
+
+            var responsePayload = {
+                surface: seed.surface || null,
+                ranks: ranks,
+                per_variant: perVariant,
+                deal_breakers: answers['final/dealbreakers'].value || '',
+                open_comments: answers['final/comments'].value || ''
+            };
+
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my ranking';
+                document.getElementById('error-message').classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Start autosave
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Restore draft notice
+        if (draft && Array.isArray(draft.cards)) {
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>

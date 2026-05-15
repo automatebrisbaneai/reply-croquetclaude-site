@@ -1,0 +1,34 @@
+{
+  "surface": "news",
+  "surface_label": "news.croquetqld.org",
+  "opener_html": "<p>Wade's narrowed the <strong>news.croquetqld.org</strong> rebuild to three refinements within one direction. They're side-by-side below — same news, same colours, same type, different decisions about density and photography. Open each in a new tab, look around for a couple of minutes, then come back here and rank them.</p><p>Each variant has the same content. We're not asking which content you like — we're asking which <em>shape</em> of news site you'd want to read every week.</p>",
+  "variants": [
+    {
+      "id": "a",
+      "rank_label": "Variant A",
+      "name": "Ghost Source baseline",
+      "tagline": "The Ghost Source theme adapted to CAQ palette + type. Standard editorial density.",
+      "diff": "Drop caps on lead articles only. Body column at standard reading width. Three-column tile grid on the home page.",
+      "url": "https://news-mockup-a.croquetwade.com",
+      "thumbnail": "variant-a.png"
+    },
+    {
+      "id": "b",
+      "rank_label": "Variant B",
+      "name": "Editorial-cranked",
+      "tagline": "Same bones as A, editorial typography dialled higher.",
+      "diff": "Drop caps on every article opener. Narrower body column. More frequent pull quotes. Hairline rules on every paragraph break.",
+      "url": "https://news-mockup-b.croquetwade.com",
+      "thumbnail": "variant-b.png"
+    },
+    {
+      "id": "c",
+      "rank_label": "Variant C",
+      "name": "Photo-forward",
+      "tagline": "Same bones as A, photographs lead instead of headlines.",
+      "diff": "Article hero photos go full-bleed (instead of inline cover treatment). Home page leads with a single large featured-article photo (not a 3-column tile grid).",
+      "url": "https://news-mockup-c.croquetwade.com",
+      "thumbnail": "variant-c.png"
+    }
+  ]
+}

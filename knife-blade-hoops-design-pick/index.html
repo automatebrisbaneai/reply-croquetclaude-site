@@ -437,19 +437,19 @@
             { label: 'Closest to what I had in mind', value: 'closest', cls: '' },
             { label: 'Workable but not what I had in mind', value: 'workable', cls: '' },
             { label: 'Wrong direction — see notes', value: 'wrong', cls: 'btn-wrong' },
-            { label: 'I don’t have a strong view', value: 'no-view', cls: 'btn-neutral' }
+            { label: "I don't have a strong view", value: 'no-view', cls: 'btn-neutral' }
         ];
 
         function buildSpecTable(rows) {
             // rows: array of { label, value, cls }
-            var table = document.createElement(‘table’);
-            table.className = ‘kbh-spec-table’;
+            var table = document.createElement('table');
+            table.className = 'kbh-spec-table';
             rows.forEach(function(row) {
-                var tr = document.createElement(‘tr’);
+                var tr = document.createElement('tr');
                 if (row.cls) tr.className = row.cls;
-                var tdLabel = document.createElement(‘td’);
+                var tdLabel = document.createElement('td');
                 tdLabel.textContent = row.label;
-                var tdValue = document.createElement(‘td’);
+                var tdValue = document.createElement('td');
                 tdValue.innerHTML = row.value;
                 tr.appendChild(tdLabel);
                 tr.appendChild(tdValue);
@@ -460,38 +460,38 @@
 
         function buildDesignCard(opts) {
             var key = opts.key;
-            var card = document.createElement(‘div’);
-            card.className = ‘kbh-design-card card’;
+            var card = document.createElement('div');
+            card.className = 'kbh-design-card card';
             card.dataset.key = key;
 
-            var h3 = document.createElement(‘h3’);
+            var h3 = document.createElement('h3');
             h3.textContent = opts.heading;
             card.appendChild(h3);
 
             if (opts.subtitle) {
-                var sub = document.createElement(‘p’);
-                sub.className = ‘kbh-subtitle’;
+                var sub = document.createElement('p');
+                sub.className = 'kbh-subtitle';
                 sub.textContent = opts.subtitle;
                 card.appendChild(sub);
             }
 
             // Hero image (click-to-enlarge)
             if (opts.imgSrc) {
-                var imgLink = document.createElement(‘a’);
+                var imgLink = document.createElement('a');
                 imgLink.href = opts.imgSrc;
-                imgLink.target = ‘_blank’;
-                imgLink.rel = ‘noopener’;
-                imgLink.className = ‘kbh-img-link’;
-                imgLink.title = ‘Click to open full-size in a new tab’;
-                var img = document.createElement(‘img’);
+                imgLink.target = '_blank';
+                imgLink.rel = 'noopener';
+                imgLink.className = 'kbh-img-link';
+                imgLink.title = 'Click to open full-size in a new tab';
+                var img = document.createElement('img');
                 img.src = opts.imgSrc;
                 img.alt = opts.imgAlt || opts.heading;
-                img.className = ‘kbh-design-img’;
+                img.className = 'kbh-design-img';
                 imgLink.appendChild(img);
                 card.appendChild(imgLink);
-                var hint = document.createElement(‘span’);
-                hint.className = ‘kbh-enlarge-hint’;
-                hint.textContent = ‘Click image to open full-size in a new tab.’;
+                var hint = document.createElement('span');
+                hint.className = 'kbh-enlarge-hint';
+                hint.textContent = 'Click image to open full-size in a new tab.';
                 card.appendChild(hint);
             }
 
@@ -500,29 +500,29 @@
                 card.appendChild(buildSpecTable(opts.specRows));
             }
 
-            var choiceLabel = document.createElement(‘span’);
-            choiceLabel.className = ‘kbh-choice-label’;
-            choiceLabel.textContent = ‘How does this fit?’;
+            var choiceLabel = document.createElement('span');
+            choiceLabel.className = 'kbh-choice-label';
+            choiceLabel.textContent = 'How does this fit?';
             card.appendChild(choiceLabel);
 
-            var btnRow = document.createElement(‘div’);
-            btnRow.className = ‘kbh-answer-buttons answer-buttons’;
+            var btnRow = document.createElement('div');
+            btnRow.className = 'kbh-answer-buttons answer-buttons';
 
             choiceButtons.forEach(function(btn) {
-                var b = document.createElement(‘button’);
-                b.type = ‘button’;
-                b.className = ‘kbh-btn-choice btn-answer’ + (btn.cls ? ‘ ‘ + btn.cls : ‘’);
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'kbh-btn-choice btn-answer' + (btn.cls ? ' ' + btn.cls : '');
                 b.dataset.value = btn.value;
                 b.textContent = btn.label;
 
-                b.addEventListener(‘click’, function() {
-                    btnRow.querySelectorAll(‘.kbh-btn-choice’).forEach(function(x) {
-                        x.classList.remove(‘selected’);
+                b.addEventListener('click', function() {
+                    btnRow.querySelectorAll('.kbh-btn-choice').forEach(function(x) {
+                        x.classList.remove('selected');
                     });
-                    b.classList.add(‘selected’);
+                    b.classList.add('selected');
                     answers[key].choice = btn.value;
-                    card.classList.add(‘answered’);
-                    card.classList.remove(‘missing’);
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
                     if (autosave) autosave.save();
                 });
 
@@ -531,16 +531,16 @@
 
             card.appendChild(btnRow);
 
-            var voiceLabel = document.createElement(‘span’);
-            voiceLabel.className = ‘kbh-voice-label’;
-            voiceLabel.textContent = opts.voicePrompt || ‘Anything you’d change about this design?’;
+            var voiceLabel = document.createElement('span');
+            voiceLabel.className = 'kbh-voice-label';
+            voiceLabel.textContent = opts.voicePrompt || "Anything you'd change about this design?";
             card.appendChild(voiceLabel);
 
-            var voiceTA = document.createElement(‘textarea’);
-            voiceTA.className = ‘kbh-voice-ta’;
-            voiceTA.placeholder = ‘Width, thickness, depth, how it’s installed — anything.’;
-            voiceTA.setAttribute(‘aria-label’, ‘Notes for ‘ + opts.heading);
-            voiceTA.addEventListener(‘input’, function() {
+            var voiceTA = document.createElement('textarea');
+            voiceTA.className = 'kbh-voice-ta';
+            voiceTA.placeholder = "Width, thickness, depth, how it's installed — anything.";
+            voiceTA.setAttribute('aria-label', 'Notes for ' + opts.heading);
+            voiceTA.addEventListener('input', function() {
                 answers[key].voice = voiceTA.value;
                 if (autosave) autosave.save();
             });
@@ -562,7 +562,7 @@
 
         var pageSubtitle = document.createElement('p');
         pageSubtitle.style.cssText = 'font-size:1rem;color:var(--text-secondary,#666);margin:0 0 1.5rem 0;font-style:italic;';
-        pageSubtitle.textContent = 'Round 2 — show us what’s wrong with them so we can do better';
+        pageSubtitle.textContent = "Round 2 — show us what's wrong with them so we can do better";
         container.appendChild(pageSubtitle);
 
         // Opener
@@ -570,7 +570,7 @@
         opener.className = 'opener';
         opener.innerHTML =
             '<p>Hi ' + firstName + ' — below are the results of the engineering review and three first-pass hoop designs based on your brief.</p>' +
-            '<p>Work through the six sections. There’s no right answer — your reactions to the designs are the most useful thing we can get right now. The page asks you to pick the closest design to what you had in mind, or tell us where they’re off.</p>' +
+            "<p>Work through the six sections. There's no right answer — your reactions to the designs are the most useful thing we can get right now. The page asks you to pick the closest design to what you had in mind, or tell us where they're off.</p>" +
             '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically as you go. Close the tab and come back any time — the link picks up where you left off until you press <em>Send my answers</em>.</p>';
         container.appendChild(opener);
 
@@ -608,7 +608,7 @@
         card1.appendChild(p1a);
 
         var p1b = document.createElement('p');
-        p1b.innerHTML = 'A 1in × 1in × 0.1in plate is roughly <strong>25 times too thin</strong> to hold the upright steady when a power hitter strikes the hoop. The weld at that thickness is also about half what’s needed. The blade dimensions described (0.1in × 12in star) are also concerning — too long for a typical Queensland bowling green root zone, and the blades themselves would bend before the soil engaged.';
+        p1b.innerHTML = "A 1in × 1in × 0.1in plate is roughly <strong>25 times too thin</strong> to hold the upright steady when a power hitter strikes the hoop. The weld at that thickness is also about half what's needed. The blade dimensions described (0.1in × 12in star) are also concerning — too long for a typical Queensland bowling green root zone, and the blades themselves would bend before the soil engaged.";
         card1.appendChild(p1b);
 
         var p1c = document.createElement('p');
@@ -630,11 +630,11 @@
         card2.appendChild(h3c2);
 
         var p2a = document.createElement('p');
-        p2a.textContent = 'We’re good at polishing up a design when there’s a clear example to work from. We’re less good at inventing one from scratch with only a few sentences of brief.';
+        p2a.textContent = "We're good at polishing up a design when there's a clear example to work from. We're less good at inventing one from scratch with only a few sentences of brief.";
         card2.appendChild(p2a);
 
         var p2b = document.createElement('p');
-        p2b.textContent = 'The three designs below are first-pass attempts based on your email, the WCF spec photos, and the Tamborine photo. None of them may be quite what you had in mind. That’s fine — show us what’s wrong with them and we’ll iterate.';
+        p2b.textContent = "The three designs below are first-pass attempts based on your email, the WCF spec photos, and the Tamborine photo. None of them may be quite what you had in mind. That's fine — show us what's wrong with them and we'll iterate.";
         card2.appendChild(p2b);
 
         var p2c = document.createElement('p');
@@ -648,7 +648,7 @@
         li2a.innerHTML = '<strong>Send a sketch.</strong> Even a rough phone-photo of a hand-drawn sketch is gold. We can polish it.';
         var li2b = document.createElement('li');
         li2b.style.cssText = 'margin-bottom:0;font-size:0.95rem;line-height:1.6;color:var(--text-secondary,#444);';
-        li2b.innerHTML = '<strong>Mark up our drawings.</strong> Print the designs, draw on them with a pen, photograph and upload. Tell us where we’re off.';
+        li2b.innerHTML = "<strong>Mark up our drawings.</strong> Print the designs, draw on them with a pen, photograph and upload. Tell us where we're off.";
         ul2.appendChild(li2a);
         ul2.appendChild(li2b);
         card2.appendChild(ul2);
@@ -715,22 +715,22 @@
         container.appendChild(divC3);
 
         var cardAResult = buildDesignCard({
-            key: ‘design-a’,
-            heading: ‘Design A — Single Flat Blade (true knife-blade)’,
-            subtitle: ‘Slices straight in like a knife — leaves a thin slit that closes’,
-            imgSrc: ‘img/A-iso-focus.png’,
-            imgAlt: ‘Design A: Single Flat Blade — 3D isometric view’,
+            key: 'design-a',
+            heading: 'Design A — Single Flat Blade (true knife-blade)',
+            subtitle: 'Slices straight in like a knife — leaves a thin slit that closes',
+            imgSrc: 'img/A-iso-focus.png',
+            imgAlt: 'Design A: Single Flat Blade — 3D isometric view',
             specRows: [
-                { label: ‘Install’, value: ‘Knife-blade slice — one thin slit ~640 mm² in cross-section’ },
-                { label: ‘Soil disturbance’, value: ‘~640 mm² — slit closes within days’ },
-                { label: ‘Above ground’, value: ‘12 in upright (305 mm), 16 mm round, mild steel S275 — WCF spec’ },
-                { label: ‘Plate’, value: ‘100 × 100 × 10 mm mild steel S275, sits 10 mm below turf’ },
-                { label: ‘Blade’, value: ‘1 fin, 80 mm wide × 8 mm thick × 200 mm long, knife-edge sloping tip’ },
-                { label: ‘Weld’, value: ‘Socket joint mandatory — upright passes through plate, 8 mm fillet welds top + bottom’ },
-                { label: ‘Engineering’, value: ‘<strong>PASS</strong> — governing mode is socket weld at 2.04× margin’, cls: ‘kbh-verdict-pass’ },
-                { label: ‘Trade-off’, value: ‘Simplest to fabricate. Installer must orient plate perpendicular to line of play — mark the plate so they can\’t get it wrong.’, cls: ‘kbh-verdict-tradeoff’ }
+                { label: 'Install', value: 'Knife-blade slice — one thin slit ~640 mm² in cross-section' },
+                { label: 'Soil disturbance', value: '~640 mm² — slit closes within days' },
+                { label: 'Above ground', value: '12 in upright (305 mm), 16 mm round, mild steel S275 — WCF spec' },
+                { label: 'Plate', value: '100 × 100 × 10 mm mild steel S275, sits 10 mm below turf' },
+                { label: 'Blade', value: '1 fin, 80 mm wide × 8 mm thick × 200 mm long, knife-edge sloping tip' },
+                { label: 'Weld', value: 'Socket joint mandatory — upright passes through plate, 8 mm fillet welds top + bottom' },
+                { label: 'Engineering', value: '<strong>PASS</strong> — governing mode is socket weld at 2.04× margin', cls: 'kbh-verdict-pass' },
+                { label: 'Trade-off', value: 'Simplest to fabricate. Installer must orient plate perpendicular to line of play — mark the plate so they can\'t get it wrong.', cls: 'kbh-verdict-tradeoff' }
             ],
-            voicePrompt: ‘Anything you’d change about A — width, thickness, depth, how it’s installed, anything’
+            voicePrompt: "Anything you'd change about A — width, thickness, depth, how it's installed, anything"
         });
         container.appendChild(cardAResult.card);
 
@@ -740,22 +740,22 @@
         container.appendChild(divC4);
 
         var cardBResult = buildDesignCard({
-            key: ‘design-b’,
-            heading: ‘Design B — 4-Fin Cross (star anchor)’,
-            subtitle: ‘Marilyn\’s original geometry — four blades welded in a cross’,
-            imgSrc: ‘img/B-iso-focus.png’,
-            imgAlt: ‘Design B: 4-Fin Cross — 3D isometric view’,
+            key: 'design-b',
+            heading: 'Design B — 4-Fin Cross (star anchor)',
+            subtitle: 'Marilyn\'s original geometry — four blades welded in a cross',
+            imgSrc: 'img/B-iso-focus.png',
+            imgAlt: 'Design B: 4-Fin Cross — 3D isometric view',
             specRows: [
-                { label: ‘Install’, value: ‘Star-anchor punch — four blades drive simultaneously, soil packs between fins’ },
-                { label: ‘Soil disturbance’, value: ‘~2,500 mm² (4 slits + packed core between fins) — ~4× design A’ },
-                { label: ‘Above ground’, value: ‘Same as A (12 in upright, 16 mm round)’ },
-                { label: ‘Plate’, value: ‘100 × 100 × 10 mm mild steel S275’ },
-                { label: ‘Blade’, value: ‘4 fins at 90°, each 40 mm wide × 6 mm thick × 200 mm long’ },
-                { label: ‘Weld’, value: ‘Socket joint mandatory’ },
-                { label: ‘Engineering’, value: ‘<strong>PASS</strong> — same margin as A (2.04×)’, cls: ‘kbh-verdict-pass’ },
-                { label: ‘Trade-off’, value: ‘Works equally from any ball-approach angle. Hardest to fabricate (4 cuts, 4 welds). Hardest to extract — soil packs into pockets between fins.’, cls: ‘kbh-verdict-tradeoff’ }
+                { label: 'Install', value: 'Star-anchor punch — four blades drive simultaneously, soil packs between fins' },
+                { label: 'Soil disturbance', value: '~2,500 mm² (4 slits + packed core between fins) — ~4× design A' },
+                { label: 'Above ground', value: 'Same as A (12 in upright, 16 mm round)' },
+                { label: 'Plate', value: '100 × 100 × 10 mm mild steel S275' },
+                { label: 'Blade', value: '4 fins at 90°, each 40 mm wide × 6 mm thick × 200 mm long' },
+                { label: 'Weld', value: 'Socket joint mandatory' },
+                { label: 'Engineering', value: '<strong>PASS</strong> — same margin as A (2.04×)', cls: 'kbh-verdict-pass' },
+                { label: 'Trade-off', value: 'Works equally from any ball-approach angle. Hardest to fabricate (4 cuts, 4 welds). Hardest to extract — soil packs into pockets between fins.', cls: 'kbh-verdict-tradeoff' }
             ],
-            voicePrompt: ‘Anything you’d change about B — width, thickness, depth, number of fins, anything’
+            voicePrompt: "Anything you'd change about B — width, thickness, depth, number of fins, anything"
         });
         container.appendChild(cardBResult.card);
 
@@ -765,22 +765,22 @@
         container.appendChild(divC5);
 
         var cardCResult = buildDesignCard({
-            key: ‘design-c’,
-            heading: ‘Design C — 3-Fin Y-Star (star anchor)’,
-            subtitle: ‘Three blades at 120° — middle ground between A and B’,
-            imgSrc: ‘img/C-iso-focus.png’,
-            imgAlt: ‘Design C: 3-Fin Y-Star — 3D isometric view’,
+            key: 'design-c',
+            heading: 'Design C — 3-Fin Y-Star (star anchor)',
+            subtitle: 'Three blades at 120° — middle ground between A and B',
+            imgSrc: 'img/C-iso-focus.png',
+            imgAlt: 'Design C: 3-Fin Y-Star — 3D isometric view',
             specRows: [
-                { label: ‘Install’, value: ‘Star-anchor punch — three blades drive simultaneously’ },
-                { label: ‘Soil disturbance’, value: ‘~1,800 mm² (3 slits + packed core) — ~3× design A’ },
-                { label: ‘Above ground’, value: ‘Same as A (12 in upright, 16 mm round)’ },
-                { label: ‘Plate’, value: ‘100 × 100 × 10 mm mild steel S275’ },
-                { label: ‘Blade’, value: ‘3 fins at 120°, each 40 mm wide × 6 mm thick × 200 mm long’ },
-                { label: ‘Weld’, value: ‘Socket joint mandatory’ },
-                { label: ‘Engineering’, value: ‘<strong>PASS</strong> — same margin as A’, cls: ‘kbh-verdict-pass’ },
-                { label: ‘Trade-off’, value: ‘Less metal than B, easier to extract (wider gaps between fins). Slight directional asymmetry but designed for worst case.’, cls: ‘kbh-verdict-tradeoff’ }
+                { label: 'Install', value: 'Star-anchor punch — three blades drive simultaneously' },
+                { label: 'Soil disturbance', value: '~1,800 mm² (3 slits + packed core) — ~3× design A' },
+                { label: 'Above ground', value: 'Same as A (12 in upright, 16 mm round)' },
+                { label: 'Plate', value: '100 × 100 × 10 mm mild steel S275' },
+                { label: 'Blade', value: '3 fins at 120°, each 40 mm wide × 6 mm thick × 200 mm long' },
+                { label: 'Weld', value: 'Socket joint mandatory' },
+                { label: 'Engineering', value: '<strong>PASS</strong> — same margin as A', cls: 'kbh-verdict-pass' },
+                { label: 'Trade-off', value: 'Less metal than B, easier to extract (wider gaps between fins). Slight directional asymmetry but designed for worst case.', cls: 'kbh-verdict-tradeoff' }
             ],
-            voicePrompt: ‘Anything you’d change about C — angles, number of fins, dimensions, anything’
+            voicePrompt: "Anything you'd change about C — angles, number of fins, dimensions, anything"
         });
         container.appendChild(cardCResult.card);
 
@@ -793,16 +793,16 @@
         card6.className = 'kbh-missed-card';
 
         var h3c6 = document.createElement('h3');
-        h3c6.textContent = 'What’s in your head about this that we haven’t asked?';
+        h3c6.textContent = "What's in your head about this that we haven't asked?";
         card6.appendChild(h3c6);
 
         var p6 = document.createElement('p');
-        p6.textContent = 'The brief was light. There’s almost certainly something you’re seeing that we’re not. Tell us.';
+        p6.textContent = "The brief was light. There's almost certainly something you're seeing that we're not. Tell us.";
         card6.appendChild(p6);
 
         var missedTA = document.createElement('textarea');
         missedTA.className = 'kbh-voice-ta';
-        missedTA.placeholder = 'Anything at all — materials, installation method, how the hoop attaches to the anchor, what the Men’s Shed can actually make, or anything else.';
+        missedTA.placeholder = "Anything at all — materials, installation method, how the hoop attaches to the anchor, what the Men's Shed can actually make, or anything else.";
         missedTA.setAttribute('aria-label', 'Open feedback');
         missedTA.addEventListener('input', function() {
             missedVoice = missedTA.value;
@@ -854,8 +854,8 @@
             if (missing.length > 0) {
                 var ve = document.getElementById('validation-error');
                 ve.textContent = missing.length === 1
-                    ? 'One design still needs a pick — it’s highlighted above.'
-                    : missing.length + ' designs still need a pick — they’re highlighted above.';
+                    ? "One design still needs a pick — it's highlighted above."
+                    : missing.length + " designs still need a pick — they're highlighted above.";
                 ve.classList.add('visible');
                 var firstMissing = document.querySelector('.kbh-design-card.missing');
                 if (firstMissing) {
