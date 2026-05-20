@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News site — production-readiness survey — CroquetClaude</title>
+    <meta name="description" content="Six calls left on the news.croquetqld.org build.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---------------------------------------------------------------
+           news-site-readiness-2026-05 — per-mission styles
+           DO NOT touch app.js or styles.css — only this block.
+        --------------------------------------------------------------- */
+        :root {
+            --nsr-cream: #fefae0;
+            --nsr-green: #2d6a4f;
+            --nsr-terracotta: #bc6c25;
+            --nsr-red: #b83227;
+            --nsr-ink: #1c1916;
+            --nsr-muted: #6b6560;
+            --nsr-border: #e8e2d6;
+            --nsr-card-bg: #ffffff;
+            --nsr-page-bg: #f8f5ee;
+            --nsr-paper-deep: #f1ead6;
+        }
+
+        body { background: var(--nsr-page-bg); }
+
+        .opener {
+            border-left: 4px solid var(--nsr-green);
+            background: var(--nsr-cream);
+            padding: 1.25rem 1.4rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.6rem;
+        }
+        .opener p {
+            margin: 0 0 0.75rem;
+            line-height: 1.65;
+            font-size: 1.05rem;
+        }
+        .opener p:last-child { margin-bottom: 0; }
+        .nsr-autosave-note {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--nsr-muted);
+            border-top: 1px dashed var(--nsr-border);
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+        }
+        .nsr-discovery-callout {
+            background: var(--nsr-paper-deep);
+            border: 1px solid var(--nsr-border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.6rem;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: var(--nsr-ink);
+        }
+        .nsr-discovery-callout strong {
+            color: var(--nsr-green);
+        }
+
+        .nsr-section-label {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--nsr-green);
+            background: rgba(45,106,79,0.08);
+            border-radius: 3px;
+            padding: 2px 7px;
+            margin-bottom: 0.4rem;
+        }
+
+        /* Question card — single card per section */
+        .nsr-q-card {
+            background: var(--nsr-card-bg);
+            border: 1px solid var(--nsr-border);
+            border-radius: 10px;
+            padding: 1.4rem 1.5rem;
+            margin-bottom: 1.4rem;
+            scroll-margin-top: 1rem;
+        }
+        .nsr-q-card.answered {
+            border-color: var(--nsr-green);
+            box-shadow: 0 0 0 1px var(--nsr-green) inset;
+        }
+        .nsr-q-card.missing {
+            border-color: var(--nsr-red);
+            box-shadow: 0 0 0 1px var(--nsr-red) inset;
+        }
+        .nsr-q-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--nsr-ink);
+            margin: 0 0 0.7rem;
+            line-height: 1.3;
+        }
+        .nsr-q-context {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--nsr-ink);
+            margin: 0 0 1rem;
+        }
+        .nsr-q-note {
+            font-size: 0.9rem;
+            color: var(--nsr-muted);
+            font-style: italic;
+            line-height: 1.55;
+            margin: 0.6rem 0 1rem;
+            padding-left: 0.85rem;
+            border-left: 3px solid var(--nsr-terracotta);
+        }
+
+        /* Thumbnails */
+        .nsr-thumbs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+            margin: 1rem 0 1.2rem;
+        }
+        .nsr-thumbs.two { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 640px) {
+            .nsr-thumbs.two { grid-template-columns: 1fr; }
+        }
+        .nsr-thumb {
+            background: var(--nsr-paper-deep);
+            border: 1px solid var(--nsr-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .nsr-thumb img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid var(--nsr-border);
+            background: #fff;
+        }
+        .nsr-thumb-caption {
+            padding: 0.55rem 0.8rem 0.7rem;
+            font-size: 0.85rem;
+            color: var(--nsr-muted);
+            line-height: 1.5;
+        }
+
+        /* Library sample list */
+        .nsr-samples {
+            background: var(--nsr-paper-deep);
+            border-left: 3px solid var(--nsr-green);
+            padding: 0.85rem 1.1rem;
+            margin: 0.4rem 0 1.1rem;
+            border-radius: 0 6px 6px 0;
+        }
+        .nsr-samples-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--nsr-green);
+            margin: 0 0 0.5rem;
+        }
+        .nsr-samples ul {
+            margin: 0;
+            padding: 0 0 0 1.1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--nsr-ink);
+        }
+        .nsr-samples ul li {
+            font-style: italic;
+        }
+
+        /* Option buttons — radio-style, full-width for legibility */
+        .nsr-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            margin: 0.6rem 0 0.9rem;
+        }
+        .nsr-option-btn {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            background: transparent;
+            border: 2px solid var(--nsr-green);
+            color: var(--nsr-green);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 0.97rem;
+            line-height: 1.5;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.12s ease, color 0.12s ease;
+        }
+        .nsr-option-btn:hover {
+            background: rgba(45,106,79,0.06);
+        }
+        .nsr-option-btn.selected {
+            background: var(--nsr-green);
+            color: #fff;
+        }
+        .nsr-option-btn.selected .nsr-option-marker {
+            background: #fff;
+            color: var(--nsr-green);
+        }
+        .nsr-option-btn[data-value="other"]:not(.selected) {
+            border-color: var(--nsr-terracotta);
+            color: var(--nsr-terracotta);
+        }
+        .nsr-option-btn[data-value="other"]:hover {
+            background: rgba(188,108,37,0.07);
+        }
+        .nsr-option-btn[data-value="other"].selected {
+            background: var(--nsr-terracotta);
+            color: #fff;
+            border-color: var(--nsr-terracotta);
+        }
+        .nsr-option-marker {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.7rem;
+            height: 1.7rem;
+            padding: 0 0.45rem;
+            font-weight: 700;
+            background: rgba(45,106,79,0.1);
+            color: var(--nsr-green);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: -0.05rem;
+        }
+        .nsr-option-btn[data-value="other"] .nsr-option-marker {
+            background: rgba(188,108,37,0.12);
+            color: var(--nsr-terracotta);
+        }
+
+        /* Notes textarea */
+        .nsr-notes {
+            margin-top: 0.6rem;
+        }
+        .nsr-notes label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--nsr-muted);
+            margin-bottom: 0.3rem;
+        }
+        .nsr-notes textarea {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: var(--nsr-ink);
+            background: #fcfaf3;
+            border: 1px solid var(--nsr-border);
+            border-radius: 6px;
+            padding: 0.6rem 0.75rem;
+            min-height: 70px;
+            resize: vertical;
+        }
+        .nsr-notes textarea:focus {
+            outline: none;
+            border-color: var(--nsr-green);
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">news.croquetqld.org — production-readiness survey</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: news-site-readiness-2026-05
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var seed = tokenRecord.payload_seed || {};
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+
+        var questions = (seed.sections && seed.sections['questions']) || [];
+
+        // answers keyed by question id
+        var answers = {};
+        questions.forEach(function(q) {
+            answers[q.id] = { answer: null, notes: '' };
+        });
+
+        // Pre-load from saved draft
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (k && answers.hasOwnProperty(k)) {
+                    answers[k].answer = (entry.answer !== undefined) ? entry.answer : null;
+                    answers[k].notes = entry.notes || '';
+                }
+            });
+        }
+
+        // ---- Autosave plumbing ----
+        var autosave = null;
+
+        function buildPayload() {
+            var cards = Object.keys(answers).map(function(k) {
+                return { key: k, answer: answers[k].answer, notes: answers[k].notes || '' };
+            });
+            return { cards: cards };
+        }
+
+        function updateValidationState() {
+            return Object.keys(answers).filter(function(k) { return answers[k].answer === null; });
+        }
+
+        // ---- Build the DOM ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // ---- Opener ----
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>I&rsquo;ve done a full discovery sweep of the news site stack, ' + firstName + '. There&rsquo;s six calls left for you before I can hand back a tight implementation plan &mdash; mostly architectural choices that I can&rsquo;t make on your behalf.</p>' +
+            '<p>Each card below has a thumbnail (or two) so you can see what we&rsquo;re actually talking about, plus the options I&rsquo;d offer. Pick one per card, drop notes for context where it helps.</p>' +
+            '<p class="nsr-autosave-note">Your answers save automatically as you go. Close the tab and come back any time &mdash; the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        // ---- Discovery callout ----
+        var disc = document.createElement('div');
+        disc.className = 'nsr-discovery-callout';
+        disc.innerHTML =
+            '<strong>What I found.</strong> The site is technically live and serving real content. ' +
+            'But it&rsquo;s running on two parallel backends (pb-news + Payload) with a mirror in between, ' +
+            'one mocked section (Competition Results), a half-wired harvester (CAQ-only via Graph API, 33 clubs stuck behind FB&rsquo;s admin barrier), ' +
+            'and a 106-article markdown library that hasn&rsquo;t made it into any CMS. ' +
+            'Six decisions resolve all of that.';
+        container.appendChild(disc);
+
+        // ---- Build one card per question ----
+        questions.forEach(function(q, idx) {
+            var card = document.createElement('div');
+            card.className = 'card nsr-q-card';
+            card.dataset.key = q.id;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', q.title);
+            if (answers[q.id].answer !== null) card.classList.add('answered');
+
+            // Section label
+            var label = document.createElement('div');
+            label.className = 'nsr-section-label';
+            label.textContent = 'Question ' + (idx + 1) + ' of ' + questions.length;
+            card.appendChild(label);
+
+            // Title
+            var title = document.createElement('h2');
+            title.className = 'nsr-q-title';
+            title.textContent = q.title;
+            card.appendChild(title);
+
+            // Context
+            var context = document.createElement('p');
+            context.className = 'nsr-q-context';
+            context.textContent = q.context || '';
+            card.appendChild(context);
+
+            // Library samples (only on library question)
+            if (Array.isArray(q.samples) && q.samples.length) {
+                var samples = document.createElement('div');
+                samples.className = 'nsr-samples';
+                var sLabel = document.createElement('p');
+                sLabel.className = 'nsr-samples-label';
+                sLabel.textContent = 'Sample titles from resources/articles/';
+                samples.appendChild(sLabel);
+                var ul = document.createElement('ul');
+                q.samples.forEach(function(s) {
+                    var li = document.createElement('li');
+                    li.textContent = s;
+                    ul.appendChild(li);
+                });
+                samples.appendChild(ul);
+                card.appendChild(samples);
+            }
+
+            // Thumbnails
+            if (Array.isArray(q.thumbs) && q.thumbs.length) {
+                var thumbsWrap = document.createElement('div');
+                thumbsWrap.className = 'nsr-thumbs';
+                if (q.thumbs.length === 2) thumbsWrap.classList.add('two');
+                q.thumbs.forEach(function(t) {
+                    var thumb = document.createElement('div');
+                    thumb.className = 'nsr-thumb';
+                    var img = document.createElement('img');
+                    img.src = t.src;
+                    img.alt = t.caption || '';
+                    img.loading = 'lazy';
+                    thumb.appendChild(img);
+                    var cap = document.createElement('div');
+                    cap.className = 'nsr-thumb-caption';
+                    cap.textContent = t.caption || '';
+                    thumb.appendChild(cap);
+                    thumbsWrap.appendChild(thumb);
+                });
+                card.appendChild(thumbsWrap);
+            }
+
+            // Note paragraph (italic, secondary)
+            if (q.note) {
+                var note = document.createElement('p');
+                note.className = 'nsr-q-note';
+                note.textContent = q.note;
+                card.appendChild(note);
+            }
+
+            // Options (full-width radio-style buttons)
+            var opts = document.createElement('div');
+            opts.className = 'nsr-options answer-buttons';
+            (q.options || []).forEach(function(opt, oIdx) {
+                var btn = document.createElement('button');
+                btn.className = 'btn-answer nsr-option-btn';
+                btn.dataset.value = opt.value;
+                btn.setAttribute('type', 'button');
+                if (answers[q.id].answer === opt.value) btn.classList.add('selected');
+
+                var marker = document.createElement('span');
+                marker.className = 'nsr-option-marker';
+                marker.textContent = String.fromCharCode(65 + oIdx); // A, B, C, D
+                btn.appendChild(marker);
+
+                var lblText = document.createElement('span');
+                lblText.textContent = opt.label;
+                btn.appendChild(lblText);
+
+                btn.addEventListener('click', function() {
+                    opts.querySelectorAll('.btn-answer').forEach(function(x) { x.classList.remove('selected'); });
+                    btn.classList.add('selected');
+                    answers[q.id].answer = opt.value;
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+                    updateValidationState();
+                    if (autosave) autosave.save();
+                });
+
+                opts.appendChild(btn);
+            });
+            card.appendChild(opts);
+
+            // Always-visible notes
+            var notesWrap = document.createElement('div');
+            notesWrap.className = 'nsr-notes notes-area visible';
+            var lbl = document.createElement('label');
+            lbl.textContent = 'Notes (optional):';
+            notesWrap.appendChild(lbl);
+            var ta = document.createElement('textarea');
+            ta.placeholder = 'Any context, caveats, follow-ups…';
+            ta.setAttribute('aria-label', 'Notes');
+            if (answers[q.id].notes) ta.value = answers[q.id].notes;
+            ta.addEventListener('input', function() {
+                answers[q.id].notes = ta.value;
+                if (autosave) autosave.save();
+            });
+            notesWrap.appendChild(ta);
+            card.appendChild(notesWrap);
+
+            container.appendChild(card);
+        });
+
+        // ---- Validation error ----
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // ---- Submit ----
+        var divFinal = document.createElement('hr');
+        divFinal.className = 'section-divider';
+        container.appendChild(divFinal);
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong &mdash; please let me know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var unanswered = updateValidationState();
+
+            document.querySelectorAll('.nsr-q-card').forEach(function(c) {
+                var k = c.dataset.key;
+                if (k && answers[k] && answers[k].answer === null) c.classList.add('missing');
+                else c.classList.remove('missing');
+            });
+
+            if (unanswered.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One question still needs an answer — it’s highlighted above.'
+                    : unanswered.length + ' questions still need answers — they’re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.nsr-q-card.missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            var ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            // Build structured response payload
+            var picks = questions.map(function(q) {
+                return {
+                    id: q.id,
+                    title: q.title,
+                    answer: answers[q.id].answer,
+                    notes: answers[q.id].notes || ''
+                };
+            });
+
+            var ok = await window.submitMission(tokenRecord, { picks: picks }, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answers';
+                document.getElementById('error-message').classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Start autosave ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // ---- Restore draft state into rendered DOM ----
+        if (draft && Array.isArray(draft.cards)) {
+            draft.cards.forEach(function(entry) {
+                var k = entry.key;
+                if (!k) return;
+                var card = container.querySelector('[data-key="' + k + '"]');
+                if (!card) return;
+                if (entry.answer !== null && entry.answer !== undefined) {
+                    var btn = card.querySelector('[data-value="' + entry.answer + '"]');
+                    if (btn) {
+                        btn.classList.add('selected');
+                        card.classList.add('answered');
+                    }
+                }
+                if (entry.notes) {
+                    var ta = card.querySelector('textarea');
+                    if (ta) ta.value = entry.notes;
+                }
+            });
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
