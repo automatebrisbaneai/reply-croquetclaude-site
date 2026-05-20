@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing system review — decisions — CroquetClaude</title>
+    <meta name="description" content="Five decisions on the writing-system review, plus a direction pick.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---- Mission-scoped styles: writing-system-review-2026-05 ---- */
+
+        .q-card {
+            background: #fff;
+            border: 1px solid #e0d8c8;
+            border-radius: 12px;
+            padding: 1.75rem 1.75rem 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .q-card.answered {
+            border-color: #2d6a4f;
+        }
+
+        .q-card.missing {
+            border-color: #b83227;
+            box-shadow: 0 0 0 2px rgba(184,50,39,0.15);
+        }
+
+        .q-heading {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 0.35rem;
+        }
+
+        .q-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0 0 1.1rem;
+            line-height: 1.55;
+        }
+
+        /* Direction buttons: stacked full-width with label + description */
+        .btn-direction {
+            display: block;
+            width: 100%;
+            padding: 0.85rem 1.1rem;
+            border: 1.5px solid #c8c0b0;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-direction:hover {
+            background: #f5f2eb;
+            border-color: #a09080;
+        }
+
+        .btn-direction.selected {
+            background: #f0f7f4;
+            border-color: #2d6a4f;
+            color: #1a3d2a;
+        }
+
+        .btn-direction .dir-label {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .btn-direction .dir-meta {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-direction.selected .dir-meta {
+            color: #2d6a4f;
+        }
+
+        /* Standard pick buttons */
+        .btn-q {
+            padding: 0.5rem 1rem;
+            border: 1.5px solid #2d6a4f;
+            border-radius: 6px;
+            background: #fff;
+            color: #2d6a4f;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        .btn-q:hover {
+            background: #f0f7f4;
+        }
+
+        .btn-q.selected {
+            background: #2d6a4f;
+            color: #fff;
+            border-color: #2d6a4f;
+        }
+
+        .q-reveal {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .q-reveal.visible {
+            display: block;
+        }
+
+        .q-reveal label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+        }
+
+        .q-reveal textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #d0c8b8;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            box-sizing: border-box;
+            background: #fefae0;
+        }
+
+        .q-reveal textarea:focus {
+            outline: 2px solid #2d6a4f;
+            outline-offset: 1px;
+        }
+
+        .q-freetext-area {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #d0c8b8;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            box-sizing: border-box;
+            background: #fefae0;
+        }
+
+        .q-freetext-area:focus {
+            outline: 2px solid #2d6a4f;
+            outline-offset: 1px;
+        }
+
+        .q-freetext-area.required-empty {
+            border-color: #b83227;
+        }
+
+        .q-number {
+            display: inline-block;
+            background: #bc6c25;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            padding: 0.15rem 0.55rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .q-number.direction-badge {
+            background: #2d6a4f;
+        }
+
+        @media (max-width: 480px) {
+            .q-card {
+                padding: 1.25rem 1.1rem 1.1rem;
+            }
+            .btn-q {
+                font-size: 0.85rem;
+                padding: 0.45rem 0.85rem;
+            }
+            .btn-direction {
+                font-size: 0.86rem;
+                padding: 0.75rem 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Writing system review</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: writing-system-review-2026-05
+    // Six cards: direction pick (Q1) + 5 structured decisions.
+    // Q2 (triggering piece) is required free-text.
+    // Q6 (anything else) is optional free-text.
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        const respondentName = tokenRecord.respondent_name || 'Wade';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+
+        // Answer state
+        const answers = {
+            q1: { answer: null, notes: '' },
+            q2: { answer: null, notes: '' },
+            q3: { answer: null, notes: '' },
+            q4: { answer: null, notes: '' },
+            q5: { answer: null, notes: '' },
+            q6: { answer: null, notes: '' }
+        };
+
+        // Q6 is optional; Q2 required as non-empty text; q1/q3/q4/q5 required radio
+        const requiredRadio = ['q1', 'q3', 'q4', 'q5'];
+        const requiredFreetext = ['q2'];
+
+        // Pre-load answers from draft
+        if (draft && draft.questions) {
+            Object.keys(draft.questions).forEach(function(k) {
+                if (answers.hasOwnProperty(k)) {
+                    var d = draft.questions[k];
+                    if (d.answer !== undefined) answers[k].answer = d.answer;
+                    if (d.notes !== undefined) answers[k].notes = d.notes;
+                }
+            });
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            var questions = {};
+            Object.keys(answers).forEach(function(k) {
+                questions[k] = {
+                    answer: answers[k].answer || null,
+                    notes: answers[k].notes || ''
+                };
+            });
+            return { questions: questions };
+        }
+
+        function updateValidation() {
+            var missing = [];
+            requiredRadio.forEach(function(k) {
+                if (answers[k].answer === null) missing.push(k);
+            });
+            requiredFreetext.forEach(function(k) {
+                if (!answers[k].answer || answers[k].answer.trim() === '') missing.push(k);
+            });
+            return missing;
+        }
+
+        function makeReveal(labelText, questionKey) {
+            var div = document.createElement('div');
+            div.className = 'q-reveal';
+
+            var lbl = document.createElement('label');
+            lbl.textContent = labelText;
+            div.appendChild(lbl);
+
+            var ta = document.createElement('textarea');
+            ta.placeholder = 'Type here…';
+            ta.value = answers[questionKey].notes || '';
+            ta.addEventListener('input', function() {
+                answers[questionKey].notes = ta.value;
+                if (autosave) autosave.save();
+            });
+            div.appendChild(ta);
+            return div;
+        }
+
+        // ---- Card 1: Direction pick (stacked full-width buttons) ----
+        function makeDirectionCard() {
+            var card = document.createElement('div');
+            card.className = 'q-card';
+            card.dataset.key = 'q1';
+
+            var num = document.createElement('div');
+            num.className = 'q-number direction-badge';
+            num.textContent = 'Direction';
+            card.appendChild(num);
+
+            var h = document.createElement('div');
+            h.className = 'q-heading';
+            h.textContent = 'Which option to pursue?';
+            card.appendChild(h);
+
+            var sub = document.createElement('p');
+            sub.className = 'q-subtitle';
+            sub.textContent = 'Pick one. The full options are in projects/writing-system-review/README.md — summaries below.';
+            card.appendChild(sub);
+
+            var directions = [
+                {
+                    value: 'A',
+                    label: 'A. Add to what we have.',
+                    meta: 'Anti-marketing rules in Writing Guide. Wire blader-humanizer into /proofread. Add promotional-register measure to scorecard. ~1 day. No new infra.'
+                },
+                {
+                    value: 'B',
+                    label: 'B. Reshape the wiring.',
+                    meta: '/write auto-hands-off to humanizer. Drop pipeline.py from disk. /proofread runs scorecard second. ~1 day. Less surface.'
+                },
+                {
+                    value: 'C',
+                    label: 'C. Rewrite with a different shape.',
+                    meta: 'Single-pass with stronger system prompt. Scorecard diagnostic-only. Wade’s published Substack as voice anchor. 2–3 days.'
+                },
+                {
+                    value: 'D',
+                    label: 'D. Compose OSS + build state-check pass.',
+                    meta: 'Writer → Fingerprint-anchor → Subtract → State-check → Inject → Score. 2–3 days. Highest leverage on marketing/teasing failure. The state-check pass is the new bit.'
+                }
+            ];
+
+            directions.forEach(function(dir) {
+                var b = document.createElement('button');
+                b.className = 'btn-direction btn-answer';
+                b.setAttribute('type', 'button');
+                b.dataset.value = dir.value;
+
+                var labelEl = document.createElement('span');
+                labelEl.className = 'dir-label';
+                labelEl.textContent = dir.label;
+
+                var metaEl = document.createElement('span');
+                metaEl.className = 'dir-meta';
+                metaEl.textContent = dir.meta;
+
+                b.appendChild(labelEl);
+                b.appendChild(metaEl);
+
+                // Restore from draft
+                if (answers['q1'].answer === dir.value) {
+                    b.classList.add('selected');
+                    card.classList.add('answered');
+                }
+
+                b.addEventListener('click', function() {
+                    card.querySelectorAll('.btn-direction').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers['q1'].answer = dir.value;
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+
+                    var rev = card.querySelector('.q-reveal');
+                    if (rev) rev.classList.add('visible');
+
+                    updateValidation();
+                    if (autosave) autosave.save();
+                });
+
+                card.appendChild(b);
+            });
+
+            // Notes reveal (shown after any pick)
+            var reveal = makeReveal('Anything to add about this direction:', 'q1');
+            if (answers['q1'].answer !== null) {
+                reveal.classList.add('visible');
+            }
+            card.appendChild(reveal);
+
+            return card;
+        }
+
+        // ---- Card 2: Triggering piece (required free-text) ----
+        function makeTriggerCard() {
+            var card = document.createElement('div');
+            card.className = 'q-card';
+            card.dataset.key = 'q2';
+
+            var num = document.createElement('div');
+            num.className = 'q-number';
+            num.textContent = 'Q2 of 5';
+            card.appendChild(num);
+
+            var h = document.createElement('div');
+            h.className = 'q-heading';
+            h.textContent = 'Which output triggered this?';
+            card.appendChild(h);
+
+            var sub = document.createElement('p');
+            sub.className = 'q-subtitle';
+            sub.textContent = 'Which recent piece showed the marketing/teasing tone you flagged? Name it, paste a sentence or two, or both. We’ll use it as a test case for the state-check pass.';
+            card.appendChild(sub);
+
+            var ta = document.createElement('textarea');
+            ta.className = 'q-freetext-area';
+            ta.rows = 5;
+            ta.placeholder = 'Name the piece or paste the offending sentences here…';
+            ta.value = answers['q2'].answer || '';
+            ta.addEventListener('input', function() {
+                answers['q2'].answer = ta.value;
+                if (ta.value.trim() !== '') {
+                    ta.classList.remove('required-empty');
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+                }
+                if (autosave) autosave.save();
+            });
+            if (answers['q2'].answer && answers['q2'].answer.trim() !== '') {
+                card.classList.add('answered');
+            }
+            card.appendChild(ta);
+
+            return card;
+        }
+
+        // ---- Generic radio card builder ----
+        function makeRadioCard(questionKey, numberLabel, heading, subtitle, buttons, revealConfig) {
+            var card = document.createElement('div');
+            card.className = 'q-card';
+            card.dataset.key = questionKey;
+
+            var num = document.createElement('div');
+            num.className = 'q-number';
+            num.textContent = numberLabel;
+            card.appendChild(num);
+
+            var h = document.createElement('div');
+            h.className = 'q-heading';
+            h.textContent = heading;
+            card.appendChild(h);
+
+            var sub = document.createElement('p');
+            sub.className = 'q-subtitle';
+            sub.textContent = subtitle;
+            card.appendChild(sub);
+
+            var btnRow = document.createElement('div');
+            btnRow.className = 'q-buttons answer-buttons';
+            card.appendChild(btnRow);
+
+            var reveal = null;
+            if (revealConfig) {
+                reveal = makeReveal(revealConfig.label, questionKey);
+                if (answers[questionKey].answer !== null) {
+                    reveal.classList.add('visible');
+                }
+                card.appendChild(reveal);
+            }
+
+            buttons.forEach(function(btnDef) {
+                var b = document.createElement('button');
+                b.className = 'btn-q btn-answer';
+                b.setAttribute('type', 'button');
+                b.textContent = btnDef.label;
+                b.dataset.value = btnDef.value;
+
+                if (answers[questionKey].answer === btnDef.value) {
+                    b.classList.add('selected');
+                    card.classList.add('answered');
+                }
+
+                b.addEventListener('click', function() {
+                    btnRow.querySelectorAll('.btn-q').forEach(function(x) {
+                        x.classList.remove('selected');
+                    });
+                    b.classList.add('selected');
+                    answers[questionKey].answer = btnDef.value;
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+
+                    if (reveal && revealConfig) {
+                        reveal.classList.add('visible');
+                        var ta = reveal.querySelector('textarea');
+                        if (ta) ta.focus();
+                    }
+
+                    updateValidation();
+                    if (autosave) autosave.save();
+                });
+
+                btnRow.appendChild(b);
+            });
+
+            return card;
+        }
+
+        // ---- Card 6: Optional free-text ----
+        function makeOptionalCard() {
+            var card = document.createElement('div');
+            card.className = 'q-card';
+            card.dataset.key = 'q6';
+            card.dataset.optional = 'true';
+
+            var num = document.createElement('div');
+            num.className = 'q-number';
+            num.textContent = 'Optional';
+            card.appendChild(num);
+
+            var h = document.createElement('div');
+            h.className = 'q-heading';
+            h.textContent = 'Anything else';
+            card.appendChild(h);
+
+            var sub = document.createElement('p');
+            sub.className = 'q-subtitle';
+            sub.textContent = 'Anything else to add before I start building? Submit fires regardless.';
+            card.appendChild(sub);
+
+            var ta = document.createElement('textarea');
+            ta.className = 'q-freetext-area';
+            ta.rows = 6;
+            ta.placeholder = 'Optional — leave blank if nothing to add.';
+            ta.value = answers['q6'].answer || '';
+            ta.addEventListener('input', function() {
+                answers['q6'].answer = ta.value;
+                if (autosave) autosave.save();
+            });
+            card.appendChild(ta);
+
+            return card;
+        }
+
+        // ---- Build the DOM ----
+        var app = document.getElementById('app');
+        var container = document.createElement('div');
+        container.className = 'container';
+
+        // Opener
+        var opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>' + firstName + ' — five decisions on the writing-system review, plus a direction pick at the top. The mapped system and the GitHub survey are in <code>projects/writing-system-review/</code>. This page is the structured place to land your calls.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> ' +
+            'Your answers save automatically as you go. Close the tab and come back any time — the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        // Card 1 -- Direction pick
+        container.appendChild(makeDirectionCard());
+
+        // Card 2 -- Triggering piece
+        container.appendChild(makeTriggerCard());
+
+        // Card 3 -- Writer roster
+        var q3 = makeRadioCard(
+            'q3',
+            'Q3 of 5',
+            'Writer roster',
+            'Is the 5-writer pick (Hitchens / Orwell / Lewis / Gladwell / etc.) at /write Step 2 adding value?',
+            [
+                { label: 'Keep roster',  value: 'keep' },
+                { label: 'Drop roster',  value: 'drop' },
+                { label: 'Unsure',       value: 'unsure' }
+            ],
+            { label: 'What makes you think so?' }
+        );
+        container.appendChild(q3);
+
+        // Card 4 -- Scorecard
+        var q4 = makeRadioCard(
+            'q4',
+            'Q4 of 5',
+            '12-dimension scorecard',
+            'Keep the scorecard in /proofread?',
+            [
+                { label: 'Keep as is',       value: 'keep' },
+                { label: 'Diagnostic only',  value: 'diagnostic' },
+                { label: 'Drop it',          value: 'drop' }
+            ],
+            { label: 'Why?' }
+        );
+        container.appendChild(q4);
+
+        // Card 5 -- Humanizer pass
+        var q5 = makeRadioCard(
+            'q5',
+            'Q5 of 5',
+            'Humanizer pass',
+            'Run the humanizer/blader prompt on every /write draft, or only when asked?',
+            [
+                { label: 'Automatic',    value: 'automatic' },
+                { label: 'On request',   value: 'on-request' },
+                { label: 'Drop both',    value: 'drop' }
+            ],
+            { label: 'Anything specific?' }
+        );
+        container.appendChild(q5);
+
+        // Card 6 -- Anything else (optional)
+        container.appendChild(makeOptionalCard());
+
+        // Validation error display
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // Submit section
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var unanswered = updateValidation();
+
+            document.querySelectorAll('.q-card').forEach(function(card) {
+                var k = card.dataset.key;
+                var isOptional = card.dataset.optional === 'true';
+                if (!isOptional && k && unanswered.indexOf(k) !== -1) {
+                    card.classList.add('missing');
+                    var ta = card.querySelector('.q-freetext-area');
+                    if (ta) ta.classList.add('required-empty');
+                } else {
+                    card.classList.remove('missing');
+                    var ta = card.querySelector('.q-freetext-area');
+                    if (ta) ta.classList.remove('required-empty');
+                }
+            });
+
+            if (unanswered.length > 0) {
+                var ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One question still needs an answer — it’s highlighted above.'
+                    : unanswered.length + ' questions still need answers — they’re highlighted above.';
+                ve.classList.add('visible');
+                var firstMissing = document.querySelector('.q-card.missing');
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            var ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            var responsePayload = buildPayload();
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answers';
+                var em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // Mount
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // Initialise autosave after DOM is mounted
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // Show draft-restored notice if draft was present
+        if (draft && draft.questions) {
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
