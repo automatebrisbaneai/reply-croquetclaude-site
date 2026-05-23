@@ -351,9 +351,12 @@ window.submitMission = submitMission;
 window.createAutosave = createAutosave;
 window.showDraftRestoredNotice = showDraftRestoredNotice;
 
-// Voice input is now handled by /shared/voice-to-text.js (Phase 2 swap, 2026-04-19).
-// Templates call VoiceToText.init({ target: ta, cleanUrl: null }) directly after
-// creating each textarea. No DOMContentLoaded auto-attach needed here.
+// Voice input is loaded cross-domain from https://talk.croquetwade.com/shared/voice-to-text.js
+// (Phase 2 single-source migration, 2026-05-24). Templates call
+// VoiceToText.init({ target: ta, cleanUrl: 'https://talk.croquetwade.com/clean' })
+// directly after creating each textarea — that backend's served JS injects
+// window.VTT_EXTRA_HEADERS automatically with the auth token.
+// No DOMContentLoaded auto-attach needed here.
 
 // KILL SWITCH: uncomment if shared voice-to-text.js regresses.
 // Delete after one deploy cycle (post 2026-04-21).
