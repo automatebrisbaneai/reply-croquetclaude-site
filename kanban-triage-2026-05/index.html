@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban backlog triage — CroquetClaude</title>
+    <meta name="description" content="Triage 69 unboardable plans. Pick per plan: scaffold a board, drop, or leave for later.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ---- Mission-specific styles: kanban-triage-2026-05 ---- */
+
+        .triage-card {
+            background: #fff;
+            border: 1px solid rgba(115, 24, 44, 0.12);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+
+        .triage-card.answered {
+            border-color: rgba(130, 178, 94, 0.4);
+        }
+
+        .triage-card.missing {
+            border-color: #b83227;
+            box-shadow: 0 0 0 2px rgba(184, 50, 39, 0.15);
+        }
+
+        .triage-slug {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #73182C;
+            margin-bottom: 6px;
+        }
+
+        .triage-meta {
+            font-size: 0.8rem;
+            color: #74694b;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .triage-meta a {
+            color: #74694b;
+            text-decoration: underline;
+            text-decoration-color: rgba(116, 105, 75, 0.4);
+        }
+
+        .triage-excerpt {
+            font-size: 0.9rem;
+            color: #37352F;
+            line-height: 1.55;
+            margin-bottom: 14px;
+            font-style: italic;
+        }
+
+        .triage-radios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .triage-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1.5px solid transparent;
+            transition: background 0.12s, border-color 0.12s;
+            user-select: none;
+        }
+
+        .triage-radio-label input[type="radio"] {
+            accent-color: #73182C;
+            margin: 0;
+        }
+
+        .triage-radio-label.opt-scaffold {
+            border-color: #82b25e;
+            color: #2d6a4f;
+        }
+
+        .triage-radio-label.opt-scaffold:has(input:checked),
+        .triage-radio-label.opt-scaffold.selected {
+            background: #82b25e;
+            color: #fff;
+        }
+
+        .triage-radio-label.opt-drop {
+            border-color: #b83227;
+            color: #b83227;
+        }
+
+        .triage-radio-label.opt-drop:has(input:checked),
+        .triage-radio-label.opt-drop.selected {
+            background: #b83227;
+            color: #fff;
+        }
+
+        .triage-radio-label.opt-skip {
+            border-color: rgba(116, 105, 75, 0.4);
+            color: #74694b;
+        }
+
+        .triage-radio-label.opt-skip:has(input:checked),
+        .triage-radio-label.opt-skip.selected {
+            background: rgba(116, 105, 75, 0.1);
+            border-color: #74694b;
+        }
+
+        .bulk-section {
+            background: #fff;
+            border: 1px solid rgba(115, 24, 44, 0.12);
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 8px;
+        }
+
+        .bulk-section h2 {
+            font-size: 1.1rem;
+            color: #73182C;
+            margin: 0 0 10px;
+        }
+
+        .bulk-section p {
+            font-size: 0.9rem;
+            color: #37352F;
+            line-height: 1.6;
+            margin: 0 0 16px;
+        }
+
+        .bulk-radios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .bulk-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1.5px solid transparent;
+            transition: background 0.12s, border-color 0.12s;
+            user-select: none;
+        }
+
+        .bulk-radio-label input[type="radio"] {
+            accent-color: #73182C;
+            margin: 0;
+        }
+
+        .bulk-radio-label.opt-drop-all {
+            border-color: #b83227;
+            color: #b83227;
+        }
+
+        .bulk-radio-label.opt-drop-all:has(input:checked),
+        .bulk-radio-label.opt-drop-all.selected {
+            background: #b83227;
+            color: #fff;
+        }
+
+        .bulk-radio-label.opt-leave {
+            border-color: rgba(116, 105, 75, 0.4);
+            color: #74694b;
+        }
+
+        .bulk-radio-label.opt-leave:has(input:checked),
+        .bulk-radio-label.opt-leave.selected {
+            background: rgba(116, 105, 75, 0.1);
+            border-color: #74694b;
+        }
+
+        .section-rule {
+            border: none;
+            border-top: 1px solid rgba(115, 24, 44, 0.1);
+            margin: 32px 0 28px;
+        }
+
+        .validation-error {
+            display: none;
+            color: #b83227;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .validation-error.visible {
+            display: block;
+        }
+
+        .error-message {
+            display: none;
+            color: #b83227;
+            font-size: 0.88rem;
+            margin-top: 8px;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .triage-radios {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .triage-radio-label {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .bulk-radios {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .bulk-radio-label {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Kanban backlog triage</span>
+    </header>
+
+    <div id="app">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: kanban-triage-2026-05
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        const seed = tokenRecord.payload_seed;
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+
+        const descriptive = (seed && seed.sections && seed.sections['descriptive']) || [];
+        const conversationalCount = (seed && seed.conversational_count) || 57;
+
+        // Track per-card answers: key = slug, value = 'scaffold'|'drop'|'skip'
+        // Default is 'skip' per brief ("Skip — review later" is default on)
+        const answers = {};
+        descriptive.forEach(function(plan) {
+            answers[plan.slug] = 'skip';
+        });
+
+        // Bulk conversational action — default 'leave'
+        var conversationalAction = 'leave';
+
+        // Pre-load from draft if present
+        if (draft) {
+            if (Array.isArray(draft.triage)) {
+                draft.triage.forEach(function(entry) {
+                    if (entry.slug && answers.hasOwnProperty(entry.slug)) {
+                        answers[entry.slug] = entry.action || 'skip';
+                    }
+                });
+            }
+            if (draft.conversational_action) {
+                conversationalAction = draft.conversational_action;
+            }
+        }
+
+        // ---- autosave (declared early; assigned after DOM mount) ----
+        var autosave = null;
+
+        function buildPayload() {
+            var triage = descriptive.map(function(plan) {
+                return { slug: plan.slug, action: answers[plan.slug] || 'skip' };
+            });
+            return {
+                triage: triage,
+                conversational_action: conversationalAction
+            };
+        }
+
+        // ---- Build DOM ----
+        const app = document.getElementById('app');
+        const container = document.createElement('div');
+        container.className = 'container';
+
+        // ---- Opener ----
+        const opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>Hi ' + firstName + ' — 69 plans were detected over the past 3 weeks but never got sub-boards. Triage the real ones; bulk-drop the rest.</p>' +
+            '<p>Pick per plan: scaffold a board, drop, or leave for later. Conversational inline plans (57 of them) get bulk-handled at the bottom.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">&#9998;</span> Your answers save automatically as you go. Close the tab and come back any time — the link picks up where you left off until you press <em>Apply triage</em>.</p>';
+        container.appendChild(opener);
+
+        // ---- Descriptive plans heading ----
+        const ruleTop = document.createElement('hr');
+        ruleTop.className = 'section-rule';
+        container.appendChild(ruleTop);
+
+        const headMain = document.createElement('h2');
+        headMain.className = 'section-heading';
+        headMain.textContent = 'Descriptive plans (' + descriptive.length + ')';
+        container.appendChild(headMain);
+
+        const subMain = document.createElement('p');
+        subMain.className = 'section-subtitle';
+        subMain.textContent = 'Each has a named slug and a plan file. Pick one action per plan.';
+        container.appendChild(subMain);
+
+        // ---- Plan cards ----
+        function buildCard(plan) {
+            const card = document.createElement('div');
+            card.className = 'triage-card';
+            card.dataset.slug = plan.slug;
+
+            const slugEl = document.createElement('div');
+            slugEl.className = 'triage-slug';
+            slugEl.textContent = plan.slug;
+            card.appendChild(slugEl);
+
+            const meta = document.createElement('div');
+            meta.className = 'triage-meta';
+
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = 'Detected ' + plan.detected;
+            meta.appendChild(dateSpan);
+
+            if (plan.plan_path) {
+                const pathSpan = document.createElement('span');
+                const obsidianUri = 'obsidian://open?path=' + encodeURIComponent(plan.plan_path);
+                const pathLink = document.createElement('a');
+                pathLink.href = obsidianUri;
+                pathLink.textContent = plan.plan_path.split('\\').pop().split('/').pop();
+                pathLink.title = plan.plan_path;
+                pathSpan.appendChild(pathLink);
+                meta.appendChild(pathSpan);
+            }
+
+            card.appendChild(meta);
+
+            if (plan.excerpt) {
+                const excerpt = document.createElement('div');
+                excerpt.className = 'triage-excerpt';
+                var clipped = plan.excerpt.length > 200 ? plan.excerpt.slice(0, 200) + '…' : plan.excerpt;
+                excerpt.textContent = clipped;
+                card.appendChild(excerpt);
+            }
+
+            // Radio buttons
+            const radioGroup = document.createElement('div');
+            radioGroup.className = 'triage-radios';
+            radioGroup.setAttribute('role', 'radiogroup');
+            radioGroup.setAttribute('aria-label', 'Action for ' + plan.slug);
+
+            var currentAnswer = answers[plan.slug] || 'skip';
+
+            var opts = [
+                { value: 'scaffold', label: 'Scaffold board',      cls: 'opt-scaffold' },
+                { value: 'drop',     label: 'Drop from queue',     cls: 'opt-drop'     },
+                { value: 'skip',     label: 'Skip — review later', cls: 'opt-skip' }
+            ];
+
+            opts.forEach(function(opt) {
+                var lbl = document.createElement('label');
+                lbl.className = 'triage-radio-label ' + opt.cls;
+                if (currentAnswer === opt.value) { lbl.classList.add('selected'); }
+
+                var radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'plan-' + plan.slug;
+                radio.value = opt.value;
+                radio.checked = (currentAnswer === opt.value);
+
+                radio.addEventListener('change', function() {
+                    if (radio.checked) {
+                        answers[plan.slug] = opt.value;
+                        radioGroup.querySelectorAll('.triage-radio-label').forEach(function(l) {
+                            l.classList.remove('selected');
+                        });
+                        lbl.classList.add('selected');
+                        if (opt.value === 'scaffold' || opt.value === 'drop') {
+                            card.classList.add('answered');
+                        } else {
+                            card.classList.remove('answered');
+                        }
+                        card.classList.remove('missing');
+                        if (autosave) autosave.save();
+                    }
+                });
+
+                lbl.appendChild(radio);
+                lbl.appendChild(document.createTextNode(' ' + opt.label));
+                radioGroup.appendChild(lbl);
+            });
+
+            card.appendChild(radioGroup);
+
+            if (currentAnswer === 'scaffold' || currentAnswer === 'drop') {
+                card.classList.add('answered');
+            }
+
+            return card;
+        }
+
+        const cardsGrid = document.createElement('div');
+        cardsGrid.className = 'cards-grid';
+        descriptive.forEach(function(plan) {
+            cardsGrid.appendChild(buildCard(plan));
+        });
+        container.appendChild(cardsGrid);
+
+        // ---- Conversational bulk section ----
+        var ruleMid = document.createElement('hr');
+        ruleMid.className = 'section-rule';
+        container.appendChild(ruleMid);
+
+        var bulkSection = document.createElement('div');
+        bulkSection.className = 'bulk-section';
+
+        var bulkHead = document.createElement('h2');
+        bulkHead.textContent = 'Conversational plans (' + conversationalCount + ')';
+        bulkSection.appendChild(bulkHead);
+
+        var bulkDesc = document.createElement('p');
+        bulkDesc.textContent = 'These are short inline plans you talked through during sessions — slugs like “ok-create-a-plan-…”, “yes-plan-to-…”. Almost certainly already executed live.';
+        bulkSection.appendChild(bulkDesc);
+
+        var bulkRadios = document.createElement('div');
+        bulkRadios.className = 'bulk-radios';
+        bulkRadios.setAttribute('role', 'radiogroup');
+        bulkRadios.setAttribute('aria-label', 'Action for conversational plans');
+
+        var bulkOpts = [
+            { value: 'drop_all', label: 'Drop all ' + conversationalCount, cls: 'opt-drop-all' },
+            { value: 'leave',    label: 'Leave them queued',              cls: 'opt-leave'    }
+        ];
+
+        bulkOpts.forEach(function(opt) {
+            var lbl = document.createElement('label');
+            lbl.className = 'bulk-radio-label ' + opt.cls;
+            if (conversationalAction === opt.value) { lbl.classList.add('selected'); }
+
+            var radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'conversational-action';
+            radio.value = opt.value;
+            radio.checked = (conversationalAction === opt.value);
+
+            radio.addEventListener('change', function() {
+                if (radio.checked) {
+                    conversationalAction = opt.value;
+                    bulkRadios.querySelectorAll('.bulk-radio-label').forEach(function(l) {
+                        l.classList.remove('selected');
+                    });
+                    lbl.classList.add('selected');
+                    if (autosave) autosave.save();
+                }
+            });
+
+            lbl.appendChild(radio);
+            lbl.appendChild(document.createTextNode(' ' + opt.label));
+            bulkRadios.appendChild(lbl);
+        });
+
+        bulkSection.appendChild(bulkRadios);
+        container.appendChild(bulkSection);
+
+        // ---- Validation error + Submit ----
+        var ruleBottom = document.createElement('hr');
+        ruleBottom.className = 'section-rule';
+        container.appendChild(ruleBottom);
+
+        var validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        var submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        var draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        var submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Apply triage';
+
+        var errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please contact <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            var ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Saving…';
+
+            var triage = descriptive.map(function(plan) {
+                return { slug: plan.slug, action: answers[plan.slug] || 'skip' };
+            });
+
+            var responsePayload = {
+                triage: triage,
+                conversational_action: conversationalAction
+            };
+
+            var ok = await window.submitMission(tokenRecord, responsePayload, respondentName);
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Apply triage';
+                var em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Initialise autosave ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        // ---- Restore draft into DOM ----
+        if (draft) {
+            if (Array.isArray(draft.triage)) {
+                draft.triage.forEach(function(entry) {
+                    if (!entry.slug || !entry.action) return;
+                    var card = container.querySelector('[data-slug="' + entry.slug + '"]');
+                    if (!card) return;
+                    var radioInput = card.querySelector('input[value="' + entry.action + '"]');
+                    if (radioInput) {
+                        radioInput.checked = true;
+                        var lbl = radioInput.closest('.triage-radio-label');
+                        if (lbl) {
+                            card.querySelectorAll('.triage-radio-label').forEach(function(l) { l.classList.remove('selected'); });
+                            lbl.classList.add('selected');
+                        }
+                        if (entry.action === 'scaffold' || entry.action === 'drop') {
+                            card.classList.add('answered');
+                        } else {
+                            card.classList.remove('answered');
+                        }
+                    }
+                });
+            }
+            if (draft.conversational_action) {
+                var bulkRadioInput = bulkRadios.querySelector('input[value="' + draft.conversational_action + '"]');
+                if (bulkRadioInput) {
+                    bulkRadioInput.checked = true;
+                    var bulkLbl = bulkRadioInput.closest('.bulk-radio-label');
+                    if (bulkLbl) {
+                        bulkRadios.querySelectorAll('.bulk-radio-label').forEach(function(l) { l.classList.remove('selected'); });
+                        bulkLbl.classList.add('selected');
+                    }
+                }
+            }
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>

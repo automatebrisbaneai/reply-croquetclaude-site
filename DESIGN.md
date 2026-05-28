@@ -1,3 +1,99 @@
+---
+version: alpha
+name: reply.croquetclaude.com
+description: "A handwritten letter from CroquetClaude to the recipient. Editorial single-column reading layout, Cormorant Garamond display + Atkinson Hyperlegible body, paper-cream background, terracotta-asterisk avatar, rubber-stamp INCLUDE/DROP/UNSURE answer marks. Coach questions threaded inline as marginal queries. Picked for dynamic reply pages on reply.croquetclaude.com."
+colors:
+  primary: "#2d6a4f"
+  primary-deep: "#122d22"
+  primary-ink: "#1b4332"
+  background: "#fdf7e4"
+  paper-deep: "#f6ecc7"
+  paper-edge: "#e8dba8"
+  ink: "#1f2421"
+  ink-soft: "#3d4843"
+  ink-faint: "#707a73"
+  terracotta: "#bc6c25"
+  terracotta-deep: "#8e4f17"
+  stamp-drop: "#9e2a1e"
+typography:
+  body:
+    fontFamily: Atkinson Hyperlegible
+    fontSize: 1.0625rem
+    fontWeight: 400
+    lineHeight: 1.78
+  heading:
+    fontFamily: Cormorant Garamond
+    fontSize: 2.7rem
+    fontWeight: 600
+    lineHeight: 1.08
+  section-heading:
+    fontFamily: Cormorant Garamond
+    fontSize: 1.85rem
+    fontWeight: 500
+    lineHeight: 1.15
+  numeral:
+    fontFamily: Cormorant Garamond
+    fontSize: 4rem
+    fontWeight: 500
+    lineHeight: 1
+  opener:
+    fontFamily: Cormorant Garamond
+    fontSize: 1.275rem
+    fontWeight: 500
+    lineHeight: 1.62
+  meta:
+    fontFamily: Atkinson Hyperlegible
+    fontSize: 0.9rem
+    fontWeight: 400
+    lineHeight: 1.4
+  stamp:
+    fontFamily: Atkinson Hyperlegible
+    fontSize: 0.78rem
+    fontWeight: 700
+    letterSpacing: 0.18em
+rounded:
+  none: 0px
+components:
+  page-default:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.ink}"
+    typography: "{typography.body}"
+  display-heading:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.primary-ink}"
+    typography: "{typography.heading}"
+  section-numeral:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.primary-ink}"
+    typography: "{typography.numeral}"
+  opener-block:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.ink}"
+    typography: "{typography.opener}"
+  letterhead-bar:
+    backgroundColor: "{colors.primary-deep}"
+    textColor: "{colors.background}"
+  meta-block:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.ink-soft}"
+    typography: "{typography.meta}"
+  stamp-include:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.primary}"
+    typography: "{typography.stamp}"
+  stamp-drop:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.stamp-drop}"
+    typography: "{typography.stamp}"
+  stamp-unsure:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.terracotta-deep}"
+    typography: "{typography.stamp}"
+  paper-inset:
+    backgroundColor: "{colors.paper-deep}"
+    textColor: "{colors.ink}"
+---
+
 # DESIGN.md — reply.croquetclaude.com
 
 ## Creative concept (one sentence)

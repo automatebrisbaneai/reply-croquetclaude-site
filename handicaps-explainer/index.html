@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handicaps, defined — Wade Hart for CAQ</title>
+<meta name="description" content="A short explainer on what AI can and can't do for CAQ handicaps. Written by Wade Hart. Designed by CroquetClaude.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #f5efe3;
+  --cream-deep: #ebe3d0;
+  --ink: #1a1a1a;
+  --ink-soft: #4a463e;
+  --ink-mute: #6f6a5f;
+  --rule: #d6cdb8;
+  --green: #2d6a4f;
+  --green-deep: #1f4d38;
+  --green-wash: rgba(45, 106, 79, 0.10);
+  --amber: #bc6c25;
+  --amber-wash: rgba(188, 108, 37, 0.10);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html {
+  background: var(--cream);
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: var(--green-deep); }
+
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245, 239, 227, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  z-index: 100;
+}
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.wordmark img { height: 32px; width: auto; }
+.wordmark-text {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+.wordmark-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--rule);
+}
+.byline-mark {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+main { padding-top: 56px; }
+
+section.panel {
+  min-height: calc(100vh - 56px);
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  padding: 48px 48px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--rule);
+}
+section.panel:last-of-type { border-bottom: none; }
+
+.panel-inner {
+  max-width: 720px;
+  width: 100%;
+}
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--green);
+  margin: 0 0 22px 0;
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: clamp(28px, 4.4vw, 46px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin: 0 0 22px 0;
+  color: var(--ink);
+}
+h1.dense {
+  font-size: clamp(24px, 3.4vw, 38px);
+  line-height: 1.18;
+}
+h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--green-deep);
+}
+
+.panel-sub {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(17px, 2vw, 21px);
+  color: var(--ink-soft);
+  margin: -10px 0 26px 0;
+}
+
+p { margin: 0 0 18px 0; }
+ul, ol { margin: 0 0 22px 0; padding-left: 22px; }
+li { margin-bottom: 8px; }
+
+.thesis {
+  margin: 26px 0;
+  padding: 18px 22px;
+  background: var(--green-wash);
+  border-left: 3px solid var(--green);
+  font-family: 'Fraunces', serif;
+  font-size: clamp(18px, 2.1vw, 22px);
+  line-height: 1.35;
+  color: var(--green-deep);
+}
+.thesis strong { font-weight: 600; }
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 36px auto;
+  width: 56px;
+  position: relative;
+}
+.divider::after {
+  content: "✦";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cream);
+  padding: 0 8px;
+  color: var(--amber);
+  font-size: 12px;
+}
+
+.pull-quote {
+  margin: 22px 0 0;
+  padding: 16px 0 16px 20px;
+  border-left: 3px solid var(--amber);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.finding {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 16px;
+  margin: 0 0 14px 0;
+  padding: 12px 0 0 0;
+  border-top: 1px solid var(--rule);
+}
+.finding-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--amber);
+  line-height: 1;
+}
+.finding-body p { margin-bottom: 0; }
+
+.closing-line {
+  margin: 20px 0 0;
+  padding: 14px 20px;
+  background: var(--amber-wash);
+  border-left: 3px solid var(--amber);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.diagram {
+  margin: 10px 0 18px;
+  display: flex;
+  justify-content: center;
+}
+.diagram svg { width: 100%; max-width: 720px; height: auto; }
+.diagram.compact svg { max-width: 560px; }
+
+/* Outro */
+section.outro { text-align: center; }
+section.outro h1 { font-size: clamp(28px, 3.8vw, 40px); margin-bottom: 14px; }
+.short-version {
+  margin: 28px auto 32px;
+  max-width: 520px;
+  padding: 22px 24px;
+  background: var(--cream-deep);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(17px, 2vw, 21px);
+  line-height: 1.4;
+  color: var(--ink);
+}
+.short-version .label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--green);
+  margin-bottom: 8px;
+  font-style: normal;
+}
+.short-version em { font-style: italic; color: var(--green-deep); }
+.signoff {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+}
+.design-credit {
+  margin-top: 48px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* Diagram styles */
+.dg-figure { fill: var(--green-wash); stroke: var(--green); stroke-width: 1.5; }
+.dg-figure-label { font-family: 'Fraunces', serif; font-weight: 600; font-size: 17px; fill: var(--ink); }
+.dg-figure-sub { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; fill: var(--ink-soft); }
+.dg-arrow { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; stroke-dasharray: 5 5; }
+.dg-arrow-head { fill: var(--ink-soft); }
+.dg-connector { stroke: var(--green); stroke-width: 2.5; fill: none; }
+.dg-emits-label { font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; fill: var(--green-deep); }
+.dg-handoff-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; fill: var(--ink-mute); }
+.dg-q-bg { fill: var(--cream); stroke: var(--amber); stroke-width: 2; }
+.dg-q-text { font-family: 'Fraunces', serif; font-weight: 600; font-size: 22px; fill: var(--amber); }
+.dg-gap-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; fill: var(--ink-soft); }
+
+.dg-box { fill: var(--cream); stroke: var(--ink); stroke-width: 1.5; }
+.dg-box-text { font-family: 'IBM Plex Mono', monospace; font-size: 14px; fill: var(--ink); }
+.dg-solid-arrow { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+
+.dg-axis { stroke: var(--ink-soft); stroke-width: 1; }
+.dg-bell { fill: var(--green-wash); stroke: var(--green); stroke-width: 2; }
+.dg-tick { stroke: var(--amber); stroke-width: 3; }
+.dg-bell-label { font-family: 'Fraunces', serif; font-style: italic; font-size: 16px; fill: var(--green-deep); }
+.dg-tick-label { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; fill: var(--amber); opacity: 0.78; }
+.dg-axis-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; fill: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Mobile */
+@media (max-width: 720px) {
+  section.panel { padding: 40px 22px 56px; }
+  .header { padding: 0 14px; }
+  .wordmark-sub { display: none; }
+  .finding { grid-template-columns: 36px 1fr; gap: 14px; }
+  .finding-num { font-size: 28px; }
+  html { scroll-snap-type: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; scroll-snap-type: none; }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <a class="wordmark" href="https://croquetclaude.com">
+    <img src="../assets/drawn-claude.png" alt="">
+    <span class="wordmark-text">CroquetClaude</span>
+    <span class="wordmark-sub">Handicaps, defined</span>
+  </a>
+  <span class="byline-mark">Written by Wade Hart</span>
+</header>
+
+<main>
+
+<section class="panel" id="s1">
+  <div class="panel-inner">
+    <p class="eyebrow">01 — Who solves what</p>
+    <h1>We can solve <em>anything</em> that can be defined.</h1>
+    <p class="panel-sub">Most problems involve two kinds of expert.</p>
+    <div class="diagram" aria-label="Diagram: the domain expert defines the problem, which is then handed to the systems expert to solve.">
+      <svg viewBox="0 0 720 240" role="img">
+        <circle class="dg-figure" cx="100" cy="120" r="48"/>
+        <text class="dg-figure-label" x="100" y="196" text-anchor="middle">Domain expert</text>
+        <text class="dg-figure-sub" x="100" y="214" text-anchor="middle">croquet</text>
+
+        <text class="dg-emits-label" x="200" y="106" text-anchor="middle">defines</text>
+        <line class="dg-connector" x1="148" y1="120" x2="226" y2="120"/>
+
+        <circle class="dg-q-bg" cx="252" cy="120" r="24"/>
+        <text class="dg-q-text" x="252" y="128" text-anchor="middle">?</text>
+        <text class="dg-gap-label" x="252" y="166" text-anchor="middle">the problem</text>
+
+        <text class="dg-handoff-label" x="412" y="106" text-anchor="middle">handed to</text>
+        <line class="dg-arrow" x1="278" y1="120" x2="538" y2="120"/>
+        <polygon class="dg-arrow-head" points="538,114 552,120 538,126"/>
+
+        <circle class="dg-figure" cx="610" cy="120" r="48"/>
+        <text class="dg-figure-label" x="610" y="196" text-anchor="middle">Systems expert</text>
+        <text class="dg-figure-sub" x="610" y="214" text-anchor="middle">computers, legal, regulatory…</text>
+      </svg>
+    </div>
+    <p>Domain experts define the problem. The systems expert solves it. The communication between the two is the issue.</p>
+    <div class="thesis">
+      <strong>Defining the problem belongs to the domain expert.</strong> Without that piece, the systems expert has nothing to build.
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="s2">
+  <div class="panel-inner">
+    <p class="eyebrow">02 — Why we've been stuck</p>
+    <h1>The bit we've struggled with is <em>#1</em>: the definition.</h1>
+
+    <p>CAQ and I have struggled because of issue #1, which is the definition of the problem. I've tried to define problems myself and I've tried waiting for the definition to be given to me. Neither has jived.</p>
+
+    <hr class="divider">
+
+    <p>So with that framing in mind, the answer is: define what you want, and I'll #2 it (implement).</p>
+    <p>Where my value comes in is I have strong croquet knowledge as well, so you can ask me about handicaps in both senses, croquet and systems.</p>
+
+    <hr class="divider">
+
+    <p>When it's said <em>we need a croquet person to be Operating Officer</em>, what it's really saying is: we can't define our problems and we need someone who understands the domain and the systems to define the problem we can't, and put it together.</p>
+
+    <blockquote class="pull-quote">Rejecting a definition without replacing it with a new one leaves the systems expert with nothing to solve.</blockquote>
+  </div>
+</section>
+
+<section class="panel" id="s3">
+  <div class="panel-inner">
+    <p class="eyebrow">03 — Handicaps today</p>
+    <h1>Queensland handicaps are <em>two parts</em>.</h1>
+    <div class="diagram" aria-label="Diagram: player records details, then CAQ records number.">
+      <svg viewBox="0 0 720 140" role="img">
+        <rect class="dg-box" x="60" y="40" width="240" height="60" rx="4"/>
+        <text class="dg-box-text" x="180" y="76" text-anchor="middle">player records details</text>
+
+        <line class="dg-solid-arrow" x1="310" y1="70" x2="410" y2="70"/>
+        <polygon class="dg-arrow-head" points="410,64 422,70 410,76"/>
+
+        <rect class="dg-box" x="420" y="40" width="240" height="60" rx="4"/>
+        <text class="dg-box-text" x="540" y="76" text-anchor="middle">CAQ records number</text>
+      </svg>
+    </div>
+    <p>That's been how it is forever. It would've been some kind of hand-written ledger at the beginning. Now it's Claude reprising the role of number-writer.</p>
+    <p>In MyCroquet, currently, we record the number given to us by:</p>
+    <ul>
+      <li>players, or by</li>
+      <li>tournament managers</li>
+      <li>club captains</li>
+    </ul>
+    <p>Check for any likely problems. Update.</p>
+  </div>
+</section>
+
+<section class="panel" id="s4">
+  <div class="panel-inner">
+    <p class="eyebrow">04 — If you want to record the details</p>
+    <h1>Possible. But <em>how</em> is it going to be implemented?</h1>
+    <ul>
+      <li>Will everyone need to use the online system to match the games?</li>
+      <li>If a tournament manager does, then is one needed for every pennant game?</li>
+      <li>What happens when some people use it and others are on cards?</li>
+      <li>The numbers will never balance, so when they don't match, who is corrected?</li>
+    </ul>
+    <p>That's a thought-dump, not a proper implementation analysis. Already I see a LOT of really hard problems in there, mostly on the human side.</p>
+  </div>
+</section>
+
+<section class="panel" id="s5">
+  <div class="panel-inner">
+    <p class="eyebrow">05 — The maths</p>
+    <h1 class="dense">Looking at the (non-world-ranking) handicap system mathematically: <em>it does nothing</em>.</h1>
+
+    <div class="diagram compact" aria-label="Diagram: a wide bell curve labelled single-game variance plus or minus six points, with a small tick at the centre labelled career drift plus or minus two points.">
+      <svg viewBox="0 0 720 220" role="img">
+        <line class="dg-axis" x1="60" y1="160" x2="660" y2="160"/>
+        <line class="dg-axis" x1="80"  y1="156" x2="80"  y2="164"/>
+        <line class="dg-axis" x1="180" y1="156" x2="180" y2="164"/>
+        <line class="dg-axis" x1="280" y1="156" x2="280" y2="164"/>
+        <line class="dg-axis" x1="360" y1="152" x2="360" y2="168"/>
+        <line class="dg-axis" x1="440" y1="156" x2="440" y2="164"/>
+        <line class="dg-axis" x1="540" y1="156" x2="540" y2="164"/>
+        <line class="dg-axis" x1="640" y1="156" x2="640" y2="164"/>
+
+        <text class="dg-axis-label" x="80"  y="180" text-anchor="middle">−6</text>
+        <text class="dg-axis-label" x="180" y="180" text-anchor="middle">−4</text>
+        <text class="dg-axis-label" x="280" y="180" text-anchor="middle">−2</text>
+        <text class="dg-axis-label" x="360" y="180" text-anchor="middle">0</text>
+        <text class="dg-axis-label" x="440" y="180" text-anchor="middle">+2</text>
+        <text class="dg-axis-label" x="540" y="180" text-anchor="middle">+4</text>
+        <text class="dg-axis-label" x="640" y="180" text-anchor="middle">+6</text>
+        <text class="dg-axis-label" x="360" y="208" text-anchor="middle">handicap points from the player's mean</text>
+
+        <path class="dg-bell" d="M 80 160 C 200 160 240 36 360 18 C 480 36 520 160 640 160 Z"/>
+
+        <text class="dg-bell-label" x="360" y="12" text-anchor="middle">single-game variance ±6 points</text>
+
+        <line class="dg-tick" x1="320" y1="142" x2="400" y2="142" stroke-linecap="round"/>
+        <text class="dg-tick-label" x="360" y="134" text-anchor="middle">career drift ±2 points</text>
+      </svg>
+    </div>
+
+    <div class="finding">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <p>Vast majority of players relying on the system are in Division 3. Divisions have little use in practice. You can see this in different regions defining their divisions differently.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <p>Variance in play, rather than difference in handicap, is what decides outcomes. The handicap cluster shows most people have their middle-of-the-road level and just vary around that. Their game could deviate by 6 points (play like a 5 or an 11 in any single game), but over their whole career they'll be lucky to move 2 points.</p>
+      </div>
+    </div>
+
+    <p>A whole lot of effort is done to maintain a system that mathematically has no measurable conclusions that can be drawn. The variance is too high and sample sizes too low in the middle of the curve.</p>
+
+    <div class="closing-line">When variance drops and game numbers rise, we have the ELO-based world rankings.</div>
+  </div>
+</section>
+
+<section class="panel outro" id="end">
+  <div class="panel-inner">
+    <p class="eyebrow">— end of the long answer</p>
+    <h1>That's the long answer.</h1>
+    <div class="short-version">
+      <span class="label">— and the short one</span>
+      Any workflow that's defined can be done.<br>
+      The issue is in the <em>definition</em>.
+    </div>
+    <div><span class="signoff">— Wade</span></div>
+    <p class="design-credit">Designed by CroquetClaude</p>
+  </div>
+</section>
+
+</main>
+
+</body>
+</html>
