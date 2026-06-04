@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steering Document &mdash; CAQ</title>
+    <meta name="description" content="CAQ Steering Document &mdash; add your opening and closing, John.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* --------------------------------------------------------
+       Mission-scoped styles: steering-doc-proclamation-2026-06
+       Paper palette verbatim from apps/peg.py CSS const
+       -------------------------------------------------------- */
+    :root {
+        --paper:       #f6f3ec;
+        --ink:         #23201b;
+        --muted:       #7a7264;
+        --line:        #e2dccf;
+        --card:        #fffdf8;
+        --accent:      #3a6b4f;
+        --accent-soft: #e7efe8;
+        --shadow:      0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05);
+    }
+
+    body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .doc-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+    }
+
+    .doc-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 28px 34px;
+        box-shadow: var(--shadow);
+    }
+
+    .doc-card h1 {
+        font-size: 28px;
+        line-height: 1.25;
+        margin: 0 0 6px;
+    }
+    .doc-card h2 {
+        font-size: 20px;
+        line-height: 1.25;
+        margin: 0 0 4px;
+        color: var(--ink);
+    }
+    .doc-card .draft-line {
+        font-style: italic;
+        color: var(--muted);
+        margin: 0 0 28px;
+        font-size: 15px;
+    }
+    .doc-card p {
+        margin: 0 0 14px;
+        line-height: 1.65;
+    }
+    .doc-card ul {
+        margin: 8px 0 14px 0;
+        padding-left: 22px;
+    }
+    .doc-card li {
+        margin-bottom: 6px;
+        line-height: 1.6;
+    }
+    .doc-card strong {
+        color: var(--ink);
+    }
+    .doc-card hr {
+        border: none;
+        border-top: 1px solid var(--line);
+        margin: 24px 0;
+    }
+    .section-heading {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 28px 0 8px;
+        color: var(--ink);
+    }
+    .closing-attr {
+        font-style: italic;
+        color: var(--muted);
+        margin-top: 24px;
+        font-size: 15px;
+    }
+
+    /* Green guide block — matches Peg blockquote */
+    .guide-block {
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        margin: 0 0 12px;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        color: var(--muted);
+        font-size: 15px;
+    }
+    .guide-block .guide-label {
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 6px;
+    }
+    .guide-block p {
+        margin: 0 0 8px;
+        color: var(--muted);
+    }
+    .guide-block p:last-child { margin-bottom: 0; }
+    .guide-block ul {
+        margin: 6px 0 0 0;
+        padding-left: 20px;
+        color: var(--muted);
+    }
+    .guide-block li { margin-bottom: 4px; }
+
+    /* Write textarea */
+    .write-area {
+        width: 100%;
+        min-height: 10rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--card);
+        color: var(--ink);
+        resize: vertical;
+        box-sizing: border-box;
+        margin-bottom: 8px;
+        transition: border-color .15s ease;
+    }
+    .write-area:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(58,107,79,.12);
+    }
+    .write-area.error { border-color: #b83227; }
+
+    /* Validation */
+    .validation-msg {
+        color: #b83227;
+        font-size: 14px;
+        margin-bottom: 16px;
+        display: none;
+    }
+    .validation-msg.visible { display: block; }
+
+    /* Autosave indicator */
+    #draft-saved-indicator {
+        font-size: 13px;
+        color: var(--accent);
+        opacity: 0;
+        transition: opacity .3s;
+        margin-bottom: 4px;
+        display: block;
+    }
+    #draft-saved-indicator.visible { opacity: 1; }
+
+    /* Autosave footer */
+    .autosave-note {
+        font-size: 13px;
+        color: var(--muted);
+        font-style: italic;
+        border-top: 1px dashed var(--line);
+        padding-top: 12px;
+        margin-top: 24px;
+        margin-bottom: 16px;
+    }
+
+    /* Submit button */
+    .btn-submit {
+        display: block;
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        margin-top: 4px;
+        transition: filter .15s ease;
+    }
+    .btn-submit:hover { filter: brightness(1.08); }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; }
+
+    @media (max-width: 600px) {
+        .doc-card { padding: 20px 18px; }
+        .doc-card h1 { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Steering Document</span>
+    </header>
+
+    <div id="app">
+        <!-- Rendered by renderMission() -->
+    </div>
+
+    <!-- Static document skeleton: always visible, never depends on JS data -->
+    <template id="doc-skeleton">
+        <div class="doc-wrap">
+            <div class="doc-card">
+
+                <h1>Croquet Association of Queensland</h1>
+                <h2>Steering Document</h2>
+                <p class="draft-line" id="doc-subtitle">Draft proclamation for the term</p>
+
+                <!-- Opening write area -->
+                <div class="guide-block">
+                    <div class="guide-label">Your opening</div>
+                    <p>Write your opening here, in your own words. Points to cover:</p>
+                    <ul>
+                        <li>What this is: the steering document, setting out where I&#8217;m looking to take CAQ between now and November, and the manner in which it will happen.</li>
+                        <li>We need more people.</li>
+                        <li>We need to make helping out easier and more enjoyable.</li>
+                        <li>If we work together, we&#8217;ll get good things done quickly.</li>
+                    </ul>
+                </div>
+                <textarea id="ta-opening" class="write-area" placeholder="Write your opening here&#x2026;" aria-label="Your opening"></textarea>
+                <div id="err-opening" class="validation-msg">Please write your opening before submitting.</div>
+
+                <hr>
+
+                <p>Everything below rests on four ideals, and everything comes back to them.</p>
+
+                <div class="section-heading">The four ideals</div>
+                <ul>
+                    <li><strong>Enjoy croquet.</strong> Whatever you&#8217;re doing as a player, volunteer, coach or referee, enjoy it with enthusiasm.</li>
+                    <li><strong>Keep it simple.</strong> Outcomes over complexity. Do less admin and play more croquet.</li>
+                    <li><strong>Hit our aims.</strong> Purposeful decisions. What positive outcome will this bring? Do things that advance croquet.</li>
+                    <li><strong>Cooperate for croquet.</strong> Tolerance is expected. Not all people get along, but well mannered people can cope with that. We are here to enjoy croquet.</li>
+                </ul>
+
+                <div class="section-heading">Choosing what to do</div>
+                <p>We organise the work under six aims, and we run every decision through four questions: does it help people enjoy croquet, does it make things simpler, does it hit our aims, are we cooperating? If the answer is no, we don&#8217;t do it.</p>
+                <p>We are never short of good ideas. We are short of hands. So the discipline is to choose a few things that matter and finish them, rather than start everything and land none of it.</p>
+
+                <div class="section-heading">What we&#8217;re concentrating on this term</div>
+                <p>Three things have our weight this term.</p>
+                <ul>
+                    <li><strong>Communication.</strong> First we build a reliable way to reach all 1,500 members, through the news site and the members&#8217; newsletter. Nothing else works until we can talk to people, our members first and then the wider public.</li>
+                    <li><strong>Reducing admin.</strong> We take administrative load off CAQ and off clubs by simplifying the ways things are done. Volunteers are getting harder to find, so the work itself has to get lighter.</li>
+                    <li><strong>New members.</strong> We bring new people to club gates through Come and Try and advertising, and help clubs turn them into members. More members means more revenue, more hands around the club, more people to enjoy it with, and a few more future stars to beat NSW.</li>
+                </ul>
+
+                <hr>
+
+                <div class="section-heading">In the end</div>
+
+                <!-- Closing write area -->
+                <div class="guide-block">
+                    <div class="guide-label">Your closing</div>
+                    <p>Write your closing here, in your own words. Points to land:</p>
+                    <ul>
+                        <li>It all comes back to one thing: croquet is a game, and it&#8217;s meant to be enjoyed.</li>
+                        <li>Keep the admin simple so there&#8217;s more time to play, and make decisions in the open so people can get on with it.</li>
+                        <li>If you&#8217;re here to enjoy croquet there&#8217;s a place for you, whatever your standard and whatever your code. If not, it&#8217;s fair to go and find something you&#8217;d rather do. No hard feelings.</li>
+                        <li>Bring it home on the four ideals: enjoy croquet, keep it simple, hit our aims, cooperate. And play the game.</li>
+                    </ul>
+                </div>
+                <textarea id="ta-closing" class="write-area" placeholder="Write your closing here&#x2026;" aria-label="Your closing"></textarea>
+                <div id="err-closing" class="validation-msg">Please write your closing before submitting.</div>
+
+                <p class="closing-attr">John van Barneveld, President, Croquet Association of Queensland</p>
+
+                <div class="autosave-note">
+                    Your words save automatically as you type. Close the tab and come back any time &#8212; the link picks up where you left off until you press Send to Wade.
+                </div>
+
+                <span id="draft-saved-indicator">Saved</span>
+
+                <button class="btn-submit" id="btn-submit">Send to Wade</button>
+
+            </div>
+        </div>
+    </template>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: steering-doc-proclamation-2026-06
+    // John van Barneveld writes opening + closing of the steering document.
+    // -----------------------------------------------------------------------
+
+    window.renderMission = function(tokenRecord) {
+        var respondentName = tokenRecord.respondent_name || 'John';
+        var firstName = respondentName.split(' ')[0].split(',')[0];
+        var draft = tokenRecord.draft_payload || null;
+        var savedOpening = (draft && typeof draft.opening === 'string') ? draft.opening : '';
+        var savedClosing = (draft && typeof draft.closing === 'string') ? draft.closing : '';
+
+        // Clone the static skeleton into #app
+        var tpl = document.getElementById('doc-skeleton');
+        var clone = tpl.content.cloneNode(true);
+        var app = document.getElementById('app');
+        app.innerHTML = '';
+        app.appendChild(clone);
+
+        // Personalise subtitle
+        var subtitle = app.querySelector('#doc-subtitle');
+        if (subtitle) {
+            subtitle.textContent = 'Draft proclamation for the term — ' + firstName + ' van Barneveld, President';
+        }
+
+        // Pre-fill from saved draft
+        var taOpening = app.querySelector('#ta-opening');
+        var taClosing = app.querySelector('#ta-closing');
+        if (savedOpening) taOpening.value = savedOpening;
+        if (savedClosing) taClosing.value = savedClosing;
+
+        // Show draft-restored notice if content was restored
+        if ((savedOpening || savedClosing) && draft && draft._savedAt) {
+            var card = app.querySelector('.doc-card');
+            if (card) showDraftRestoredNotice(card, draft._savedAt);
+        }
+
+        // Autosave
+        var autosave = createAutosave(tokenRecord, function() {
+            return {
+                opening: taOpening.value,
+                closing: taClosing.value
+            };
+        });
+
+        taOpening.addEventListener('input', function() {
+            autosave.save();
+            this.classList.remove('error');
+            app.querySelector('#err-opening').classList.remove('visible');
+        });
+        taClosing.addEventListener('input', function() {
+            autosave.save();
+            this.classList.remove('error');
+            app.querySelector('#err-closing').classList.remove('visible');
+        });
+
+        // Submit
+        var btn = app.querySelector('#btn-submit');
+        btn.addEventListener('click', async function() {
+            var openingText = taOpening.value.trim();
+            var closingText = taClosing.value.trim();
+            var hasError = false;
+
+            if (!openingText) {
+                taOpening.classList.add('error');
+                app.querySelector('#err-opening').classList.add('visible');
+                hasError = true;
+            }
+            if (!closingText) {
+                taClosing.classList.add('error');
+                app.querySelector('#err-closing').classList.add('visible');
+                hasError = true;
+            }
+            if (hasError) {
+                taOpening.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Sending…';
+
+            var payload = { opening: openingText, closing: closingText };
+            var ok = await submitMission(tokenRecord, payload, respondentName);
+            if (!ok) {
+                btn.disabled = false;
+                btn.textContent = 'Send to Wade';
+                alert('Something went wrong — please try again. If the problem continues, email hello@croquetclaude.com.');
+            }
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
