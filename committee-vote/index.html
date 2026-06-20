@@ -75,11 +75,6 @@
       .cv-more-panel { margin-top:10px; padding:14px 16px; background:#faf7ef; border:1px solid var(--cv-line); border-radius:10px; font-size:16px; }
       .cv-more-panel p { margin:0 0 10px; } .cv-more-panel p:last-child { margin:0; }
       .cv-more-ask { color:var(--cv-muted); font-size:14px; font-style:italic; margin:0; }
-      .cv-no-hint { font-size:14px; color:var(--cv-muted); margin:10px 0 0; font-style:italic; }
-      .cv-cond { margin-top:14px; padding:14px 16px; background:#fbf2ee; border:1px solid #e8c9bf; border-radius:10px; }
-      .cv-cond-lbl { font-size:14.5px; color:#8b3a2b; font-weight:600; margin-bottom:8px; }
-      .cv-cond textarea { width:100%; min-height:80px; font-family:inherit; font-size:16px; padding:12px; border-radius:10px; border:2px solid #e8c9bf; background:#fffdfb; resize:vertical; }
-      .cv-cond textarea:focus { outline:none; border-color:#c0392b; }
       .cv-confirm { margin-top:14px; background:#eef6ef; border:1px solid #cfe5d2; color:#265c3a; border-radius:10px; padding:12px 14px; font-size:16px; }
       .cv-foot { margin-top:48px; color:var(--cv-muted); font-size:15px; border-top:3px solid var(--cv-gold-soft); padding-top:18px; }
       .cv-foot p { margin-bottom:8px; }
@@ -132,13 +127,12 @@
 
         // ---- state ----
         const answers = {};
-        decisions.forEach(function(d) { answers[d.id] = { type: d.type, answer: null, comment: '', condition: '', micro: {} }; });
+        decisions.forEach(function(d) { answers[d.id] = { type: d.type, answer: null, comment: '', micro: {} }; });
         if (draft && Array.isArray(draft.votes)) {
             draft.votes.forEach(function(v) {
                 if (!answers[v.id]) return;
                 answers[v.id].answer = (v.answer === undefined ? null : v.answer);
                 answers[v.id].comment = v.comment || '';
-                answers[v.id].condition = v.condition || '';
                 answers[v.id].micro = v.micro || {};
             });
         }
@@ -150,8 +144,7 @@
                 round: round,
                 votes: decisions.map(function(d) {
                     return { id: d.id, type: d.type, answer: answers[d.id].answer,
-                             comment: answers[d.id].comment || '', condition: answers[d.id].condition || '',
-                             micro: answers[d.id].micro };
+                             comment: answers[d.id].comment || '', micro: answers[d.id].micro };
                 }),
                 general_notes: gn ? gn.value : ''
             };
@@ -178,30 +171,7 @@
             return box;
         }
 
-        // ---- condition capture — turns a considered "no" into the committee's
-        // negotiating position ("we'd support this if ___"). Pre-created hidden so
-        // it sits right under the buttons; revealed whenever someone votes against. ----
-        function buildConditionBox(card, id, prompt) {
-            let box = card.querySelector('.cv-cond');
-            if (box) return box;
-            box = document.createElement('div');
-            box.className = 'cv-cond';
-            const lbl = document.createElement('div');
-            lbl.className = 'cv-cond-lbl';
-            lbl.textContent = prompt || 'What would make this a yes? Your terms become the committee’s position.';
-            const ta = document.createElement('textarea');
-            ta.placeholder = 'e.g. “Fine if it’s dropped back to what the law actually requires.” Type or press the mic.';
-            ta.value = answers[id].condition || '';
-            ta.addEventListener('input', function() { answers[id].condition = ta.value; if (autosave) autosave.save(); });
-            box.appendChild(lbl); box.appendChild(ta);
-            card.appendChild(box);
-            attachVoice(ta);
-            return box;
-        }
-        function showCondition(card) { const b = card.querySelector('.cv-cond'); if (b) { b.style.display = 'block'; const ta = b.querySelector('textarea'); if (ta) ta.focus(); } }
-        function hideCondition(card) { const b = card.querySelector('.cv-cond'); if (b) b.style.display = 'none'; }
-
-        // ---- soft card (Sounds right / Let's talk / I know something / No) ----
+        // ---- soft card (Sounds right / Let's talk / I know something) ----
         function buildSoft(d, card) {
             const row = document.createElement('div');
             row.className = 'cv-btnrow';
@@ -220,7 +190,6 @@
                     row.querySelectorAll('.cv-btn').forEach(function(x) { x.classList.remove('cv-selected'); });
                     b.classList.add('cv-selected');
                     answers[d.id].answer = def.v;
-                    hideCondition(card);
                     if (def.v === 'know_something') {
                         const box = buildSaybox(card, d.id, 'Tell me what you know. Type or press the mic.');
                         const ta = box.querySelector('textarea'); if (ta) ta.focus();
@@ -230,22 +199,7 @@
                 });
                 row.appendChild(b);
             });
-            // a considered "no" is welcome on any card — and it asks for your terms
-            const noBtn = document.createElement('button');
-            noBtn.type = 'button'; noBtn.className = 'cv-btn cv-against'; noBtn.dataset.value = 'no';
-            noBtn.textContent = '✕ I’d vote no';
-            noBtn.addEventListener('click', function() {
-                row.querySelectorAll('.cv-btn').forEach(function(x) { x.classList.remove('cv-selected'); });
-                noBtn.classList.add('cv-selected');
-                answers[d.id].answer = 'no';
-                showCondition(card);
-                markAnswered(card, d.id);
-                if (autosave) autosave.save();
-            });
-            row.appendChild(noBtn);
             card.appendChild(row);
-            // pre-create the condition box (hidden) so it sits right under the buttons
-            buildConditionBox(card, d.id); hideCondition(card);
             // optional note link for any answer
             const addNote = document.createElement('button');
             addNote.type = 'button'; addNote.className = 'cv-addnote'; addNote.textContent = '💬 Add a comment';
@@ -259,12 +213,11 @@
             if (answers[d.id].answer) {
                 const sel = row.querySelector('[data-value="' + answers[d.id].answer + '"]');
                 if (sel) sel.classList.add('cv-selected');
-                if (answers[d.id].answer === 'no' || answers[d.id].condition) { const b = card.querySelector('.cv-cond'); if (b) b.style.display = 'block'; }
             }
             if (answers[d.id].comment) { buildSaybox(card, d.id); addNote.style.display = 'none'; }
         }
 
-        // ---- motion card (For / Against / Abstain) — Against asks for the term ----
+        // ---- motion card (For / Against / Abstain) ----
         function buildMotion(d, card) {
             const row = document.createElement('div');
             row.className = 'cv-btnrow';
@@ -283,26 +236,12 @@
                     row.querySelectorAll('.cv-btn').forEach(function(x) { x.classList.remove('cv-selected'); });
                     b.classList.add('cv-selected');
                     answers[d.id].answer = def.v;
-                    if (def.v === 'against') {
-                        showCondition(card);
-                        addNote.style.display = 'none';
-                    } else {
-                        hideCondition(card);
-                        if (!answers[d.id].comment) addNote.style.display = '';
-                    }
                     markAnswered(card, d.id);
                     if (autosave) autosave.save();
                 });
                 row.appendChild(b);
             });
             card.appendChild(row);
-            // a considered "Against" is welcome here — and it sets our position
-            const hint = document.createElement('p');
-            hint.className = 'cv-no-hint';
-            hint.textContent = 'A clear “Against” is welcome. If you vote against, say what would make it a yes — that becomes the line we take back.';
-            card.appendChild(hint);
-            // pre-create the condition box (hidden) so it sits right under the buttons
-            buildConditionBox(card, d.id); hideCondition(card);
             const addNote = document.createElement('button');
             addNote.type = 'button'; addNote.className = 'cv-addnote'; addNote.textContent = '💬 Add a comment (optional)';
             addNote.addEventListener('click', function() {
@@ -314,7 +253,6 @@
             if (answers[d.id].answer) {
                 const sel = row.querySelector('[data-value="' + answers[d.id].answer + '"]');
                 if (sel) sel.classList.add('cv-selected');
-                if (answers[d.id].answer === 'against' || answers[d.id].condition) { const b = card.querySelector('.cv-cond'); if (b) b.style.display = 'block'; addNote.style.display = 'none'; }
             }
             if (answers[d.id].comment) { buildSaybox(card, d.id); addNote.style.display = 'none'; }
         }
@@ -332,20 +270,15 @@
                 const anyTalk = states.indexOf('talk') !== -1;
                 const allAgree = states.length > 0 && states.every(function(s) { return s === 'agree'; });
                 if (anyTalk) {
-                    // a flagged step is a located "no" — capture the term that would change it
                     answers[d.id].answer = 'talk';
                     verdictBox.style.display = 'none';
-                    const b = card.querySelector('.cv-cond'); if (b) b.style.display = 'block';
+                } else if (allAgree) {
+                    verdictBox.style.display = 'block';
+                    // answer set only when they confirm the verdict below
+                    if (answers[d.id].answer !== 'position' && answers[d.id].answer !== 'talk') answers[d.id].answer = null;
                 } else {
-                    hideCondition(card);
-                    if (allAgree) {
-                        verdictBox.style.display = 'block';
-                        // answer set only when they confirm the verdict below
-                        if (answers[d.id].answer !== 'position' && answers[d.id].answer !== 'talk') answers[d.id].answer = null;
-                    } else {
-                        answers[d.id].answer = null;
-                        verdictBox.style.display = 'none';
-                    }
+                    answers[d.id].answer = null;
+                    verdictBox.style.display = 'none';
                 }
                 markAnswered(card, d.id);
             }
@@ -420,8 +353,6 @@
             verdictBox.appendChild(vrow);
 
             card.appendChild(wrap);
-            buildConditionBox(card, d.id, 'What would need to change for you to agree? Your terms become the committee’s position.');
-            hideCondition(card);
             card.appendChild(verdictBox);
             recompute();
             if (answers[d.id].answer === 'position') bPos.classList.add('cv-selected');
@@ -450,7 +381,6 @@
                     rows = [['For', c.for || 0, ''], ['Against', c.against || 0, 'cv-bar-against'], ['Abstain', c.abstain || 0, 'cv-bar-mute']];
                 } else {
                     rows = [['Sounds right', c.sounds_right || 0, ''], ["Let's talk", c.talk || 0, 'cv-bar-mute'], ['Knows something', c.know_something || 0, 'cv-bar-mute']];
-                    if (c.no) rows.push(['No', c.no, 'cv-bar-against']);
                     if (c.position) rows.push(['Position settled', c.position, '']);
                 }
                 const max = Math.max(1, ...rows.map(function(r) { return r[1]; }));
@@ -546,7 +476,6 @@
             (closing ? '<p class="cv-dateline">Closing ' + closing + ' · kept current by CroquetClaude</p>' : '') +
             '<p class="cv-dateline" id="cv-responded"></p>' +
             '<div class="cv-note">Your answers are gathered for the committee, with your name on them. They feed the meeting, where the committee makes the final call. Nothing here is a binding vote on its own.</div>' +
-            '<div class="cv-note">A clear “no”, with your reasons, is one of the most useful things you can give the committee. It’s how we test a decision and set the line we’ll hold. Don’t be shy of it.</div>' +
             '</header>';
 
         decisions.forEach(function(d) {
