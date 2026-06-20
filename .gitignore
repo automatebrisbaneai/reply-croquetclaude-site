@@ -1,0 +1,4 @@
+# Dev/QA artefacts — never publish to the public reply-croquetclaude-site repo.
+_screens/
+*.pyc
+__pycache__/
