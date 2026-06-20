@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your CAQ committee page</title>
+    <meta name="description" content="What's waiting on you before the next committee meeting.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+      /* Committee-vote look — calmer green/cream/gold, layered on the shared sheet. */
+      :root {
+        --cv-green:#1b4d3e; --cv-green-soft:#2e6b57; --cv-gold:#b8860b;
+        --cv-gold-soft:#f3e7c8; --cv-line:#e7e0d2; --cv-muted:#6b6a60;
+      }
+      .cv-wrap { max-width: 680px; margin: 0 auto; padding: 0 20px 80px; }
+      .cv-head { padding: 36px 0 6px; }
+      .cv-eyebrow { color: var(--cv-gold); font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+      .cv-h1 { font-family: Georgia,'Times New Roman',serif; font-size: 36px; line-height: 1.15; color: var(--cv-green); font-weight: 400; }
+      .cv-lede { margin-top: 14px; font-size: 19px; }
+      .cv-lede strong { color: var(--cv-green); }
+      .cv-dateline { margin-top: 10px; color: var(--cv-muted); font-size: 15px; }
+      .cv-note { margin-top: 14px; padding: 12px 14px; background: var(--cv-gold-soft); border-radius: 8px; font-size: 15px; color: #6f5a14; }
+
+      .cv-card { background:#fff; border:1px solid var(--cv-line); border-radius:14px; padding:24px 22px; margin:18px 0; box-shadow:0 1px 4px rgba(60,50,20,.05); }
+      .cv-card.cv-answered { border-color: var(--cv-green-soft); background:#f7fbf8; }
+      .cv-card.cv-missing { border-color:#c0392b; background:#fdf0ee; }
+      .cv-card h3 { font-family:Georgia,serif; font-size:22px; line-height:1.25; color:#2b2b27; font-weight:600; margin-bottom:12px; }
+      .cv-card p { margin-bottom:12px; }
+      .cv-short { font-size:17px; }
+
+      .cv-gates { display:flex; align-items:center; gap:7px; margin:2px 0 14px; }
+      .cv-gates .cv-dot { width:12px; height:12px; border-radius:50%; background:var(--cv-line); }
+      .cv-gates .cv-dot.cv-full { background:var(--cv-green-soft); }
+      .cv-gates .cv-lbl { margin-left:8px; font-size:14px; color:var(--cv-muted); }
+
+      .cv-call { background:#f2f7f1; border-left:5px solid var(--cv-green-soft); padding:14px 16px; border-radius:0 10px 10px 0; margin:14px 0; }
+      .cv-call .cv-tag { font-size:12.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--cv-green-soft); font-weight:700; }
+      .cv-call p { margin:6px 0 0; font-size:18px; }
+
+      .cv-btnrow { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+      .cv-btn { font-family:inherit; font-size:16px; cursor:pointer; border-radius:999px; padding:12px 18px; border:2px solid var(--cv-green-soft); background:#fff; color:var(--cv-green-soft); transition:transform .08s, background .15s, color .15s; min-height:44px; }
+      .cv-btn:active { transform:scale(.97); }
+      .cv-btn.cv-primary { background:var(--cv-green-soft); color:#fff; }
+      .cv-btn.cv-selected { background:var(--cv-green); border-color:var(--cv-green); color:#fff; font-weight:700; }
+      .cv-btn.cv-against.cv-selected { background:#b83227; border-color:#8b241b; }
+      .cv-btn.cv-small { font-size:14px; padding:8px 14px; min-height:0; }
+
+      .cv-saybox { margin-top:14px; }
+      .cv-saybox textarea { width:100%; min-height:90px; font-family:inherit; font-size:16px; padding:12px; border-radius:10px; border:2px solid var(--cv-line); background:#fffdf8; resize:vertical; }
+      .cv-saybox textarea:focus { outline:none; border-color:var(--cv-green-soft); }
+      .cv-addnote { background:none; border:none; color:var(--cv-green-soft); font-size:14px; cursor:pointer; padding:8px 0 0; text-decoration:underline; text-underline-offset:3px; }
+
+      .cv-micro { border-top:1px dashed var(--cv-line); margin-top:14px; padding-top:4px; }
+      .cv-microq { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px dashed var(--cv-line); }
+      .cv-microq .cv-q { flex:1 1 300px; font-size:17px; }
+      .cv-microq .cv-acts { display:flex; gap:8px; }
+      .cv-microq .cv-done { color:var(--cv-green-soft); font-weight:600; font-size:16px; }
+      .cv-verdict { margin-top:16px; background:var(--cv-green); color:#fdfbf4; border-radius:12px; padding:18px; }
+      .cv-verdict .cv-tag { font-size:12.5px; letter-spacing:1.6px; text-transform:uppercase; color:#d8c98e; font-weight:700; }
+      .cv-verdict p { margin-top:8px; font-size:18px; line-height:1.55; }
+      .cv-verdict .cv-btn { border-color:#fdfbf4; background:transparent; color:#fdfbf4; }
+      .cv-verdict .cv-btn.cv-selected { background:#fdfbf4; color:var(--cv-green); }
+
+      .cv-tally { margin-top:14px; padding-top:12px; border-top:1px solid var(--cv-line); font-size:14px; color:var(--cv-muted); }
+      .cv-tally .cv-tally-row { display:flex; align-items:center; gap:8px; margin:4px 0; }
+      .cv-tally .cv-bar { height:8px; border-radius:5px; background:var(--cv-green-soft); min-width:2px; }
+      .cv-tally .cv-bar.cv-bar-against { background:#b83227; }
+      .cv-tally .cv-bar.cv-bar-mute { background:#c7bfa8; }
+      .cv-tally .cv-tally-num { min-width:96px; }
+
+      .cv-deep { color:var(--cv-green-soft); text-decoration:underline; text-underline-offset:3px; font-size:15px; }
+      .cv-confirm { margin-top:14px; background:#eef6ef; border:1px solid #cfe5d2; color:#265c3a; border-radius:10px; padding:12px 14px; font-size:16px; }
+      .cv-foot { margin-top:48px; color:var(--cv-muted); font-size:15px; border-top:3px solid var(--cv-gold-soft); padding-top:18px; }
+      .cv-foot p { margin-bottom:8px; }
+      @media (max-width:480px){ .cv-h1{font-size:30px;} .cv-card{padding:20px 16px;} .cv-btnrow .cv-btn{flex:1 1 100%;} }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Committee decisions</span>
+    </header>
+
+    <div id="app"><!-- injected by app.js + renderMission() --></div>
+
+    <script src="/app.js"></script>
+    <script src="https://talk.croquetwade.com/shared/voice-to-text.js"></script>
+    <script>
+    // ---------------------------------------------------------------------
+    // committee-vote — one page renders any round from token.payload_seed
+    // ---------------------------------------------------------------------
+    const VOTE_PB = 'https://util.croquetwade.com';
+
+    function attachVoice(ta) {
+        try {
+            if (window.VoiceToText && window.VoiceToText.init) {
+                window.VoiceToText.init({ target: ta, cleanUrl: 'https://talk.croquetwade.com/clean' });
+            }
+        } catch (e) { /* voice is a bonus — never block the form */ }
+    }
+
+    function fmtDate(s) {
+        if (!s) return '';
+        const d = new Date(s);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+
+    window.renderMission = function(tokenRecord) {
+        const seed = tokenRecord.payload_seed || {};
+        const decisions = seed.decisions || [];
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const round = seed.round;
+        const visibility = seed.visibility || 'members_live';
+        const showTally = visibility === 'members_live';
+        const draft = tokenRecord.draft_payload || null;
+
+        // ---- state ----
+        const answers = {};
+        decisions.forEach(function(d) { answers[d.id] = { type: d.type, answer: null, comment: '', micro: {} }; });
+        if (draft && Array.isArray(draft.votes)) {
+            draft.votes.forEach(function(v) {
+                if (!answers[v.id]) return;
+                answers[v.id].answer = (v.answer === undefined ? null : v.answer);
+                answers[v.id].comment = v.comment || '';
+                answers[v.id].micro = v.micro || {};
+            });
+        }
+
+        let autosave = null;
+        function buildPayload() {
+            const gn = document.getElementById('cv-general');
+            return {
+                round: round,
+                votes: decisions.map(function(d) {
+                    return { id: d.id, type: d.type, answer: answers[d.id].answer,
+                             comment: answers[d.id].comment || '', micro: answers[d.id].micro };
+                }),
+                general_notes: gn ? gn.value : ''
+            };
+        }
+
+        function markAnswered(card, id) {
+            if (answers[id].answer) { card.classList.add('cv-answered'); card.classList.remove('cv-missing'); }
+            else { card.classList.remove('cv-answered'); }
+        }
+
+        // ---- shared: an optional comment/voice box ----
+        function buildSaybox(card, id, placeholder) {
+            let box = card.querySelector('.cv-saybox');
+            if (box) return box;
+            box = document.createElement('div');
+            box.className = 'cv-saybox';
+            const ta = document.createElement('textarea');
+            ta.placeholder = placeholder || 'Type here, or press the mic and just talk.';
+            ta.value = answers[id].comment || '';
+            ta.addEventListener('input', function() { answers[id].comment = ta.value; if (autosave) autosave.save(); });
+            box.appendChild(ta);
+            card.appendChild(box);
+            attachVoice(ta);
+            return box;
+        }
+
+        // ---- soft card (Sounds right / Let's talk / I know something) ----
+        function buildSoft(d, card) {
+            const row = document.createElement('div');
+            row.className = 'cv-btnrow';
+            const defs = [
+                { v: 'sounds_right', label: '✓ Sounds right', primary: true },
+                { v: 'talk', label: "Let's talk at the meeting" },
+                { v: 'know_something', label: 'I know something about this' }
+            ];
+            defs.forEach(function(def) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'cv-btn' + (def.primary ? ' cv-primary' : '');
+                b.dataset.value = def.v;
+                b.textContent = def.label;
+                b.addEventListener('click', function() {
+                    row.querySelectorAll('.cv-btn').forEach(function(x) { x.classList.remove('cv-selected'); });
+                    b.classList.add('cv-selected');
+                    answers[d.id].answer = def.v;
+                    if (def.v === 'know_something') {
+                        const box = buildSaybox(card, d.id, 'Tell me what you know. Type or press the mic.');
+                        const ta = box.querySelector('textarea'); if (ta) ta.focus();
+                    }
+                    markAnswered(card, d.id);
+                    if (autosave) autosave.save();
+                });
+                row.appendChild(b);
+            });
+            card.appendChild(row);
+            // optional note link for any answer
+            const addNote = document.createElement('button');
+            addNote.type = 'button'; addNote.className = 'cv-addnote'; addNote.textContent = '💬 Add a comment';
+            addNote.addEventListener('click', function() {
+                buildSaybox(card, d.id);
+                addNote.style.display = 'none';
+                const ta = card.querySelector('.cv-saybox textarea'); if (ta) ta.focus();
+            });
+            card.appendChild(addNote);
+            // restore
+            if (answers[d.id].answer) {
+                const sel = row.querySelector('[data-value="' + answers[d.id].answer + '"]');
+                if (sel) sel.classList.add('cv-selected');
+            }
+            if (answers[d.id].comment) { buildSaybox(card, d.id); addNote.style.display = 'none'; }
+        }
+
+        // ---- motion card (For / Against / Abstain) ----
+        function buildMotion(d, card) {
+            const row = document.createElement('div');
+            row.className = 'cv-btnrow';
+            const defs = [
+                { v: 'for', label: 'For', cls: '' },
+                { v: 'against', label: 'Against', cls: ' cv-against' },
+                { v: 'abstain', label: 'Abstain', cls: '' }
+            ];
+            defs.forEach(function(def) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'cv-btn' + def.cls;
+                b.dataset.value = def.v;
+                b.textContent = def.label;
+                b.addEventListener('click', function() {
+                    row.querySelectorAll('.cv-btn').forEach(function(x) { x.classList.remove('cv-selected'); });
+                    b.classList.add('cv-selected');
+                    answers[d.id].answer = def.v;
+                    markAnswered(card, d.id);
+                    if (autosave) autosave.save();
+                });
+                row.appendChild(b);
+            });
+            card.appendChild(row);
+            const addNote = document.createElement('button');
+            addNote.type = 'button'; addNote.className = 'cv-addnote'; addNote.textContent = '💬 Add a comment (optional)';
+            addNote.addEventListener('click', function() {
+                buildSaybox(card, d.id);
+                addNote.style.display = 'none';
+                const ta = card.querySelector('.cv-saybox textarea'); if (ta) ta.focus();
+            });
+            card.appendChild(addNote);
+            if (answers[d.id].answer) {
+                const sel = row.querySelector('[data-value="' + answers[d.id].answer + '"]');
+                if (sel) sel.classList.add('cv-selected');
+            }
+            if (answers[d.id].comment) { buildSaybox(card, d.id); addNote.style.display = 'none'; }
+        }
+
+        // ---- micro card (three agreements assemble a verdict) ----
+        function buildMicro(d, card) {
+            const wrap = document.createElement('div');
+            wrap.className = 'cv-micro';
+            const verdictBox = document.createElement('div');
+            verdictBox.className = 'cv-verdict';
+            verdictBox.style.display = 'none';
+
+            function recompute() {
+                const states = (d.micro || []).map(function(_, i) { return answers[d.id].micro[String(i)]; });
+                const anyTalk = states.indexOf('talk') !== -1;
+                const allAgree = states.length > 0 && states.every(function(s) { return s === 'agree'; });
+                if (anyTalk) {
+                    answers[d.id].answer = 'talk';
+                    verdictBox.style.display = 'none';
+                } else if (allAgree) {
+                    verdictBox.style.display = 'block';
+                    // answer set only when they confirm the verdict below
+                    if (answers[d.id].answer !== 'position' && answers[d.id].answer !== 'talk') answers[d.id].answer = null;
+                } else {
+                    answers[d.id].answer = null;
+                    verdictBox.style.display = 'none';
+                }
+                markAnswered(card, d.id);
+            }
+
+            (d.micro || []).forEach(function(m, i) {
+                const q = document.createElement('div');
+                q.className = 'cv-microq';
+                const label = document.createElement('span');
+                label.className = 'cv-q'; label.textContent = m.q;
+                const acts = document.createElement('span');
+                acts.className = 'cv-acts';
+                function setState(state) {
+                    answers[d.id].micro[String(i)] = state;
+                    acts.innerHTML = '';
+                    const done = document.createElement('span');
+                    done.className = 'cv-done';
+                    done.textContent = state === 'agree' ? '✓ Agreed' : '📌 For the meeting';
+                    if (state === 'talk') done.style.color = '#9a6b00';
+                    acts.appendChild(done);
+                    const undo = document.createElement('button');
+                    undo.type = 'button'; undo.className = 'cv-addnote'; undo.textContent = 'change';
+                    undo.style.marginLeft = '8px';
+                    undo.addEventListener('click', function() { renderActs(); recompute(); if (autosave) autosave.save(); });
+                    acts.appendChild(undo);
+                    recompute();
+                    if (autosave) autosave.save();
+                }
+                function renderActs() {
+                    acts.innerHTML = '';
+                    const a = document.createElement('button');
+                    a.type = 'button'; a.className = 'cv-btn cv-small'; a.textContent = 'Agree';
+                    a.addEventListener('click', function() { setState('agree'); });
+                    const n = document.createElement('button');
+                    n.type = 'button'; n.className = 'cv-btn cv-small'; n.textContent = 'Not sure';
+                    n.addEventListener('click', function() { setState('talk'); });
+                    acts.appendChild(a); acts.appendChild(n);
+                }
+                renderActs();
+                // restore
+                if (answers[d.id].micro[String(i)]) {
+                    const st = answers[d.id].micro[String(i)];
+                    acts.innerHTML = '';
+                    const done = document.createElement('span');
+                    done.className = 'cv-done';
+                    done.textContent = st === 'agree' ? '✓ Agreed' : '📌 For the meeting';
+                    if (st === 'talk') done.style.color = '#9a6b00';
+                    acts.appendChild(done);
+                }
+                q.appendChild(label); q.appendChild(acts);
+                wrap.appendChild(q);
+            });
+
+            verdictBox.innerHTML = '<span class="cv-tag">Then the position settles</span><p>' +
+                (d.verdict || 'You’ve agreed with each part, so the conclusion follows on its own.') + '</p>';
+            const vrow = document.createElement('div');
+            vrow.className = 'cv-btnrow';
+            const bPos = document.createElement('button');
+            bPos.type = 'button'; bPos.className = 'cv-btn'; bPos.textContent = "✓ That's my position";
+            bPos.addEventListener('click', function() {
+                answers[d.id].answer = 'position';
+                bPos.classList.add('cv-selected'); bTalk.classList.remove('cv-selected');
+                markAnswered(card, d.id); if (autosave) autosave.save();
+            });
+            const bTalk = document.createElement('button');
+            bTalk.type = 'button'; bTalk.className = 'cv-btn'; bTalk.textContent = "Let's still talk at the meeting";
+            bTalk.addEventListener('click', function() {
+                answers[d.id].answer = 'talk';
+                bTalk.classList.add('cv-selected'); bPos.classList.remove('cv-selected');
+                markAnswered(card, d.id); if (autosave) autosave.save();
+            });
+            vrow.appendChild(bPos); vrow.appendChild(bTalk);
+            verdictBox.appendChild(vrow);
+
+            card.appendChild(wrap);
+            card.appendChild(verdictBox);
+            recompute();
+            if (answers[d.id].answer === 'position') bPos.classList.add('cv-selected');
+            if (answers[d.id].answer === 'talk') bTalk.classList.add('cv-selected');
+        }
+
+        // ---- tally panel ----
+        function buildTallyPanel(d, card) {
+            if (!showTally) return null;
+            const t = document.createElement('div');
+            t.className = 'cv-tally';
+            t.dataset.for = d.id;
+            t.textContent = 'Loading where the committee is so far…';
+            card.appendChild(t);
+            return t;
+        }
+        function renderTally(counts) {
+            if (!counts) return;
+            decisions.forEach(function(d) {
+                const el = document.querySelector('.cv-tally[data-for="' + d.id + '"]');
+                if (!el) return;
+                const c = counts[d.id] || {};
+                el.innerHTML = '';
+                let rows;
+                if (d.type === 'motion') {
+                    rows = [['For', c.for || 0, ''], ['Against', c.against || 0, 'cv-bar-against'], ['Abstain', c.abstain || 0, 'cv-bar-mute']];
+                } else {
+                    rows = [['Sounds right', c.sounds_right || 0, ''], ["Let's talk", c.talk || 0, 'cv-bar-mute'], ['Knows something', c.know_something || 0, 'cv-bar-mute']];
+                    if (c.position) rows.push(['Position settled', c.position, '']);
+                }
+                const max = Math.max(1, ...rows.map(function(r) { return r[1]; }));
+                rows.forEach(function(r) {
+                    const line = document.createElement('div'); line.className = 'cv-tally-row';
+                    const num = document.createElement('span'); num.className = 'cv-tally-num'; num.textContent = r[0] + ' ' + r[1];
+                    const bar = document.createElement('span'); bar.className = 'cv-bar ' + r[2]; bar.style.width = (8 + (r[1] / max) * 120) + 'px';
+                    if (!r[1]) bar.style.opacity = '0.25';
+                    line.appendChild(num); line.appendChild(bar);
+                    el.appendChild(line);
+                });
+            });
+        }
+        async function fetchTally() {
+            if (!showTally) return;
+            try {
+                const url = VOTE_PB + '/api/collections/vote_tally/records?filter=' +
+                    encodeURIComponent('round="' + round + '"') + '&perPage=1&sort=-updated';
+                const res = await fetch(url);
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.items || !data.items.length) return;
+                const rec = data.items[0];
+                renderTally(rec.counts || {});
+                const banner = document.getElementById('cv-responded');
+                if (banner && typeof rec.responded === 'number' && typeof rec.total === 'number') {
+                    const out = Math.max(0, rec.total - rec.responded);
+                    banner.textContent = rec.responded + ' of ' + rec.total + ' have responded so far'
+                        + (out ? ' · ' + out + ' still to come' : ' · everyone is in');
+                }
+            } catch (e) { /* tally is a bonus — never block voting */ }
+        }
+
+        // ---- build page ----
+        const app = document.getElementById('app');
+        const wrap = document.createElement('div');
+        wrap.className = 'cv-wrap';
+
+        const closing = fmtDate(seed.closes_at);
+        wrap.innerHTML =
+            '<header class="cv-head">' +
+            '<div class="cv-eyebrow">Croquet Association of Queensland</div>' +
+            '<h1 class="cv-h1">Good day, ' + firstName + '.</h1>' +
+            '<p class="cv-lede"><strong>' + decisions.length + ' ' + (decisions.length === 1 ? 'thing is' : 'things are') +
+            ' waiting on you</strong> before the next committee meeting. Read as much or as little as you like, and press a button when you’re ready.</p>' +
+            (closing ? '<p class="cv-dateline">Closing ' + closing + ' · kept current by CroquetClaude</p>' : '') +
+            '<p class="cv-dateline" id="cv-responded"></p>' +
+            '<div class="cv-note">Your answers are gathered for the committee, with your name on them. They feed the meeting, where the committee makes the final call. Nothing here is a binding vote on its own.</div>' +
+            '</header>';
+
+        decisions.forEach(function(d) {
+            const card = document.createElement('div');
+            card.className = 'cv-card';
+            card.dataset.id = d.id;
+
+            const h = document.createElement('h3'); h.textContent = d.title || d.id; card.appendChild(h);
+
+            if (d.gates_total) {
+                const g = document.createElement('div'); g.className = 'cv-gates';
+                for (let i = 0; i < d.gates_total; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'cv-dot' + (i < (d.gates_done || 0) ? ' cv-full' : '');
+                    g.appendChild(dot);
+                }
+                const lbl = document.createElement('span'); lbl.className = 'cv-lbl';
+                lbl.textContent = (d.gates_done || 0) + ' of ' + d.gates_total + ' checks done';
+                g.appendChild(lbl); card.appendChild(g);
+            }
+
+            if (d.short) { const p = document.createElement('p'); p.className = 'cv-short'; p.textContent = d.short; card.appendChild(p); }
+
+            if (d.proposed && !(d.micro && d.micro.length)) {
+                const call = document.createElement('div'); call.className = 'cv-call';
+                call.innerHTML = '<span class="cv-tag">Our proposed answer</span><p>' + d.proposed + '</p>';
+                card.appendChild(call);
+            }
+
+            if (d.type === 'motion') buildMotion(d, card);
+            else if (d.micro && d.micro.length) buildMicro(d, card);
+            else buildSoft(d, card);
+
+            if (d.doc_url) {
+                const deep = document.createElement('p'); deep.style.marginTop = '14px';
+                deep.innerHTML = '<a class="cv-deep" href="' + d.doc_url + '" target="_blank" rel="noopener">Read the full background</a>';
+                card.appendChild(deep);
+            }
+
+            buildTallyPanel(d, card);
+            wrap.appendChild(card);
+        });
+
+        // general notes
+        const gnWrap = document.createElement('div'); gnWrap.className = 'cv-card';
+        gnWrap.innerHTML = '<h3>Anything else for the committee?</h3>';
+        const gnTa = document.createElement('textarea');
+        gnTa.id = 'cv-general'; gnTa.className = '';
+        gnTa.style.cssText = 'width:100%;min-height:90px;font-family:inherit;font-size:16px;padding:12px;border-radius:10px;border:2px solid var(--cv-line);background:#fffdf8;resize:vertical;';
+        gnTa.placeholder = 'Optional — type or press the mic.';
+        gnTa.value = (draft && draft.general_notes) || '';
+        gnTa.addEventListener('input', function() { if (autosave) autosave.save(); });
+        gnWrap.appendChild(gnTa);
+        wrap.appendChild(gnWrap);
+        // (voice attached after mount)
+
+        // validation + submit
+        const ve = document.createElement('div'); ve.className = 'validation-error'; ve.id = 'cv-validation';
+        wrap.appendChild(ve);
+        const submitWrap = document.createElement('div'); submitWrap.className = 'submit-wrap';
+        const draftSaved = document.createElement('span'); draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator'; draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+        const submitBtn = document.createElement('button'); submitBtn.id = 'cv-submit';
+        submitBtn.className = 'btn-submit'; submitBtn.type = 'button'; submitBtn.textContent = 'Send my responses';
+        const errorMsg = document.createElement('div'); errorMsg.className = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            const unanswered = decisions.filter(function(d) { return !answers[d.id].answer; });
+            document.querySelectorAll('.cv-card[data-id]').forEach(function(card) {
+                const id = card.dataset.id;
+                if (id && answers[id] && !answers[id].answer) card.classList.add('cv-missing');
+                else card.classList.remove('cv-missing');
+            });
+            if (unanswered.length > 0) {
+                ve.textContent = unanswered.length === 1
+                    ? 'One decision still needs a response — it’s highlighted above.'
+                    : unanswered.length + ' decisions still need a response — they’re highlighted above.';
+                ve.classList.add('visible');
+                const firstMissing = document.querySelector('.cv-card.cv-missing');
+                if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            ve.classList.remove('visible');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+            const ok = await window.submitMission(tokenRecord, buildPayload(), respondentName);
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my responses';
+                errorMsg.classList.add('visible');
+            }
+        });
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        wrap.appendChild(submitWrap);
+
+        // footer
+        const foot = document.createElement('footer'); foot.className = 'cv-foot';
+        foot.innerHTML = '<p><strong>This page was put together for ' + firstName + '</strong> by CroquetClaude, and it always shows today’s truth: when something changes, the page changes.</p>' +
+            '<p>Every button you press and every word you type or speak goes to Wade and into the meeting notes. Nothing disappears into a computer.</p>';
+        wrap.appendChild(foot);
+
+        // mount
+        app.innerHTML = '';
+        app.appendChild(wrap);
+
+        // autosave after mount (so #cv-general exists)
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+        attachVoice(gnTa);
+        if (draft && (Array.isArray(draft.votes) && draft.votes.some(function(v){return v.answer;}) || draft.general_notes)) {
+            window.showDraftRestoredNotice(wrap, tokenRecord.updated);
+        }
+
+        // live tally now + every 25s
+        fetchTally();
+        if (showTally) setInterval(fetchTally, 25000);
+    };
+
+    document.addEventListener('DOMContentLoaded', function() { window.initMission(); });
+    </script>
+</body>
+</html>
