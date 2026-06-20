@@ -70,6 +70,11 @@
       .cv-tally .cv-tally-num { min-width:96px; }
 
       .cv-deep { color:var(--cv-green-soft); text-decoration:underline; text-underline-offset:3px; font-size:15px; }
+      button.cv-deep { font-family:inherit; background:none; border:none; cursor:pointer; padding:0; }
+      .cv-more { margin-top:16px; }
+      .cv-more-panel { margin-top:10px; padding:14px 16px; background:#faf7ef; border:1px solid var(--cv-line); border-radius:10px; font-size:16px; }
+      .cv-more-panel p { margin:0 0 10px; } .cv-more-panel p:last-child { margin:0; }
+      .cv-more-ask { color:var(--cv-muted); font-size:14px; font-style:italic; margin:0; }
       .cv-confirm { margin-top:14px; background:#eef6ef; border:1px solid #cfe5d2; color:#265c3a; border-radius:10px; padding:12px 14px; font-size:16px; }
       .cv-foot { margin-top:48px; color:var(--cv-muted); font-size:15px; border-top:3px solid var(--cv-gold-soft); padding-top:18px; }
       .cv-foot p { margin-bottom:8px; }
@@ -409,6 +414,53 @@
             } catch (e) { /* tally is a bonus — never block voting */ }
         }
 
+        // ---- more information — ALWAYS available on every card ----
+        // The form can vary (an inline background panel, a link to the full
+        // decision page, or, failing both, how to ask) but a member can always
+        // dig deeper before they decide.
+        function buildMoreInfo(d, card) {
+            const more = document.createElement('div');
+            more.className = 'cv-more';
+            let has = false;
+
+            if (d.detail) {
+                has = true;
+                const toggle = document.createElement('button');
+                toggle.type = 'button'; toggle.className = 'cv-deep';
+                toggle.textContent = 'Read the full background';
+                const panel = document.createElement('div');
+                panel.className = 'cv-more-panel'; panel.style.display = 'none';
+                String(d.detail).split(/\n{2,}|\n/).forEach(function(para) {
+                    const t = para.trim(); if (!t) return;
+                    const p = document.createElement('p'); p.textContent = t; panel.appendChild(p);
+                });
+                toggle.addEventListener('click', function() {
+                    const open = panel.style.display === 'block';
+                    panel.style.display = open ? 'none' : 'block';
+                    toggle.textContent = open ? 'Read the full background' : 'Hide the background';
+                });
+                more.appendChild(toggle);
+                more.appendChild(panel);
+            }
+
+            if (d.doc_url) {
+                has = true;
+                const link = document.createElement('p');
+                link.style.margin = d.detail ? '10px 0 0' : '0';
+                link.innerHTML = '<a class="cv-deep" href="' + d.doc_url +
+                    '" target="_blank" rel="noopener">Open the full decision page ↗</a>';
+                more.appendChild(link);
+            }
+
+            if (!has) {
+                const ask = document.createElement('p');
+                ask.className = 'cv-more-ask';
+                ask.textContent = 'Want more before you decide? Reply here, or raise it at the meeting — there’s always more if you need it.';
+                more.appendChild(ask);
+            }
+            card.appendChild(more);
+        }
+
         // ---- build page ----
         const app = document.getElementById('app');
         const wrap = document.createElement('div');
@@ -457,11 +509,7 @@
             else if (d.micro && d.micro.length) buildMicro(d, card);
             else buildSoft(d, card);
 
-            if (d.doc_url) {
-                const deep = document.createElement('p'); deep.style.marginTop = '14px';
-                deep.innerHTML = '<a class="cv-deep" href="' + d.doc_url + '" target="_blank" rel="noopener">Read the full background</a>';
-                card.appendChild(deep);
-            }
+            buildMoreInfo(d, card);
 
             buildTallyPanel(d, card);
             wrap.appendChild(card);

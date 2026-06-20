@@ -18,26 +18,40 @@ NO_SUBMIT = '--no-submit' in sys.argv
 if not TOKEN:
     sys.exit("usage: python _committee_vote_e2e.py <token> [--no-submit]")
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_screens')
+OUT = os.environ.get('VOTE_OUT') or os.path.join(os.path.dirname(os.path.abspath(__file__)), '_screens')
 os.makedirs(OUT, exist_ok=True)
-URL = f'http://127.0.0.1:8765/committee-vote/?t={TOKEN}'
+BASE = os.environ.get('VOTE_BASE', 'http://127.0.0.1:8765').rstrip('/')
+NOSHOT = '--no-shot' in sys.argv or os.environ.get('VOTE_NOSHOT')
+URL = f'{BASE}/committee-vote/?t={TOKEN}'
 
 VIEWPORTS = [('phone', 375, 850), ('tablet', 1024, 768), ('desktop', 1440, 1000)]
 
 with sync_playwright() as p:
     browser = p.chromium.launch()
 
+    # --- render check (always) ---
+    ctx = browser.new_context(viewport={'width': 1024, 'height': 900}, device_scale_factor=1)
+    page = ctx.new_page()
+    page.goto(URL)
+    page.wait_for_selector('.cv-card', timeout=10000)
+    h1 = page.query_selector('.cv-h1')
+    cards = page.query_selector_all('.cv-card[data-id]')
+    has_voice = page.evaluate("() => !!(window.VoiceToText && window.VoiceToText.init)")
+    print(f'  render OK: greeting="{h1.inner_text() if h1 else "?"}" · decision cards={len(cards)} · voice_loaded={has_voice}')
+    ctx.close()
+
     # --- screenshots ---
-    for label, w, h in VIEWPORTS:
-        ctx = browser.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
-        page = ctx.new_page()
-        page.goto(URL)
-        page.wait_for_selector('.cv-card', timeout=10000)
-        page.wait_for_timeout(1200)
-        path = os.path.join(OUT, f'committee-vote-{label}-{w}.png')
-        page.screenshot(path=path, full_page=True)
-        print(f'  shot {label} ({w}x{h}) -> {path}')
-        ctx.close()
+    if not NOSHOT:
+        for label, w, h in VIEWPORTS:
+            ctx = browser.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
+            page = ctx.new_page()
+            page.goto(URL)
+            page.wait_for_selector('.cv-card', timeout=10000)
+            page.wait_for_timeout(1200)
+            path = os.path.join(OUT, f'committee-vote-{label}-{w}.png')
+            page.screenshot(path=path, full_page=True)
+            print(f'  shot {label} ({w}x{h}) -> {path}')
+            ctx.close()
 
     if NO_SUBMIT:
         browser.close()
