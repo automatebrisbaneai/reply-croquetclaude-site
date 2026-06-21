@@ -522,10 +522,10 @@
             '<div class="cv-eyebrow">Croquet Association of Queensland</div>' +
             '<h1 class="cv-h1">Good day, ' + firstName + '.</h1>' +
             '<p class="cv-lede"><strong>' + decisions.length + ' ' + (decisions.length === 1 ? 'thing is' : 'things are') +
-            ' waiting on you</strong> before the next committee meeting. Read as much or as little as you like, and press a button when you’re ready.</p>' +
-            (closing ? '<p class="cv-dateline">Closing ' + closing + ' · kept current by CroquetClaude</p>' : '') +
+            ' waiting on you</strong> before the next committee meeting. Read as much or as little as you like, and make your decision when you’re ready. You can change it any time before voting closes.</p>' +
+            (closing ? '<p class="cv-dateline">Closing ' + closing + '</p>' : '') +
             '<p class="cv-dateline" id="cv-responded"></p>' +
-            '<div class="cv-note">Your answers are gathered for the committee, with your name on them. They feed the meeting, where the committee makes the final call. Nothing here is a binding vote on its own.</div>' +
+            '<div class="cv-note">Your answers are out-of-committee votes. The aim of this voting structure is to allow committee members freedom to make decisions with all the information in their own time rather than being constrained to a single monthly meeting.</div>' +
             '</header>';
 
         decisions.forEach(function(d) {
@@ -610,7 +610,10 @@
             ve.classList.remove('visible');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
-            const ok = await window.submitMission(tokenRecord, buildPayload(), respondentName);
+            const ok = await window.submitMission(tokenRecord, buildPayload(), respondentName, null, {
+                keepOpen: true,
+                thankyouNote: 'Your answer is in. You can change it any time before voting closes by reopening your link.'
+            });
             if (!ok) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send my responses';

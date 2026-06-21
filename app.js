@@ -273,7 +273,7 @@ function showDraftRestoredNotice(container, savedAt) {
  * @param {FileList|File[]} [attachments] — optional file attachments
  * @returns {Promise<boolean>} — true on success
  */
-async function submitMission(tokenRecord, responsePayload, respondentName, attachments) {
+async function submitMission(tokenRecord, responsePayload, respondentName, attachments, opts) {
     // 1. POST the response — use FormData when attachments present
     let postOk = false;
     try {
@@ -318,15 +318,18 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
     // Clear local backup — response is safely on the server
     _clearLocalDraft(tokenRecord.token);
 
-    // 2. PATCH the token to mark as submitted
-    try {
-        await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ submitted_at: new Date().toISOString() })
-        });
-    } catch {
-        // Best-effort — response is saved, PATCH failure is non-fatal
+    // 2. PATCH the token to mark as submitted — UNLESS the caller wants the link
+    //    to stay open for later correction (committee-vote: revise until close).
+    if (!(opts && opts.keepOpen)) {
+        try {
+            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ submitted_at: new Date().toISOString() })
+            });
+        } catch {
+            // Best-effort — response is saved, PATCH failure is non-fatal
+        }
     }
 
     // 3. Show thank-you screen
@@ -337,7 +340,7 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
             <div class="thankyou-screen visible">
                 <img src="/assets/party-claude.png" alt="" class="thankyou-claude">
                 <h1>Thanks ${firstName} — I'll get your reply right away.</h1>
-                <p>You don't need to do anything else.</p>
+                <p>${(opts && opts.thankyouNote) ? opts.thankyouNote : "You don't need to do anything else."}</p>
             </div>
         `;
     }
