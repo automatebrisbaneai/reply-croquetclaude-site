@@ -315,12 +315,24 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
         return false;
     }
 
-    // Clear local backup — response is safely on the server
-    _clearLocalDraft(tokenRecord.token);
-
-    // 2. PATCH the token to mark as submitted — UNLESS the caller wants the link
-    //    to stay open for later correction (committee-vote: revise until close).
-    if (!(opts && opts.keepOpen)) {
+    // 2. Update the token. If the caller wants the link to stay open for later
+    //    correction (committee-vote: revise until close), record the submitted
+    //    answer as the draft so a re-open shows it; otherwise mark it submitted.
+    if (opts && opts.keepOpen) {
+        try {
+            const dp = Object.assign({}, responsePayload, { _savedAt: new Date().toISOString() });
+            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ draft_payload: dp })
+            });
+        } catch {
+            // non-fatal — the response is saved on the server either way
+        }
+        _clearLocalDraft(tokenRecord.token);
+    } else {
+        // Clear local backup — response is safely on the server
+        _clearLocalDraft(tokenRecord.token);
         try {
             await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
                 method: 'PATCH',
