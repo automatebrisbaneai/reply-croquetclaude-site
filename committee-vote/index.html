@@ -84,7 +84,15 @@
       .cv-confirm { margin-top:14px; background:#eef6ef; border:1px solid #cfe5d2; color:#265c3a; border-radius:10px; padding:12px 14px; font-size:16px; }
       .cv-foot { margin-top:48px; color:var(--cv-muted); font-size:15px; border-top:3px solid var(--cv-gold-soft); padding-top:18px; }
       .cv-foot p { margin-bottom:8px; }
-      @media (max-width:480px){ .cv-h1{font-size:30px;} .cv-card{padding:20px 16px;} .cv-btnrow .cv-btn{flex:1 1 100%;} }
+      .cv-tabs { display:flex; gap:8px; margin:20px 0 6px; }
+      .cv-tab { font-family:inherit; font-size:15px; cursor:pointer; border-radius:999px; padding:9px 18px; border:2px solid var(--cv-line); background:#fff; color:var(--cv-muted); font-weight:600; transition:background .15s, color .15s, border-color .15s; }
+      .cv-tab.cv-tab-active { background:var(--cv-green); border-color:var(--cv-green); color:#fdfbf4; }
+      .cv-hidden { display:none; }
+      .cv-card.cv-made-card { background:#f7f6f1; border-color:var(--cv-line); }
+      .cv-made-badge { display:inline-block; font-size:12px; letter-spacing:1.4px; text-transform:uppercase; font-weight:700; color:var(--cv-green-soft); background:var(--cv-gold-soft); border-radius:999px; padding:3px 11px; margin-bottom:10px; }
+      .cv-made-outcome { font-size:17px; color:#2b2b27; }
+      .cv-empty { color:var(--cv-muted); font-size:16px; padding:18px 2px; }
+      @media (max-width:480px){ .cv-h1{font-size:30px;} .cv-card{padding:20px 16px;} .cv-btnrow .cv-btn{flex:1 1 100%;} .cv-tab{flex:1 1 auto;text-align:center;} }
     </style>
 </head>
 <body>
@@ -124,6 +132,8 @@
     window.renderMission = function(tokenRecord) {
         const seed = tokenRecord.payload_seed || {};
         const decisions = seed.decisions || [];
+        const openDecisions = decisions.filter(function(d) { return d.status !== 'made'; });
+        const madeDecisions = decisions.filter(function(d) { return d.status === 'made'; });
         const respondentName = tokenRecord.respondent_name || 'there';
         const firstName = respondentName.split(' ')[0].split(',')[0];
         const round = seed.round;
@@ -133,7 +143,7 @@
 
         // ---- state ----
         const answers = {};
-        decisions.forEach(function(d) { answers[d.id] = { type: d.type, answer: null, comment: '', micro: {} }; });
+        openDecisions.forEach(function(d) { answers[d.id] = { type: d.type, answer: null, comment: '', micro: {} }; });
         if (draft && Array.isArray(draft.votes)) {
             draft.votes.forEach(function(v) {
                 if (!answers[v.id]) return;
@@ -148,7 +158,7 @@
             const gn = document.getElementById('cv-general');
             return {
                 round: round,
-                votes: decisions.map(function(d) {
+                votes: openDecisions.map(function(d) {
                     return { id: d.id, type: d.type, answer: answers[d.id].answer,
                              comment: answers[d.id].comment || '', micro: answers[d.id].micro };
                 }),
@@ -511,24 +521,60 @@
             card.appendChild(more);
         }
 
+        // ---- made (decided) card — read-only, no answer wiring ----
+        function buildMadeCard(d) {
+            const card = document.createElement('div');
+            card.className = 'cv-card cv-made-card';
+            card.dataset.id = d.id;
+            const badge = document.createElement('div'); badge.className = 'cv-made-badge'; badge.textContent = 'Decision made';
+            card.appendChild(badge);
+            const h = document.createElement('h3'); h.textContent = d.title || d.id; card.appendChild(h);
+            const o = document.createElement('p'); o.className = 'cv-made-outcome';
+            o.textContent = d.outcome || 'This decision has been settled.';
+            card.appendChild(o);
+            if (d.detail || d.doc_url) buildMoreInfo(d, card);
+            return card;
+        }
+
         // ---- build page ----
         const app = document.getElementById('app');
         const wrap = document.createElement('div');
         wrap.className = 'cv-wrap';
 
         const closing = fmtDate(seed.closes_at);
+        const lede = openDecisions.length > 0
+            ? '<strong>' + openDecisions.length + ' ' + (openDecisions.length === 1 ? 'thing is' : 'things are') +
+              ' waiting on you</strong> before the next committee meeting. Read as much or as little as you like, and make your decision when you’re ready. You can change it any time before voting closes.'
+            : '<strong>You’re all caught up.</strong> Nothing is waiting on you right now. Decisions already made are kept under “Made”.';
         wrap.innerHTML =
             '<header class="cv-head">' +
             '<div class="cv-eyebrow">Croquet Association of Queensland</div>' +
             '<h1 class="cv-h1">Good day, ' + firstName + '.</h1>' +
-            '<p class="cv-lede"><strong>' + decisions.length + ' ' + (decisions.length === 1 ? 'thing is' : 'things are') +
-            ' waiting on you</strong> before the next committee meeting. Read as much or as little as you like, and make your decision when you’re ready. You can change it any time before voting closes.</p>' +
+            '<p class="cv-lede">' + lede + '</p>' +
             (closing ? '<p class="cv-dateline">Closing ' + closing + '</p>' : '') +
             '<p class="cv-dateline" id="cv-responded"></p>' +
             '<div class="cv-note">Your answers are out-of-committee votes. The aim of this voting structure is to allow committee members freedom to make decisions with all the information in their own time rather than being constrained to a single monthly meeting.</div>' +
             '</header>';
 
-        decisions.forEach(function(d) {
+        // open / made toggle — decided decisions are kept, not removed
+        const tabs = document.createElement('div'); tabs.className = 'cv-tabs';
+        const tabOpen = document.createElement('button');
+        tabOpen.type = 'button'; tabOpen.className = 'cv-tab'; tabOpen.textContent = 'Open (' + openDecisions.length + ')';
+        const tabMade = document.createElement('button');
+        tabMade.type = 'button'; tabMade.className = 'cv-tab'; tabMade.textContent = 'Made (' + madeDecisions.length + ')';
+        tabs.appendChild(tabOpen); tabs.appendChild(tabMade);
+        wrap.appendChild(tabs);
+
+        const openWrap = document.createElement('div'); openWrap.id = 'cv-open';
+        const madeWrap = document.createElement('div'); madeWrap.id = 'cv-made'; madeWrap.className = 'cv-hidden';
+        wrap.appendChild(openWrap); wrap.appendChild(madeWrap);
+
+        function showOpen() { openWrap.classList.remove('cv-hidden'); madeWrap.classList.add('cv-hidden'); tabOpen.classList.add('cv-tab-active'); tabMade.classList.remove('cv-tab-active'); }
+        function showMade() { madeWrap.classList.remove('cv-hidden'); openWrap.classList.add('cv-hidden'); tabMade.classList.add('cv-tab-active'); tabOpen.classList.remove('cv-tab-active'); }
+        tabOpen.addEventListener('click', showOpen);
+        tabMade.addEventListener('click', showMade);
+
+        openDecisions.forEach(function(d) {
             const card = document.createElement('div');
             card.className = 'cv-card';
             card.dataset.id = d.id;
@@ -563,8 +609,18 @@
             buildMoreInfo(d, card);
 
             buildTallyPanel(d, card);
-            wrap.appendChild(card);
+            openWrap.appendChild(card);
         });
+
+        if (madeDecisions.length) {
+            madeDecisions.forEach(function(d) { madeWrap.appendChild(buildMadeCard(d)); });
+        } else {
+            const empty = document.createElement('p'); empty.className = 'cv-empty';
+            empty.textContent = 'No decisions made yet. Once the committee settles a decision, it moves here and stays.';
+            madeWrap.appendChild(empty);
+        }
+
+        if (openDecisions.length === 0 && madeDecisions.length > 0) showMade(); else showOpen();
 
         // general notes
         const gnWrap = document.createElement('div'); gnWrap.className = 'cv-card';
@@ -576,12 +632,12 @@
         gnTa.value = (draft && draft.general_notes) || '';
         gnTa.addEventListener('input', function() { if (autosave) autosave.save(); });
         gnWrap.appendChild(gnTa);
-        wrap.appendChild(gnWrap);
+        openWrap.appendChild(gnWrap);
         // (voice attached after mount)
 
         // validation + submit
         const ve = document.createElement('div'); ve.className = 'validation-error'; ve.id = 'cv-validation';
-        wrap.appendChild(ve);
+        openWrap.appendChild(ve);
         const submitWrap = document.createElement('div'); submitWrap.className = 'submit-wrap';
         const draftSaved = document.createElement('span'); draftSaved.id = 'draft-saved-indicator';
         draftSaved.className = 'draft-saved-indicator'; draftSaved.textContent = '• Draft saved';
@@ -592,7 +648,7 @@
         errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
 
         submitBtn.addEventListener('click', async function() {
-            const unanswered = decisions.filter(function(d) { return !answers[d.id].answer; });
+            const unanswered = openDecisions.filter(function(d) { return !answers[d.id].answer; });
             document.querySelectorAll('.cv-card[data-id]').forEach(function(card) {
                 const id = card.dataset.id;
                 if (id && answers[id] && !answers[id].answer) card.classList.add('cv-missing');
@@ -622,7 +678,7 @@
         });
         submitWrap.appendChild(submitBtn);
         submitWrap.appendChild(errorMsg);
-        wrap.appendChild(submitWrap);
+        openWrap.appendChild(submitWrap);
 
         // footer
         const foot = document.createElement('footer'); foot.className = 'cv-foot';
