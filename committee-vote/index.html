@@ -45,6 +45,12 @@
       .cv-btn.cv-selected { background:var(--cv-green); border-color:var(--cv-green); color:#fff; font-weight:700; }
       .cv-btn.cv-against.cv-selected { background:#b83227; border-color:#8b241b; }
       .cv-btn.cv-small { font-size:14px; padding:8px 14px; min-height:0; }
+      /* decline card: the "No" is the signalled answer (red, prominent); the
+         alternative is muted grey, present but not dressed up as a yes. */
+      .cv-btn.cv-no-primary { border-color:#b83227; color:#b83227; font-weight:700; }
+      .cv-btn.cv-no-primary.cv-selected { background:#b83227; border-color:#8b241b; color:#fff; }
+      .cv-btn.cv-muted { border-color:#cbc7bd; color:#6b6a60; }
+      .cv-btn.cv-muted.cv-selected { background:#6b6a60; border-color:#55544c; color:#fff; }
 
       .cv-saybox { margin-top:14px; }
       .cv-saybox textarea { width:100%; min-height:90px; font-family:inherit; font-size:16px; padding:12px; border-radius:10px; border:2px solid var(--cv-line); background:#fffdf8; resize:vertical; }
@@ -217,6 +223,48 @@
             if (answers[d.id].comment) { buildSaybox(card, d.id); addNote.style.display = 'none'; }
         }
 
+        // ---- decline card: the committee's confident answer is "No, we do not
+        // want this". The No is the signalled (recommended) answer — red, prominent,
+        // left. The alternative is present but muted, never dressed up as a yes. ----
+        function buildDecline(d, card) {
+            const row = document.createElement('div');
+            row.className = 'cv-btnrow';
+            const defs = [
+                { v: 'no', label: d.no_label || '✗ No, we do not want this', cls: ' cv-no-primary' },
+                { v: 'support', label: d.yes_label || 'Actually, I’d support it', cls: ' cv-muted' },
+                { v: 'talk', label: "Let's talk at the meeting", cls: ' cv-muted' }
+            ];
+            defs.forEach(function(def) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'cv-btn' + def.cls;
+                b.dataset.value = def.v;
+                b.textContent = def.label;
+                b.addEventListener('click', function() {
+                    row.querySelectorAll('.cv-btn').forEach(function(x) { x.classList.remove('cv-selected'); });
+                    b.classList.add('cv-selected');
+                    answers[d.id].answer = def.v;
+                    markAnswered(card, d.id);
+                    if (autosave) autosave.save();
+                });
+                row.appendChild(b);
+            });
+            card.appendChild(row);
+            const addNote = document.createElement('button');
+            addNote.type = 'button'; addNote.className = 'cv-addnote'; addNote.textContent = '💬 Add a comment';
+            addNote.addEventListener('click', function() {
+                buildSaybox(card, d.id);
+                addNote.style.display = 'none';
+                const ta = card.querySelector('.cv-saybox textarea'); if (ta) ta.focus();
+            });
+            card.appendChild(addNote);
+            if (answers[d.id].answer) {
+                const sel = row.querySelector('[data-value="' + answers[d.id].answer + '"]');
+                if (sel) sel.classList.add('cv-selected');
+            }
+            if (answers[d.id].comment) { buildSaybox(card, d.id); addNote.style.display = 'none'; }
+        }
+
         // ---- motion card (For / Against / Abstain) ----
         function buildMotion(d, card) {
             const row = document.createElement('div');
@@ -379,6 +427,8 @@
                 let rows;
                 if (d.type === 'motion') {
                     rows = [['For', c.for || 0, ''], ['Against', c.against || 0, 'cv-bar-against'], ['Abstain', c.abstain || 0, 'cv-bar-mute']];
+                } else if (d.stance === 'decline') {
+                    rows = [['No, we do not want this', c.no || 0, 'cv-bar-against'], ['Would support it', c.support || 0, 'cv-bar-mute'], ["Let's talk", c.talk || 0, 'cv-bar-mute']];
                 } else {
                     rows = [['Sounds right', c.sounds_right || 0, ''], ["Let's talk", c.talk || 0, 'cv-bar-mute'], ['Knows something', c.know_something || 0, 'cv-bar-mute']];
                     if (c.position) rows.push(['Position settled', c.position, '']);
@@ -507,6 +557,7 @@
 
             if (d.type === 'motion') buildMotion(d, card);
             else if (d.micro && d.micro.length) buildMicro(d, card);
+            else if (d.stance === 'decline') buildDecline(d, card);
             else buildSoft(d, card);
 
             buildMoreInfo(d, card);
