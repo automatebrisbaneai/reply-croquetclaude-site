@@ -204,8 +204,10 @@ function createAutosave(tokenRecord, buildPayload) {
         const patchPayload = Object.assign({}, payload, { _savedAt: savedAt });
 
         try {
+            // ?t=<token> is required by the updateRule (mirrors the listRule's
+            // query-param check) — the rule can't inspect the PATCH body otherwise.
             const res = await fetch(
-                `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`,
+                `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}?t=${encodeURIComponent(tokenRecord.token)}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -318,10 +320,13 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
     // 2. Update the token. If the caller wants the link to stay open for later
     //    correction (committee-vote: revise until close), record the submitted
     //    answer as the draft so a re-open shows it; otherwise mark it submitted.
+    // ?t=<token> is required by the updateRule (mirrors the listRule's query-param
+    // check) — the rule can't inspect the PATCH body/URL params otherwise.
+    const tokenPatchUrl = `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}?t=${encodeURIComponent(tokenRecord.token)}`;
     if (opts && opts.keepOpen) {
         try {
             const dp = Object.assign({}, responsePayload, { _savedAt: new Date().toISOString() });
-            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
+            await fetch(tokenPatchUrl, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ draft_payload: dp })
@@ -334,7 +339,7 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
         // Clear local backup — response is safely on the server
         _clearLocalDraft(tokenRecord.token);
         try {
-            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
+            await fetch(tokenPatchUrl, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ submitted_at: new Date().toISOString() })
