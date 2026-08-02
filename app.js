@@ -205,7 +205,7 @@ function createAutosave(tokenRecord, buildPayload) {
 
         try {
             const res = await fetch(
-                `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`,
+                `${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}?t=${encodeURIComponent(tokenRecord.token)}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -321,7 +321,7 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
     if (opts && opts.keepOpen) {
         try {
             const dp = Object.assign({}, responsePayload, { _savedAt: new Date().toISOString() });
-            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
+            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}?t=${encodeURIComponent(tokenRecord.token)}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ draft_payload: dp })
@@ -334,7 +334,7 @@ async function submitMission(tokenRecord, responsePayload, respondentName, attac
         // Clear local backup — response is safely on the server
         _clearLocalDraft(tokenRecord.token);
         try {
-            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}`, {
+            await fetch(`${PB_BASE}/api/collections/${TOKENS_COLLECTION}/records/${tokenRecord.id}?t=${encodeURIComponent(tokenRecord.token)}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ submitted_at: new Date().toISOString() })
