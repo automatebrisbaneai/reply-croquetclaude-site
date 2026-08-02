@@ -676,3 +676,91 @@ body {
 /* === Voice input styles removed (Phase 2, 2026-04-19) ===
    Replaced by .vtt-* styles injected by /shared/voice-to-text.js.
    Kill-switch: restore from git if shared module regresses. */
+
+/* === Mission-specific: coaching-referee-register-2026-08 ===
+   Survey-shaped mission (one question per card, not per-record). Options are
+   generic positions, not include/drop/unsure semantics, so .btn-opt gets its
+   own neutral-to-lawn-green selected state instead of the data-value colours
+   above. Scoped under .mission-coaching-register so it can't leak. */
+
+.mission-coaching-register .questions-grid {
+    grid-template-columns: 1fr;
+}
+
+.mission-coaching-register .question-card {
+    padding: var(--space-md);
+}
+
+.mission-coaching-register .q-number {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent-warm);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+}
+
+.mission-coaching-register .card-name {
+    font-size: 1.05rem;
+    line-height: 1.4;
+    margin-bottom: 0.35rem;
+}
+
+.mission-coaching-register .q-why {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: var(--space-sm);
+    line-height: 1.5;
+}
+
+.mission-coaching-register .opt-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+}
+
+.mission-coaching-register .btn-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.15rem;
+    padding: 0.65rem 0.9rem;
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.mission-coaching-register .btn-opt:hover {
+    background: #f0f8f4;
+    border-color: var(--lawn-green);
+}
+
+.mission-coaching-register .btn-opt.selected {
+    background: var(--lawn-green);
+    border-color: var(--lawn-dark);
+    color: var(--white);
+}
+
+.mission-coaching-register .btn-opt.selected .btn-opt-sub {
+    color: var(--white);
+    opacity: 0.9;
+}
+
+.mission-coaching-register .btn-opt-label {
+    font-weight: 700;
+}
+
+.mission-coaching-register .btn-opt-sub {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+    white-space: normal;
+    line-height: 1.4;
+}
+
+.mission-coaching-register .notes-area {
+    margin-top: 0.6rem;
+}
