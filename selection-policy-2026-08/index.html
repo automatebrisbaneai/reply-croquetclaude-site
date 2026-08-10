@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection policy: throwing ideas around - CroquetClaude</title>
+    <meta name="description" content="A few questions on team-selection policy, no pressure, no wrong answers.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Selection policy: throwing ideas around</span>
+    </header>
+
+    <div id="app" class="mission-coaching-register">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: selection-policy-2026-08
+    // A survey-shaped mission (not per-record cards): each question is its
+    // own card, single-select / multi-select / free-text, plus a persistent
+    // "Additional words" box per ask-wade convention (never a fallback-only
+    // field: a pick and a note both count).
+    // Question set + full design rationale: projects/plans/selection-policy-mission.md
+    // -----------------------------------------------------------------------
+
+    const QUESTIONS = [
+        {
+            id: 'policy-review-scope',
+            type: 'multi',
+            q: 'The selection policy is due for review. What parts of it, if any, are worth a look?',
+            why: 'The policy set its own review date at June 2026. That is the only reason we are asking now. It has already been revised three times since February 2025, so another look is routine.',
+            options: [
+                { value: 'ranking-rule', label: 'The rule that a player must have a World Ranking to suit the level', sub: 'Sets a clear bar. A number is only part of the picture.' },
+                { value: 'appeals', label: 'The right to appeal a non-selection', sub: 'Gives players a way to be heard. Also gives selectors more to defend.' },
+                { value: 'captain', label: 'What the captain is actually there to do', sub: 'Not defined anywhere at the moment.' },
+                { value: 'criteria', label: 'What counts besides playing form', sub: 'Widens the field. Makes the call harder to explain.' },
+                { value: 'timing', label: 'How and when the team gets picked', sub: 'Timing decides who is available and who gets seen.' },
+                { value: 'nothing', label: 'Nothing. It works. Leave it alone.', sub: 'A settled policy has value of its own.' }
+            ],
+            notesPlaceholder: 'Anything you would add to that list, or take off it.'
+        },
+        {
+            id: 'ranking-weight',
+            type: 'single',
+            q: 'How much should World Ranking count when picking a state team?',
+            why: 'The policy says a selected player must have a ranking commensurate with the level. It does not say how much weight that carries against everything else.',
+            options: [
+                { value: 'decides', label: 'Ranking should decide the team', sub: 'Hard to argue with. Hard to correct when it is wrong.' },
+                { value: 'heavy', label: 'Ranking is the main thing, with room to move', sub: 'Keeps the number honest and leaves a door open.' },
+                { value: 'one-input', label: 'Ranking is one input among several', sub: 'More balanced. Puts more on selectors to explain themselves.' },
+                { value: 'background', label: 'Ranking is background information only', sub: 'Frees up judgement. Gives players less to aim at.' },
+                { value: 'wrong-measure', label: 'Ranking is not the right measure for this at all', sub: 'Then something else has to do the job it is doing now.' }
+            ],
+            notesPlaceholder: 'If none of those fit, say it your way.'
+        },
+        {
+            id: 'ranking-and-stamina',
+            type: 'single',
+            q: 'Does a good World Ranking tell you a player can last an interstate event?',
+            why: 'A ranking can be built on one and two day tournaments. The Interstate Shield asks for days of it back to back. Marilyn thinks those are two different tests. She may be right.',
+            options: [
+                { value: 'no-different', label: 'No. Short-form results say little about lasting the week', sub: 'Then the policy needs a second test we do not currently have.' },
+                { value: 'partly', label: 'Partly. It tells you about shot quality, not staying power', sub: 'Useful, as long as nobody reads more into it than that.' },
+                { value: 'yes-holds', label: 'Yes. A well ranked player will hold up', sub: 'Simple, and it keeps one measure doing one job.' },
+                { value: 'better-measure', label: 'There is a better way to measure stamina we could use', sub: 'Someone then has to record it and keep it current.' },
+                { value: 'unsure', label: 'Not sure. I would want to see the evidence', sub: 'Fair. We can go and look.' }
+            ],
+            notesPlaceholder: 'If you have watched players fade or hold up at an interstate, what did it come down to?'
+        },
+        {
+            id: 'rising-and-falling',
+            type: 'single',
+            q: 'One player is ranked higher but going backwards. Another is ranked lower but climbing. When do you switch?',
+            why: 'Rankings look backwards. Selection looks forwards. This is the point where the two disagree, and the policy is silent on it.',
+            options: [
+                { value: 'wait-cross', label: 'Wait until the numbers actually cross', sub: 'Defensible, and always a season behind the truth.' },
+                { value: 'switch-early', label: 'Switch before they cross if the trend is clear', sub: 'Picks the better player sooner. Harder to justify to the one dropped.' },
+                { value: 'recent-only', label: 'Only look at recent form, not the long-run number', sub: 'Sharper picture, noisier one.' },
+                { value: 'selector-call', label: 'This is exactly what selectors are for. No rule will settle it', sub: 'Trusts the panel and gives them no cover.' },
+                { value: 'depends-event', label: 'It depends on the event', sub: 'A shield week and a one day fixture are not the same decision.' }
+            ],
+            notesPlaceholder: 'What signals tell you a player is on the way up or down, before the ranking shows it?'
+        },
+        {
+            id: 'ranking-side-effects',
+            type: 'multi',
+            q: 'Does selecting by ranking change how top players behave? Tick anything you have actually seen.',
+            why: 'This is my argument and I want it tested rather than agreed with. My claim is that a ranking-based system quietly rewards protecting your number. If that is not what happens in Queensland, that is the most useful thing you can tell me.',
+            options: [
+                { value: 'pick-events', label: 'Players pick and choose events to protect their number', sub: 'If true, the ranking is measuring caution as well as skill.' },
+                { value: 'avoid-fields', label: 'Players avoid fields where a loss would cost them', sub: 'Thins out the very events we want strong.' },
+                { value: 'less-help', label: 'Players have less reason to bring a rising player on', sub: 'Costs the state more over ten years than any one team selection.' },
+                { value: 'clear-target', label: 'None of that. A ranking gives players something clear to chase', sub: 'A visible target can lift effort right across the board.' },
+                { value: 'not-here', label: 'It may happen elsewhere. Not here.', sub: 'Then the problem is theoretical and we should leave it alone.' }
+            ],
+            notesPlaceholder: 'No names needed. If you have seen the opposite effect, that is just as useful.'
+        },
+        {
+            id: 'other-criteria',
+            type: 'multi',
+            q: 'Besides playing form, what should selectors be allowed to weigh?',
+            why: 'Nothing here is proposed. It is a list to react to. Tick what belongs and ignore the rest.',
+            options: [
+                { value: 'stamina', label: 'Stamina over a long event', sub: 'Directly relevant, and hard to measure fairly.' },
+                { value: 'temperament', label: 'Temperament under pressure', sub: 'Everyone knows it matters. Nobody can put a number on it.' },
+                { value: 'doubles', label: 'How well a player pairs in doubles', sub: 'Wins matches. Also opens the door to who gets on with whom.' },
+                { value: 'commitment', label: 'Availability and willingness to prepare', sub: 'Rewards the reliable. Can penalise people with jobs and distance.' },
+                { value: 'passing-on', label: 'What the player passes on to others', sub: 'Builds the next squad. Not a reason to win the shield this year.' },
+                { value: 'head-to-head', label: 'Record against the players they will actually face', sub: 'Sharp and specific. Small sample sizes.' },
+                { value: 'strength-only', label: 'Nothing. Playing strength and nothing else', sub: 'Cleanest possible policy to defend.' }
+            ],
+            notesPlaceholder: 'What do you weigh in your own head that is not written down anywhere?'
+        },
+        {
+            id: 'mentoring-spot',
+            type: 'single',
+            q: 'Is there ever a case for picking a player mainly for what they bring to the rest of the team?',
+            why: "One idea being kicked around is that a player past their best who is bringing younger players on might still earn a place. My line is that if he is passing on knowledge in Adelaide, he is helping us win in Brisbane. The counter is that it costs a playing spot we cannot spare. I am not sure which is right.",
+            options: [
+                { value: 'named-role', label: 'Yes, and it should be a named role in the policy', sub: 'Honest about what the spot is for. Also makes it a target for argument.' },
+                { value: 'informal', label: 'Yes, but leave it to selectors and do not write it down', sub: 'Flexible. Invisible to anyone who was not picked.' },
+                { value: 'if-close', label: 'Only as a tiebreaker between players already close on merit', sub: 'Low cost, low effect.' },
+                { value: 'captain-job', label: "That is the captain's job, not an extra player's", sub: 'Tidier, if the captain role is actually defined.' },
+                { value: 'no', label: 'No. Pick the strongest team. Do the developing at home', sub: 'Clear and defensible. The mentoring still has to happen somewhere.' }
+            ],
+            notesPlaceholder: 'Have you seen a team get more out of someone off the court than on it?'
+        },
+        {
+            id: 'appeals',
+            type: 'single',
+            q: 'Should a player who misses selection be able to appeal?',
+            why: 'The policy currently gives that right through the State Complaints Process. Worth knowing: rugby league, the All Blacks and Cricket Australia have no real selection appeal, and all pick on judgement. Sports that select strictly by ranking tend to need one, because a number invites a dispute in a way a judgement call does not. That pattern may or may not hold for us.',
+            options: [
+                { value: 'keep', label: 'Keep the appeal exactly as it is', sub: 'Players have a route. Selectors know where they stand.' },
+                { value: 'process-only', label: 'Keep it, but only for how the decision was made, not who was picked', sub: 'Protects fairness without re-running the selection.' },
+                { value: 'reasons-instead', label: 'Drop the appeal and give every unselected player reasons instead', sub: 'More work up front. Much less argument afterwards.' },
+                { value: 'depends-method', label: 'It depends on the method. Ranking-based selection needs an appeal, judgement-based does not', sub: 'Ties the two decisions together, so we cannot do one without the other.' },
+                { value: 'drop', label: 'Drop it. Selection is a judgement call and should be final', sub: 'Matches the team sports. Feels harsh to whoever misses out.' }
+            ],
+            notesPlaceholder: 'What does a good appeals process actually protect, in your view?'
+        },
+        {
+            id: 'captain-role',
+            type: 'multi',
+            q: 'What should a state captain actually do?',
+            why: 'The role is not defined anywhere. Whatever you write here is likely to become the first draft of it, so take the pen.',
+            options: [
+                { value: 'lineup', label: 'Choose the line-up on the day', sub: 'Needs the freshest read. Can cut across the selectors.' },
+                { value: 'pairings', label: 'Set the order and the doubles pairings', sub: 'Tactical work best done by someone on the ground.' },
+                { value: 'on-panel', label: 'Sit on the selection panel', sub: 'Gets the captain the team they can work with. Blurs two jobs.' },
+                { value: 'coach', label: 'Coach and advise during play', sub: 'Real value if the captain is not also playing.' },
+                { value: 'manage', label: 'Manage the group off the court', sub: 'Unglamorous and probably the biggest single factor in a good week.' },
+                { value: 'report', label: 'Report back to CAQ after the event', sub: 'Turns one week into something the state learns from.' },
+                { value: 'rules', label: 'Speak for the team on rules and disputes', sub: 'Needs someone confident with the referees.' },
+                { value: 'develop', label: 'Bring the less experienced players in the squad along', sub: 'Long game. Competes with winning this week.' }
+            ],
+            notesPlaceholder: "In your own words: what does a good captain do that a poor one does not?"
+        },
+        {
+            id: 'anything-missed',
+            type: 'text',
+            q: 'What have we not asked about?',
+            why: 'You have both seen more selection than anyone else we could ask. If there is a problem we have walked straight past, this is the place to put it.',
+            notesPlaceholder: 'Anything at all. Half-formed is fine, and so is telling us the whole exercise is barking up the wrong tree.'
+        }
+    ];
+
+    window.renderMission = function(tokenRecord) {
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+
+        // answers[id] = { single: value|null, multi: Set, notes: string }
+        const answers = {};
+        QUESTIONS.forEach(function(qDef) {
+            answers[qDef.id] = { single: null, multi: new Set(), notes: '' };
+        });
+
+        // Restore from draft
+        if (draft && Array.isArray(draft.answers)) {
+            draft.answers.forEach(function(entry) {
+                if (!entry || !answers[entry.id]) return;
+                if (entry.single !== undefined) answers[entry.id].single = entry.single;
+                if (Array.isArray(entry.multi)) answers[entry.id].multi = new Set(entry.multi);
+                if (entry.notes) answers[entry.id].notes = entry.notes;
+            });
+        }
+
+        function isAnswered(qDef) {
+            const a = answers[qDef.id];
+            if (qDef.type === 'text') return true; // optional
+            if (qDef.type === 'single') return a.single !== null || a.notes.trim().length > 0;
+            if (qDef.type === 'multi') return a.multi.size > 0 || a.notes.trim().length > 0;
+            return true;
+        }
+
+        function updateValidationState() {
+            return QUESTIONS.filter(function(qDef) { return !isAnswered(qDef); });
+        }
+
+        var autosave = null;
+
+        function buildPayload() {
+            var out = QUESTIONS.map(function(qDef) {
+                return {
+                    id: qDef.id,
+                    single: answers[qDef.id].single,
+                    multi: Array.from(answers[qDef.id].multi),
+                    notes: answers[qDef.id].notes || ''
+                };
+            });
+            return { answers: out };
+        }
+
+        // ---- Build DOM ----
+        const app = document.getElementById('app');
+        const container = document.createElement('div');
+        container.className = 'container';
+
+        const opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>' + firstName + ', thanks for taking a look at this.</p>' +
+            '<p>This is not a decision waiting on your sign-off. The current selection policy set its own review date at June 2026 and that has come and gone, so now is the normal time to ask whether it still does the job. We are throwing ideas around, nothing more.</p>' +
+            '<p>There are no wrong answers here. Every question has a box for your own words, and writing in that box is a complete answer on its own. Skip anything that does not interest you.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically as you go. Close the tab and come back any time: the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        const hr0 = document.createElement('hr');
+        hr0.className = 'section-divider';
+        container.appendChild(hr0);
+
+        const grid = document.createElement('div');
+        grid.className = 'cards-grid questions-grid';
+
+        function buildQuestionCard(qDef, index) {
+            const a = answers[qDef.id];
+            const card = document.createElement('div');
+            card.className = 'card question-card';
+            card.dataset.key = qDef.id;
+            card.setAttribute('role', 'group');
+            card.setAttribute('aria-label', qDef.q);
+
+            const numEl = document.createElement('div');
+            numEl.className = 'q-number';
+            numEl.textContent = 'Q' + (index + 1);
+            card.appendChild(numEl);
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'card-name';
+            nameEl.textContent = qDef.q;
+            card.appendChild(nameEl);
+
+            if (qDef.why) {
+                const whyEl = document.createElement('div');
+                whyEl.className = 'q-why';
+                whyEl.textContent = qDef.why;
+                card.appendChild(whyEl);
+            }
+
+            if (qDef.type === 'single' || qDef.type === 'multi') {
+                const btnRow = document.createElement('div');
+                btnRow.className = 'answer-buttons opt-buttons';
+
+                qDef.options.forEach(function(opt) {
+                    const b = document.createElement('button');
+                    b.className = 'btn-answer btn-opt';
+                    b.dataset.value = opt.value;
+                    b.setAttribute('type', 'button');
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'btn-opt-label';
+                    labelSpan.textContent = opt.label;
+                    b.appendChild(labelSpan);
+
+                    if (opt.sub) {
+                        const subSpan = document.createElement('span');
+                        subSpan.className = 'btn-opt-sub';
+                        subSpan.textContent = opt.sub;
+                        b.appendChild(subSpan);
+                    }
+
+                    // Restore selection
+                    if (qDef.type === 'single' && a.single === opt.value) {
+                        b.classList.add('selected');
+                    }
+                    if (qDef.type === 'multi' && a.multi.has(opt.value)) {
+                        b.classList.add('selected');
+                    }
+
+                    b.addEventListener('click', function() {
+                        if (qDef.type === 'single') {
+                            if (a.single === opt.value) {
+                                // click again clears
+                                a.single = null;
+                                b.classList.remove('selected');
+                            } else {
+                                btnRow.querySelectorAll('.btn-opt').forEach(function(x) {
+                                    x.classList.remove('selected');
+                                });
+                                a.single = opt.value;
+                                b.classList.add('selected');
+                            }
+                        } else {
+                            if (a.multi.has(opt.value)) {
+                                a.multi.delete(opt.value);
+                                b.classList.remove('selected');
+                            } else {
+                                a.multi.add(opt.value);
+                                b.classList.add('selected');
+                            }
+                        }
+
+                        if (isAnswered(qDef)) {
+                            card.classList.add('answered');
+                            card.classList.remove('missing');
+                        } else {
+                            card.classList.remove('answered');
+                        }
+
+                        updateValidationState();
+                        if (autosave) autosave.save();
+                    });
+
+                    btnRow.appendChild(b);
+                });
+
+                card.appendChild(btnRow);
+            }
+
+            // Additional words / free-text box — always present, per ask-wade convention.
+            const notesArea = document.createElement('div');
+            notesArea.className = 'notes-area visible';
+            const notesLabel = document.createElement('label');
+            notesLabel.style.cssText = 'display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;';
+            notesLabel.textContent = (qDef.type === 'text') ? 'Your answer:' : 'Additional words:';
+            const notesTA = document.createElement('textarea');
+            notesTA.placeholder = qDef.notesPlaceholder || 'Any context that would help…';
+            notesTA.setAttribute('aria-label', notesLabel.textContent + ' ' + qDef.q);
+            notesTA.value = a.notes || '';
+            notesTA.addEventListener('input', function() {
+                a.notes = notesTA.value;
+                if (isAnswered(qDef)) {
+                    card.classList.add('answered');
+                    card.classList.remove('missing');
+                }
+                if (autosave) autosave.save();
+            });
+            notesArea.appendChild(notesLabel);
+            notesArea.appendChild(notesTA);
+            card.appendChild(notesArea);
+
+            if (isAnswered(qDef)) card.classList.add('answered');
+
+            return card;
+        }
+
+        QUESTIONS.forEach(function(qDef, i) {
+            grid.appendChild(buildQuestionCard(qDef, i));
+        });
+
+        container.appendChild(grid);
+
+        // ---- Validation error ----
+        const validationError = document.createElement('div');
+        validationError.className = 'validation-error';
+        validationError.id = 'validation-error';
+        container.appendChild(validationError);
+
+        // ---- Submit ----
+        const submitWrap = document.createElement('div');
+        submitWrap.className = 'submit-wrap';
+
+        const draftSaved = document.createElement('span');
+        draftSaved.id = 'draft-saved-indicator';
+        draftSaved.className = 'draft-saved-indicator';
+        draftSaved.textContent = '• Draft saved';
+        submitWrap.appendChild(draftSaved);
+
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-btn';
+        submitBtn.className = 'btn-submit';
+        submitBtn.setAttribute('type', 'button');
+        submitBtn.textContent = 'Send my answers';
+
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'error-message';
+        errorMsg.innerHTML = 'Something went wrong — please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+        submitBtn.addEventListener('click', async function() {
+            const unanswered = updateValidationState();
+
+            grid.querySelectorAll('.question-card').forEach(function(card) {
+                const k = card.dataset.key;
+                const stillMissing = unanswered.some(function(q) { return q.id === k; });
+                if (stillMissing) {
+                    card.classList.add('missing');
+                } else {
+                    card.classList.remove('missing');
+                }
+            });
+
+            if (unanswered.length > 0) {
+                const ve = document.getElementById('validation-error');
+                ve.textContent = unanswered.length === 1
+                    ? 'One question still needs an answer — it’s highlighted above.'
+                    : unanswered.length + ' questions still need answers — they’re highlighted above.';
+                ve.classList.add('visible');
+                const firstMissing = document.querySelector('.question-card.missing');
+                if (firstMissing) {
+                    firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            const ve = document.getElementById('validation-error');
+            ve.classList.remove('visible');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+            const responsePayload = buildPayload();
+
+            const ok = await window.submitMission(tokenRecord, responsePayload, respondentName, null, {
+                thankyouNote: 'Thanks. That is genuinely useful, and nothing goes anywhere without you seeing it first.'
+            });
+
+            if (!ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send my answers';
+                const em = document.getElementById('error-message');
+                em.classList.add('visible');
+            }
+        });
+
+        submitWrap.appendChild(submitBtn);
+        submitWrap.appendChild(errorMsg);
+        container.appendChild(submitWrap);
+
+        // ---- Mount ----
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        // ---- Autosave ----
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+
+        if (draft && Array.isArray(draft.answers)) {
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>

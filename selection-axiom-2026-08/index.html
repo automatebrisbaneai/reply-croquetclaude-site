@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The ideal Queensland player: CroquetClaude</title>
+    <meta name="description" content="A short survey: what makes someone the ideal Queensland player.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* -------------------------------------------------------------------
+           Scoped to THIS page only. Nothing here touches the shared
+           styles.css other reply-tool missions depend on.
+           ------------------------------------------------------------------- */
+        .stepper-wrap { max-width: 620px; margin: 0 auto; }
+
+        .progress-line {
+            font-family: var(--font-heading);
+            font-size: var(--font-size-small);
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+        }
+
+        .progress-track {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: var(--space-md);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--lawn-green);
+            transition: width 0.25s ease;
+        }
+
+        .step-group-label {
+            font-family: var(--font-heading);
+            font-size: var(--font-size-small);
+            font-weight: 600;
+            color: var(--accent-warm-hover);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.4rem;
+        }
+
+        .step-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .step-card.fade-in { animation: stepFadeIn 0.28s ease; }
+
+        @keyframes stepFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .step-card.fade-in { animation: none; }
+        }
+
+        .step-question {
+            font-family: var(--font-heading);
+            font-size: var(--font-size-h3);
+            color: var(--lawn-dark);
+            margin-bottom: var(--space-sm);
+            line-height: 1.4;
+        }
+
+        .rating-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .btn-rating {
+            flex: 1 1 0;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.7rem 0;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--cream);
+            color: var(--text-primary);
+            cursor: pointer;
+            min-height: 48px;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .btn-rating:focus-visible {
+            outline: 3px solid var(--lawn-green);
+            outline-offset: 2px;
+        }
+
+        .btn-rating.selected {
+            background: var(--lawn-green);
+            border-color: var(--lawn-dark);
+            color: var(--white);
+        }
+
+        .rating-anchors {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .comment-label {
+            display: block;
+            font-size: var(--font-size-small);
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-back {
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            padding: 0.6rem 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            min-height: 44px;
+        }
+
+        .btn-back:disabled { opacity: 0.4; cursor: default; }
+
+        .btn-next {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.6rem;
+            background: var(--lawn-green);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            min-height: 44px;
+        }
+
+        .btn-next:hover { background: var(--lawn-dark); }
+
+        /* ---- Review screen ---- */
+
+        .review-row {
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 0;
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-sm);
+            align-items: flex-start;
+        }
+
+        .review-row:last-child { border-bottom: none; }
+
+        .review-text { flex: 1; }
+
+        .review-group {
+            font-size: 0.75rem;
+            color: var(--accent-warm-hover);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-weight: 600;
+        }
+
+        .review-question { color: var(--text-primary); margin: 0.15rem 0; }
+
+        .review-rating {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--lawn-dark);
+        }
+
+        .review-rating.unrated { color: var(--text-secondary); font-weight: 400; font-style: italic; }
+
+        .review-comment {
+            font-size: var(--font-size-small);
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        .btn-edit-row {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            padding: 0.35rem 0.8rem;
+            border: 1px solid var(--lawn-green);
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--lawn-green);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-edit-row:hover { background: #f0f8f4; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">The ideal Queensland player</span>
+    </header>
+
+    <div id="app" class="mission-coaching-register">
+        <!-- Content injected by app.js + renderMission() -->
+    </div>
+
+    <script src="/app.js"></script>
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission: selection-axiom-2026-08 (round 1 of 2)
+    // Rated survey, one item on screen at a time, adapted from the
+    // apps/learn-quiz/index.html stepper shape (currentStep, render-in-place,
+    // counter, fade-in). Genuinely new here: back navigation and a
+    // review-and-edit screen before send. No shared component exists for
+    // this anywhere in the vault, so it's all self-contained in this page's
+    // own script, matching the per-mission convention every other reply-tool
+    // page already uses.
+    //
+    // Round 2 is the existing mechanics mission (selection-policy-2026-08),
+    // sent later, reframed around whatever axiom gets agreed here. See:
+    // resources/selection-and-culture/applied/euclidean-selection-architecture.md
+    // -----------------------------------------------------------------------
+
+    // Group A: the core axiom. 5 constructs, 2 phrasings each, this is the
+    // actual postulate being tested, so it's where the reliability check
+    // (asking the same underlying thing a couple of different ways) earns
+    // its keep.
+    const BASE_ITEMS = [
+        { id: 'a-win-1', group: 'A', pairId: 'win', type: 'rating', text: 'Plays to win. Their ranking matches the level required.' },
+        { id: 'a-win-2', group: 'A', pairId: 'win', type: 'rating', text: 'When it is close, they are the one you would trust to close it out.' },
+        { id: 'a-sustain-1', group: 'A', pairId: 'sustain', type: 'rating', text: 'Can be trusted to hold up across a full week, not just one good day.' },
+        { id: 'a-sustain-2', group: 'A', pairId: 'sustain', type: 'rating', text: 'Their form on day one still holds up by day four.' },
+        { id: 'a-improve-1', group: 'A', pairId: 'improve', type: 'rating', text: 'Makes the players around them better, whether or not they are on court.' },
+        { id: 'a-improve-2', group: 'A', pairId: 'improve', type: 'rating', text: 'Younger or newer players play better just from being near them.' },
+        { id: 'a-teamwant-1', group: 'A', pairId: 'teamwant', type: 'rating', text: 'Someone the rest of the team wants alongside them at the event.' },
+        { id: 'a-teamwant-2', group: 'A', pairId: 'teamwant', type: 'rating', text: 'The team is better off, off the court too, for having them there.' },
+        { id: 'a-sport-1', group: 'A', pairId: 'sport', type: 'rating', text: 'Personal development and sportsmanship matter as much as the result.' },
+        { id: 'a-sport-2', group: 'A', pairId: 'sport', type: 'rating', text: 'Would rather lose playing the right way than win by cutting corners.' },
+
+        // Group B: what rules someone out. One phrasing each for four of
+        // them; the winning-above-all one gets two, since it is the most
+        // direct opposite of the core axiom and worth the same reliability
+        // check as its matching Group A construct.
+        { id: 'b-games-1', group: 'B', pairId: 'games', type: 'rating', text: 'Plays the rankings: picks soft events, avoids risk to protect their number.' },
+        { id: 'b-fades-1', group: 'B', pairId: 'fades', type: 'rating', text: 'Fades when it counts, cannot hold up across a full event.' },
+        { id: 'b-keeps-1', group: 'B', pairId: 'keeps', type: 'rating', text: 'Keeps their form and knowledge to themselves, does not help anyone else improve.' },
+        { id: 'b-notwant-1', group: 'B', pairId: 'notwant', type: 'rating', text: 'The rest of the team would rather not have them at the event.' },
+        { id: 'b-winabove-1', group: 'B', pairId: 'winabove', type: 'rating', text: 'Puts winning above everything else, whatever that costs the people around them.' },
+        { id: 'b-winabove-2', group: 'B', pairId: 'winabove', type: 'rating', text: 'Would cut a corner to win if no one would notice.' },
+
+        // Group C: what the team is for. Four genuinely distinct purposes,
+        // not one construct asked differently, so one phrasing each.
+        { id: 'c-win-shield', group: 'C', pairId: 'shield', type: 'rating', text: 'Win the interstate shield. That is the job.' },
+        { id: 'c-show-well', group: 'C', pairId: 'showwell', type: 'rating', text: 'Show croquet at its best in public, on and off the court.' },
+        { id: 'c-nextgen', group: 'C', pairId: 'nextgen', type: 'rating', text: 'Build the next generation of state players.' },
+        { id: 'c-reward', group: 'C', pairId: 'reward', type: 'rating', text: 'Reward and recognise the players who have earned it.' },
+
+        // Group D: catch-all, free text, last step before the review screen.
+        { id: 'anything-missed', group: 'D', type: 'text', text: 'Anything else worth saying before we go further?' }
+    ];
+
+    // Group E only exists for one respondent (Marilyn, as the person who
+    // commissioned this): a process-feedback question, appended when the
+    // minted token's seed carries extra_feedback:true. Not part of the
+    // question set Dick and Gaye see.
+    const PROCESS_FEEDBACK_ITEM = {
+        id: 'process-feedback', group: 'E', type: 'text',
+        text: 'Anything about this process itself you would change before it goes to Dick and Gaye?'
+    };
+
+    const GROUP_LABELS = {
+        A: 'What matters',
+        B: 'What rules someone out',
+        C: 'What the team is for',
+        D: 'Anything else',
+        E: 'Before this goes out'
+    };
+
+    window.renderMission = function(tokenRecord) {
+        const respondentName = tokenRecord.respondent_name || 'there';
+        const firstName = respondentName.split(' ')[0].split(',')[0];
+        const draft = tokenRecord.draft_payload || null;
+        const seed = tokenRecord.payload_seed || {};
+        const items = seed.extra_feedback ? BASE_ITEMS.concat([PROCESS_FEEDBACK_ITEM]) : BASE_ITEMS;
+
+        // answers[id] = { rating: null|0-5, comment: '', text: '' }
+        const answers = {};
+        items.forEach(function(item) {
+            answers[item.id] = { rating: null, comment: '', text: '' };
+        });
+
+        if (draft && Array.isArray(draft.answers)) {
+            draft.answers.forEach(function(entry) {
+                if (!entry || !answers[entry.id]) return;
+                if (entry.rating !== undefined) answers[entry.id].rating = entry.rating;
+                if (entry.comment) answers[entry.id].comment = entry.comment;
+                if (entry.text) answers[entry.id].text = entry.text;
+            });
+        }
+
+        function buildPayload() {
+            return {
+                answers: items.map(function(item) {
+                    var a = answers[item.id];
+                    return { id: item.id, rating: a.rating, comment: a.comment || '', text: a.text || '' };
+                })
+            };
+        }
+
+        // ---- State ----
+        var currentStep = 0;      // index into items while stepping through
+        var onReview = false;     // true once past the last item
+        var autosave = null;
+
+        // ---- Build the static shell (header/opener stay put; the
+        // stepper panel and review screen swap inside #stage) ----
+        const app = document.getElementById('app');
+        const container = document.createElement('div');
+        container.className = 'container stepper-wrap';
+
+        const opener = document.createElement('div');
+        opener.className = 'opener';
+        opener.innerHTML =
+            '<p>' + firstName + ', thanks for taking a look at this.</p>' +
+            '<p>Round one of two. Before we get into how a team gets picked, we want to agree on something simpler first: what makes someone the ideal Queensland player. Getting that settled means the next set of questions build on something real, instead of starting from nothing.</p>' +
+            '<p>A short survey, one question at a time. Rate each from 0 (not important) to 5 (essential), and add a comment on any of them, we would genuinely like to know the thinking behind a number, not just the number itself.</p>' +
+            '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically as you go. Close the tab and come back any time: the link picks up where you left off until you press <em>Send my answers</em>.</p>';
+        container.appendChild(opener);
+
+        const hr0 = document.createElement('hr');
+        hr0.className = 'section-divider';
+        container.appendChild(hr0);
+
+        const stage = document.createElement('div');
+        stage.id = 'stage';
+        container.appendChild(stage);
+
+        app.innerHTML = '';
+        app.appendChild(container);
+
+        autosave = window.createAutosave(tokenRecord, buildPayload);
+        if (draft && Array.isArray(draft.answers)) {
+            window.showDraftRestoredNotice(container, tokenRecord.updated);
+        }
+
+        // ---- Step renderer ----
+        function renderStep() {
+            const item = items[currentStep];
+            const a = answers[item.id];
+
+            stage.innerHTML = '';
+
+            const progressLine = document.createElement('div');
+            progressLine.className = 'progress-line';
+            progressLine.textContent = 'Question ' + (currentStep + 1) + ' of ' + items.length;
+            stage.appendChild(progressLine);
+
+            const track = document.createElement('div');
+            track.className = 'progress-track';
+            const fill = document.createElement('div');
+            fill.className = 'progress-fill';
+            fill.style.width = Math.round(((currentStep + 1) / items.length) * 100) + '%';
+            track.appendChild(fill);
+            stage.appendChild(track);
+
+            const card = document.createElement('div');
+            card.className = 'step-card fade-in';
+
+            const groupLabel = document.createElement('div');
+            groupLabel.className = 'step-group-label';
+            groupLabel.textContent = GROUP_LABELS[item.group];
+            card.appendChild(groupLabel);
+
+            const q = document.createElement('div');
+            q.className = 'step-question';
+            q.textContent = item.text;
+            card.appendChild(q);
+
+            if (item.type === 'rating') {
+                const row = document.createElement('div');
+                row.className = 'rating-row';
+                for (var v = 0; v <= 5; v++) {
+                    (function(val) {
+                        const b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn-rating' + (a.rating === val ? ' selected' : '');
+                        b.textContent = String(val);
+                        b.setAttribute('aria-pressed', a.rating === val ? 'true' : 'false');
+                        b.addEventListener('click', function() {
+                            a.rating = (a.rating === val) ? null : val; // click again clears
+                            if (autosave) autosave.save();
+                            renderStep();
+                        });
+                        row.appendChild(b);
+                    })(v);
+                }
+                card.appendChild(row);
+
+                const anchors = document.createElement('div');
+                anchors.className = 'rating-anchors';
+                anchors.innerHTML = '<span>not important</span><span>essential</span>';
+                card.appendChild(anchors);
+
+                const commentLabel = document.createElement('label');
+                commentLabel.className = 'comment-label';
+                commentLabel.textContent = 'Anything behind that number worth saying?';
+                card.appendChild(commentLabel);
+
+                const ta = document.createElement('textarea');
+                ta.placeholder = 'Optional, but we would genuinely like to know.';
+                ta.value = a.comment;
+                ta.rows = 3;
+                ta.addEventListener('input', function() {
+                    a.comment = ta.value;
+                    if (autosave) autosave.save();
+                });
+                card.appendChild(ta);
+            } else {
+                // free-text catch-all
+                const ta = document.createElement('textarea');
+                ta.style.width = '100%';
+                ta.style.minHeight = '110px';
+                ta.style.padding = '0.6rem 0.75rem';
+                ta.style.border = '1px solid var(--border)';
+                ta.style.borderRadius = 'var(--radius)';
+                ta.style.fontFamily = 'var(--font-body)';
+                ta.style.fontSize = 'var(--font-size-base)';
+                ta.placeholder = 'Optional: anything at all.';
+                ta.value = a.text;
+                ta.addEventListener('input', function() {
+                    a.text = ta.value;
+                    if (autosave) autosave.save();
+                });
+                card.appendChild(ta);
+            }
+
+            stage.appendChild(card);
+
+            const nav = document.createElement('div');
+            nav.className = 'step-nav';
+
+            const back = document.createElement('button');
+            back.type = 'button';
+            back.className = 'btn-back';
+            back.textContent = 'Back';
+            back.disabled = (currentStep === 0);
+            back.addEventListener('click', function() {
+                if (currentStep > 0) { currentStep--; renderStep(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            });
+            nav.appendChild(back);
+
+            const next = document.createElement('button');
+            next.type = 'button';
+            next.className = 'btn-next';
+            next.textContent = (currentStep === items.length - 1) ? 'Review your answers' : 'Next';
+            next.addEventListener('click', function() {
+                if (currentStep < items.length - 1) {
+                    currentStep++;
+                    renderStep();
+                } else {
+                    onReview = true;
+                    renderReview();
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            nav.appendChild(next);
+
+            stage.appendChild(nav);
+        }
+
+        // ---- Review screen ----
+        function renderReview() {
+            stage.innerHTML = '';
+
+            const heading = document.createElement('div');
+            heading.className = 'section-heading';
+            heading.textContent = 'Review your answers';
+            stage.appendChild(heading);
+
+            const sub = document.createElement('div');
+            sub.className = 'section-subtitle';
+            sub.textContent = 'Everything below is what would be sent. Edit anything before you send it.';
+            stage.appendChild(sub);
+
+            const list = document.createElement('div');
+            list.className = 'step-card';
+
+            items.forEach(function(item, idx) {
+                const a = answers[item.id];
+                const row = document.createElement('div');
+                row.className = 'review-row';
+
+                const text = document.createElement('div');
+                text.className = 'review-text';
+
+                const g = document.createElement('div');
+                g.className = 'review-group';
+                g.textContent = GROUP_LABELS[item.group];
+                text.appendChild(g);
+
+                const qEl = document.createElement('div');
+                qEl.className = 'review-question';
+                qEl.textContent = item.text;
+                text.appendChild(qEl);
+
+                if (item.type === 'rating') {
+                    const r = document.createElement('div');
+                    if (a.rating !== null) {
+                        r.className = 'review-rating';
+                        r.textContent = 'Rated ' + a.rating + ' / 5';
+                    } else {
+                        r.className = 'review-rating unrated';
+                        r.textContent = 'Not rated';
+                    }
+                    text.appendChild(r);
+                    if (a.comment) {
+                        const c = document.createElement('div');
+                        c.className = 'review-comment';
+                        c.textContent = '“' + a.comment + '”';
+                        text.appendChild(c);
+                    }
+                } else if (a.text) {
+                    const c = document.createElement('div');
+                    c.className = 'review-comment';
+                    c.textContent = '“' + a.text + '”';
+                    text.appendChild(c);
+                }
+
+                row.appendChild(text);
+
+                const editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'btn-edit-row';
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', function() {
+                    currentStep = idx;
+                    onReview = false;
+                    renderStep();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                row.appendChild(editBtn);
+
+                list.appendChild(row);
+            });
+
+            stage.appendChild(list);
+
+            // ---- Submit ----
+            const submitWrap = document.createElement('div');
+            submitWrap.className = 'submit-wrap';
+
+            const draftSaved = document.createElement('span');
+            draftSaved.id = 'draft-saved-indicator';
+            draftSaved.className = 'draft-saved-indicator';
+            draftSaved.textContent = '• Draft saved';
+            submitWrap.appendChild(draftSaved);
+
+            const submitBtn = document.createElement('button');
+            submitBtn.id = 'submit-btn';
+            submitBtn.className = 'btn-submit';
+            submitBtn.type = 'button';
+            submitBtn.textContent = 'Send my answers';
+
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'error-message';
+            errorMsg.id = 'error-message';
+            errorMsg.innerHTML = 'Something went wrong, please let us know at <a href="mailto:hello@croquetclaude.com">hello@croquetclaude.com</a>.';
+
+            submitBtn.addEventListener('click', async function() {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+                const responsePayload = buildPayload();
+                const ok = await window.submitMission(tokenRecord, responsePayload, respondentName, null, {
+                    thankyouNote: 'Thanks. That is genuinely useful. Once we have heard from both of you, we will put together one shared answer and check it with you before anything moves further.'
+                });
+
+                if (!ok) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send my answers';
+                    document.getElementById('error-message').classList.add('visible');
+                }
+            });
+
+            submitWrap.appendChild(submitBtn);
+            submitWrap.appendChild(errorMsg);
+            stage.appendChild(submitWrap);
+        }
+
+        renderStep();
+    };
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', function() {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
