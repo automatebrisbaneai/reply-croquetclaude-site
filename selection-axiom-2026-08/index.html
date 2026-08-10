@@ -532,7 +532,13 @@
                     b.textContent = opt.label;
                     b.setAttribute('aria-pressed', a.choice === side ? 'true' : 'false');
                     b.addEventListener('click', function() {
-                        a.choice = (a.choice === side) ? null : side; // click again clears
+                        // A forced pick, not a toggle: clicking either side
+                        // always sets it (no click-again-to-clear, unlike
+                        // the rating buttons). Also avoids a genuine bug a
+                        // toggle would reintroduce here, since an
+                        // accidental double-dispatch of the same click
+                        // would net back to null instead of staying picked.
+                        a.choice = side;
                         if (autosave) autosave.save();
                         renderStep();
                     });
