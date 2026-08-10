@@ -112,6 +112,47 @@
             margin-bottom: var(--space-sm);
         }
 
+        /* Forced trade-offs: two fixed-position, fixed-size buttons.
+           Stacked top/bottom (not side by side) since each label is a full
+           sentence, and stacking reads better than squeezing two of them
+           into half-width columns on a narrow phone. Position A is always
+           the top slot, B always the bottom slot, every render, only the
+           label text changes between the ten comparison items. */
+        .choice-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .btn-choice {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.4;
+            text-align: left;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--cream);
+            color: var(--text-primary);
+            cursor: pointer;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .btn-choice:focus-visible {
+            outline: 3px solid var(--lawn-green);
+            outline-offset: 2px;
+        }
+
+        .btn-choice.selected {
+            background: var(--lawn-green);
+            border-color: var(--lawn-dark);
+            color: var(--white);
+        }
+
         .comment-label {
             display: block;
             font-size: var(--font-size-small);
@@ -274,6 +315,46 @@
         { id: 'c-nextgen', group: 'C', pairId: 'nextgen', type: 'rating', text: 'Build the next generation of state players.' },
         { id: 'c-reward', group: 'C', pairId: 'reward', type: 'rating', text: 'Reward and recognise the players who have earned it.' },
 
+        // Group T: forced trade-offs. The Group A ratings above cost nothing
+        // to agree with (every statement is an obviously good trait), so
+        // everyone rates everything highly and nothing differentiates. This
+        // is the fix: a straight pick between two of the five core
+        // constructs, one tap each, no middle ground. Full round robin
+        // across all five (10 pairs) rather than a hand-picked few, since
+        // each one is quick to answer and a full pairwise set lets a
+        // priority order fall out of the win rate, not just guesswork about
+        // which tensions matter.
+        { id: 't-win-sustain', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'win', label: 'A reliable winner, results hold up under pressure' },
+          optionB: { value: 'sustain', label: 'Consistent, form holds up across the whole event' } },
+        { id: 't-win-improve', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'win', label: 'A reliable winner, results hold up under pressure' },
+          optionB: { value: 'improve', label: 'Lifts the team, makes everyone around them better' } },
+        { id: 't-win-teamwant', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'win', label: 'A reliable winner, results hold up under pressure' },
+          optionB: { value: 'teamwant', label: 'Wanted, the team genuinely wants them there' } },
+        { id: 't-win-sport', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'win', label: 'A reliable winner, results hold up under pressure' },
+          optionB: { value: 'sport', label: 'A good sport, plays the right way even if it costs a win' } },
+        { id: 't-sustain-improve', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'sustain', label: 'Consistent, form holds up across the whole event' },
+          optionB: { value: 'improve', label: 'Lifts the team, makes everyone around them better' } },
+        { id: 't-sustain-teamwant', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'sustain', label: 'Consistent, form holds up across the whole event' },
+          optionB: { value: 'teamwant', label: 'Wanted, the team genuinely wants them there' } },
+        { id: 't-sustain-sport', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'sustain', label: 'Consistent, form holds up across the whole event' },
+          optionB: { value: 'sport', label: 'A good sport, plays the right way even if it costs a win' } },
+        { id: 't-improve-teamwant', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'improve', label: 'Lifts the team, makes everyone around them better' },
+          optionB: { value: 'teamwant', label: 'Wanted, the team genuinely wants them there' } },
+        { id: 't-improve-sport', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'improve', label: 'Lifts the team, makes everyone around them better' },
+          optionB: { value: 'sport', label: 'A good sport, plays the right way even if it costs a win' } },
+        { id: 't-teamwant-sport', group: 'T', type: 'choice', text: 'Which matters more in an ideal Queensland player?',
+          optionA: { value: 'teamwant', label: 'Wanted, the team genuinely wants them there' },
+          optionB: { value: 'sport', label: 'A good sport, plays the right way even if it costs a win' } },
+
         // Group D: catch-all, free text, last step before the review screen.
         { id: 'anything-missed', group: 'D', type: 'text', text: 'Anything else worth saying before we go further?' }
     ];
@@ -291,6 +372,7 @@
         A: 'What matters',
         B: 'What rules someone out',
         C: 'What the team is for',
+        T: 'When these clash',
         D: 'Anything else',
         E: 'Before this goes out'
     };
@@ -302,10 +384,10 @@
         const seed = tokenRecord.payload_seed || {};
         const items = seed.extra_feedback ? BASE_ITEMS.concat([PROCESS_FEEDBACK_ITEM]) : BASE_ITEMS;
 
-        // answers[id] = { rating: null|0-5, comment: '', text: '' }
+        // answers[id] = { rating: null|0-5, comment: '', text: '', choice: null|'A'|'B' }
         const answers = {};
         items.forEach(function(item) {
-            answers[item.id] = { rating: null, comment: '', text: '' };
+            answers[item.id] = { rating: null, comment: '', text: '', choice: null };
         });
 
         if (draft && Array.isArray(draft.answers)) {
@@ -314,6 +396,7 @@
                 if (entry.rating !== undefined) answers[entry.id].rating = entry.rating;
                 if (entry.comment) answers[entry.id].comment = entry.comment;
                 if (entry.text) answers[entry.id].text = entry.text;
+                if (entry.choice) answers[entry.id].choice = entry.choice;
             });
         }
 
@@ -321,7 +404,7 @@
             return {
                 answers: items.map(function(item) {
                     var a = answers[item.id];
-                    return { id: item.id, rating: a.rating, comment: a.comment || '', text: a.text || '' };
+                    return { id: item.id, rating: a.rating, comment: a.comment || '', text: a.text || '', choice: a.choice };
                 })
             };
         }
@@ -434,6 +517,43 @@
                     if (autosave) autosave.save();
                 });
                 card.appendChild(ta);
+            } else if (item.type === 'choice') {
+                // Forced trade-off: two fixed-position buttons, same DOM/CSS
+                // every render so nothing shifts size or position as the
+                // respondent steps through the ten comparisons, only the
+                // label text changes.
+                const row = document.createElement('div');
+                row.className = 'choice-row';
+                [item.optionA, item.optionB].forEach(function(opt, idx) {
+                    const side = idx === 0 ? 'A' : 'B';
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'btn-choice' + (a.choice === side ? ' selected' : '');
+                    b.textContent = opt.label;
+                    b.setAttribute('aria-pressed', a.choice === side ? 'true' : 'false');
+                    b.addEventListener('click', function() {
+                        a.choice = (a.choice === side) ? null : side; // click again clears
+                        if (autosave) autosave.save();
+                        renderStep();
+                    });
+                    row.appendChild(b);
+                });
+                card.appendChild(row);
+
+                const commentLabel = document.createElement('label');
+                commentLabel.className = 'comment-label';
+                commentLabel.textContent = 'Anything behind that pick worth saying?';
+                card.appendChild(commentLabel);
+
+                const ta = document.createElement('textarea');
+                ta.placeholder = 'Optional, but we would genuinely like to know.';
+                ta.value = a.comment;
+                ta.rows = 3;
+                ta.addEventListener('input', function() {
+                    a.comment = ta.value;
+                    if (autosave) autosave.save();
+                });
+                card.appendChild(ta);
             } else {
                 // free-text catch-all
                 const ta = document.createElement('textarea');
@@ -519,7 +639,9 @@
 
                 const qEl = document.createElement('div');
                 qEl.className = 'review-question';
-                qEl.textContent = item.text;
+                qEl.textContent = (item.type === 'choice')
+                    ? (item.optionA.label + '   vs   ' + item.optionB.label)
+                    : item.text;
                 text.appendChild(qEl);
 
                 if (item.type === 'rating') {
@@ -530,6 +652,23 @@
                     } else {
                         r.className = 'review-rating unrated';
                         r.textContent = 'Not rated';
+                    }
+                    text.appendChild(r);
+                    if (a.comment) {
+                        const c = document.createElement('div');
+                        c.className = 'review-comment';
+                        c.textContent = '“' + a.comment + '”';
+                        text.appendChild(c);
+                    }
+                } else if (item.type === 'choice') {
+                    const r = document.createElement('div');
+                    if (a.choice) {
+                        const picked = a.choice === 'A' ? item.optionA : item.optionB;
+                        r.className = 'review-rating';
+                        r.textContent = 'Picked: ' + picked.label;
+                    } else {
+                        r.className = 'review-rating unrated';
+                        r.textContent = 'Not picked';
                     }
                     text.appendChild(r);
                     if (a.comment) {
