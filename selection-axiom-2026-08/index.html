@@ -301,12 +301,12 @@
         // them; the winning-above-all one gets two, since it is the most
         // direct opposite of the core axiom and worth the same reliability
         // check as its matching Group A construct.
-        { id: 'b-games-1', group: 'B', pairId: 'games', type: 'rating', text: 'Plays the rankings: picks soft events, avoids risk to protect their number.' },
-        { id: 'b-fades-1', group: 'B', pairId: 'fades', type: 'rating', text: 'Fades when it counts, cannot hold up across a full event.' },
-        { id: 'b-keeps-1', group: 'B', pairId: 'keeps', type: 'rating', text: 'Keeps their form and knowledge to themselves, does not help anyone else improve.' },
-        { id: 'b-notwant-1', group: 'B', pairId: 'notwant', type: 'rating', text: 'The rest of the team would rather not have them at the event.' },
-        { id: 'b-winabove-1', group: 'B', pairId: 'winabove', type: 'rating', text: 'Puts winning above everything else, whatever that costs the people around them.' },
-        { id: 'b-winabove-2', group: 'B', pairId: 'winabove', type: 'rating', text: 'Would cut a corner to win if no one would notice.' },
+        { id: 'b-games-1', group: 'B', pairId: 'games', type: 'level', text: 'Plays the rankings: picks soft events, avoids risk to protect their number.' },
+        { id: 'b-fades-1', group: 'B', pairId: 'fades', type: 'level', text: 'Fades when it counts, cannot hold up across a full event.' },
+        { id: 'b-keeps-1', group: 'B', pairId: 'keeps', type: 'level', text: 'Keeps their form and knowledge to themselves, does not help anyone else improve.' },
+        { id: 'b-notwant-1', group: 'B', pairId: 'notwant', type: 'level', text: 'The rest of the team would rather not have them at the event.' },
+        { id: 'b-winabove-1', group: 'B', pairId: 'winabove', type: 'level', text: 'Puts winning above everything else, whatever that costs the people around them.' },
+        { id: 'b-winabove-2', group: 'B', pairId: 'winabove', type: 'level', text: 'Would cut a corner to win if no one would notice.' },
 
         // Group C: what the team is for. Four genuinely distinct purposes,
         // not one construct asked differently, so one phrasing each.
@@ -377,6 +377,18 @@
         E: 'Before this goes out'
     };
 
+    // Labelled levels for the Group B rule-out items. These replace a 0-5
+    // number, which reads backwards on a negative statement: "essential"
+    // and "not important" both invite the wrong question ("essential to
+    // what?"). The label itself is the answer, so there's nothing to
+    // misread.
+    const LEVEL_OPTIONS = [
+        { value: 'not-issue', label: 'Not really an issue' },
+        { value: 'counts-against', label: 'Counts against them' },
+        { value: 'serious', label: 'Serious concern' },
+        { value: 'rules-out', label: 'Rules them out' }
+    ];
+
     window.renderMission = function(tokenRecord) {
         const respondentName = tokenRecord.respondent_name || 'there';
         const firstName = respondentName.split(' ')[0].split(',')[0];
@@ -384,10 +396,10 @@
         const seed = tokenRecord.payload_seed || {};
         const items = seed.extra_feedback ? BASE_ITEMS.concat([PROCESS_FEEDBACK_ITEM]) : BASE_ITEMS;
 
-        // answers[id] = { rating: null|0-5, comment: '', text: '', choice: null|'A'|'B' }
+        // answers[id] = { rating: null|0-5, comment: '', text: '', choice: null|'A'|'B', level: null|LEVEL_OPTIONS value }
         const answers = {};
         items.forEach(function(item) {
-            answers[item.id] = { rating: null, comment: '', text: '', choice: null };
+            answers[item.id] = { rating: null, comment: '', text: '', choice: null, level: null };
         });
 
         if (draft && Array.isArray(draft.answers)) {
@@ -397,6 +409,7 @@
                 if (entry.comment) answers[entry.id].comment = entry.comment;
                 if (entry.text) answers[entry.id].text = entry.text;
                 if (entry.choice) answers[entry.id].choice = entry.choice;
+                if (entry.level) answers[entry.id].level = entry.level;
             });
         }
 
@@ -404,7 +417,7 @@
             return {
                 answers: items.map(function(item) {
                     var a = answers[item.id];
-                    return { id: item.id, rating: a.rating, comment: a.comment || '', text: a.text || '', choice: a.choice };
+                    return { id: item.id, rating: a.rating, comment: a.comment || '', text: a.text || '', choice: a.choice, level: a.level };
                 })
             };
         }
@@ -425,7 +438,7 @@
         opener.innerHTML =
             '<p>' + firstName + ', thanks for taking a look at this.</p>' +
             '<p>Round one of two. Before we get into how a team gets picked, we want to agree on something simpler first: what makes someone the ideal Queensland player. Getting that settled means the next set of questions build on something real, instead of starting from nothing.</p>' +
-            '<p>A short survey, one question at a time. Rate each from 0 (not important) to 5 (essential), and add a comment on any of them, we would genuinely like to know the thinking behind a number, not just the number itself.</p>' +
+            '<p>A short survey, one question at a time. Rate each from 0 (not important) to 5 (essential), and add a comment on any of them, we would genuinely like to know the thinking behind a number, not just the number itself. One short section, what rules someone out, uses labelled buttons instead of a number.</p>' +
             '<p class="opener-note"><span class="opener-note-icon" aria-hidden="true">✎</span> Your answers save automatically as you go. Close the tab and come back any time: the link picks up where you left off until you press <em>Send my answers</em>.</p>';
         container.appendChild(opener);
 
@@ -506,6 +519,50 @@
                 const commentLabel = document.createElement('label');
                 commentLabel.className = 'comment-label';
                 commentLabel.textContent = 'Anything behind that number worth saying?';
+                card.appendChild(commentLabel);
+
+                const ta = document.createElement('textarea');
+                ta.placeholder = 'Optional, but we would genuinely like to know.';
+                ta.value = a.comment;
+                ta.rows = 3;
+                ta.addEventListener('input', function() {
+                    a.comment = ta.value;
+                    if (autosave) autosave.save();
+                });
+                card.appendChild(ta);
+            } else if (item.type === 'level') {
+                // Rule-out items: labelled buttons instead of a number, so
+                // the answer can't be misread as running the wrong
+                // direction against the group's own "essential" scale.
+                const lead = document.createElement('div');
+                lead.className = 'comment-label';
+                lead.textContent = 'How much should this rule someone out of a Queensland team?';
+                card.insertBefore(lead, q.nextSibling);
+
+                const row = document.createElement('div');
+                row.className = 'choice-row';
+                LEVEL_OPTIONS.forEach(function(opt) {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'btn-choice' + (a.level === opt.value ? ' selected' : '');
+                    b.textContent = opt.label;
+                    b.setAttribute('aria-pressed', a.level === opt.value ? 'true' : 'false');
+                    b.addEventListener('click', function() {
+                        // Set, don't toggle: matches the trade-off buttons.
+                        // A clear-on-reclick here reintroduces the same
+                        // double-click bug already found and fixed on
+                        // those (10 Aug walkthrough).
+                        a.level = opt.value;
+                        if (autosave) autosave.save();
+                        renderStep();
+                    });
+                    row.appendChild(b);
+                });
+                card.appendChild(row);
+
+                const commentLabel = document.createElement('label');
+                commentLabel.className = 'comment-label';
+                commentLabel.textContent = 'Anything behind that worth saying?';
                 card.appendChild(commentLabel);
 
                 const ta = document.createElement('textarea');
@@ -658,6 +715,23 @@
                     } else {
                         r.className = 'review-rating unrated';
                         r.textContent = 'Not rated';
+                    }
+                    text.appendChild(r);
+                    if (a.comment) {
+                        const c = document.createElement('div');
+                        c.className = 'review-comment';
+                        c.textContent = '“' + a.comment + '”';
+                        text.appendChild(c);
+                    }
+                } else if (item.type === 'level') {
+                    const r = document.createElement('div');
+                    const opt = LEVEL_OPTIONS.filter(function(o) { return o.value === a.level; })[0];
+                    if (opt) {
+                        r.className = 'review-rating';
+                        r.textContent = 'Answered: ' + opt.label;
+                    } else {
+                        r.className = 'review-rating unrated';
+                        r.textContent = 'Not answered';
                     }
                     text.appendChild(r);
                     if (a.comment) {
