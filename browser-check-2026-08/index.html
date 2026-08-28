@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser check — CroquetClaude</title>
+    <meta name="description" content="A one-click check of the browser on this computer.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* ---- browser-check-2026-08 : scoped styles ------------------------- */
+    /* Deliberately plain CSS. No color-mix, no @layer, no grid-only layout. */
+    /* This page must render on the very browsers it is here to identify.   */
+    .bc-wrap { max-width: 720px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .bc-opener {
+        background: #f7f1d8;
+        border-left: 4px solid #2d6a4f;
+        padding: 1.15rem 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+    .bc-opener p { font-size: 17px; line-height: 1.6; margin: 0 0 0.85rem; }
+    .bc-opener p:last-child { margin-bottom: 0; }
+    .bc-readout {
+        border: 1px solid #d8d2b8;
+        background: #fffdf3;
+        padding: 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+    .bc-readout h2 {
+        font-size: 15px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #6b6b5a;
+        margin: 0 0 0.9rem;
+    }
+    .bc-line { font-size: 19px; line-height: 1.55; margin: 0 0 0.5rem; }
+    .bc-line:last-child { margin-bottom: 0; }
+    .bc-label { color: #6b6b5a; }
+    .bc-value { font-weight: 700; color: #2d3d33; }
+    .bc-verdict { padding: 1rem 1.15rem; margin-bottom: 1.75rem; font-size: 18px; line-height: 1.55; }
+    .bc-verdict-bad { background: #fbeceb; border-left: 4px solid #b83227; }
+    .bc-verdict-good { background: #ecf4ef; border-left: 4px solid #2d6a4f; }
+    .bc-verdict-unknown { background: #fbf1e6; border-left: 4px solid #bc6c25; }
+    .bc-send {
+        display: block;
+        width: 100%;
+        min-height: 56px;
+        padding: 1rem 1.25rem;
+        font-family: inherit;
+        font-size: 19px;
+        font-weight: 700;
+        color: #ffffff;
+        background: #2d6a4f;
+        border: 2px solid #2d6a4f;
+        cursor: pointer;
+    }
+    .bc-send:hover { background: #245740; border-color: #245740; }
+    .bc-send[disabled] { background: #8fa89a; border-color: #8fa89a; cursor: default; }
+    .bc-fallback {
+        margin-top: 1.5rem;
+        padding-top: 1.1rem;
+        border-top: 1px dashed #d8d2b8;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #6b6b5a;
+        font-style: italic;
+    }
+    .bc-status { margin-top: 0.9rem; font-size: 16px; line-height: 1.5; }
+    .bc-status-ok { color: #2d6a4f; font-weight: 700; }
+    .bc-status-err { color: #b83227; font-weight: 700; }
+    .bc-raw {
+        margin-top: 1.1rem;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #6b6b5a;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    @media (max-width: 480px) {
+        .bc-line { font-size: 17px; }
+        .bc-wrap { padding: 1.1rem 1rem 3rem; }
+    }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Browser check</span>
+    </header>
+
+    <div class="bc-wrap">
+        <!-- Static, always-visible readout. Written by an ES5 script below so it
+             appears even if /app.js (ES6) fails to run on a very old browser.
+             That failure is itself a finding, so the page must survive it. -->
+        <div id="bc-static"></div>
+
+        <!-- app.js + renderMission() inject the send button here -->
+        <div id="app"></div>
+    </div>
+
+    <script>
+    // -----------------------------------------------------------------------
+    // Mission — browser-check-2026-08
+    //
+    // Purpose: find out what browser a member is using, when the MyCroquet app
+    // renders wrongly for them and its buttons do nothing. MyCroquet is built on
+    // Tailwind v4 + Next.js 16, which need Chrome/Edge 111+, Safari 16.4+, or
+    // Firefox 128+. Below that the layout rules are dropped (leaving a block of
+    // bare accent colour) and the page script fails, so nothing is submitted.
+    //
+    // ES5 ONLY in this block: no const/let, no arrow functions, no template
+    // literals. This must run on the old browsers we are trying to identify.
+    // -----------------------------------------------------------------------
+
+    var BC = {};
+
+    BC.detect = function () {
+        var ua = navigator.userAgent || '';
+        var d = {
+            user_agent: ua,
+            browser: 'Unknown',
+            browser_version: null,
+            os: 'Unknown',
+            screen: (window.screen ? screen.width + ' x ' + screen.height : 'unknown'),
+            window_size: (window.innerWidth || 0) + ' x ' + (window.innerHeight || 0),
+            language: navigator.language || navigator.userLanguage || 'unknown'
+        };
+
+        // --- browser name + major version -------------------------------
+        var m;
+        if ((m = ua.match(/Edg(?:e|A|iOS)?\/(\d+)/))) { d.browser = 'Microsoft Edge'; d.browser_version = parseInt(m[1], 10); }
+        else if ((m = ua.match(/OPR\/(\d+)/))) { d.browser = 'Opera'; d.browser_version = parseInt(m[1], 10); }
+        else if ((m = ua.match(/Firefox\/(\d+)/))) { d.browser = 'Firefox'; d.browser_version = parseInt(m[1], 10); }
+        else if ((m = ua.match(/Chrome\/(\d+)/))) { d.browser = 'Google Chrome'; d.browser_version = parseInt(m[1], 10); }
+        else if ((m = ua.match(/Version\/(\d+)[\d.]* Safari/))) { d.browser = 'Safari'; d.browser_version = parseInt(m[1], 10); }
+        else if (ua.indexOf('MSIE') !== -1 || ua.indexOf('Trident/') !== -1) { d.browser = 'Internet Explorer'; d.browser_version = null; }
+
+        // --- operating system -------------------------------------------
+        if ((m = ua.match(/Windows NT ([\d.]+)/))) {
+            var winmap = { '10.0': 'Windows 10 or 11', '6.3': 'Windows 8.1', '6.2': 'Windows 8', '6.1': 'Windows 7', '6.0': 'Windows Vista', '5.1': 'Windows XP' };
+            d.os = winmap[m[1]] || ('Windows (NT ' + m[1] + ')');
+        }
+        else if (ua.indexOf('Mac OS X') !== -1) { d.os = 'Mac'; }
+        else if (ua.indexOf('Android') !== -1) { d.os = 'Android'; }
+        else if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) { d.os = 'iPhone or iPad'; }
+        else if (ua.indexOf('Linux') !== -1) { d.os = 'Linux'; }
+
+        // --- direct capability tests ------------------------------------
+        // Worth more than the version string, which can be spoofed or odd.
+        // These are the exact things MyCroquet's stylesheet and script need.
+        var supports = function (decl) {
+            try { return !!(window.CSS && CSS.supports && CSS.supports(decl)); }
+            catch (e) { return false; }
+        };
+        d.supports_color_mix = supports('color: color-mix(in srgb, red 50%, blue)');
+        d.supports_cascade_layers = (typeof window.CSSLayerBlockRule !== 'undefined');
+        d.supports_has_selector = supports('selector(:has(a))');
+        d.supports_grid = supports('display: grid');
+        d.supports_css_vars = supports('--x: 1');
+        try { new Function('var a = {}; return a?.b ?? 1;'); d.supports_modern_js = true; }
+        catch (e) { d.supports_modern_js = false; }
+
+        // MyCroquet needs colour-mixing and cascade layers for its stylesheet,
+        // and modern script syntax for its buttons. Missing any = broken page.
+        d.mycroquet_ok = !!(d.supports_color_mix && d.supports_cascade_layers && d.supports_modern_js);
+        return d;
+    };
+
+    BC.esc = function (s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    };
+
+    BC.renderStatic = function (d) {
+        var yn = function (v) { return v ? 'Yes' : 'No'; };
+        var versionText = d.browser_version ? (d.browser + ' ' + d.browser_version) : d.browser;
+
+        var verdictClass, verdictText;
+        if (d.mycroquet_ok) {
+            verdictClass = 'bc-verdict-good';
+            verdictText = 'This browser is new enough for myCroquet. If the page still looks wrong on this computer, something else is blocking it, and I will keep looking.';
+        } else {
+            verdictClass = 'bc-verdict-bad';
+            verdictText = 'This browser is too old for myCroquet. That is why the page looked strange and the button did nothing. It is not a fault with your account.';
+        }
+
+        var h = '';
+        h += '<div class="bc-opener">';
+        h += '<p><strong>Thank you for clicking.</strong> This page has just read what this computer uses to go on the internet. Nothing here changes anything on your computer.</p>';
+        h += '<p>Here is what it found.</p>';
+        h += '</div>';
+
+        h += '<div class="bc-readout">';
+        h += '<h2>This computer</h2>';
+        h += '<p class="bc-line"><span class="bc-label">Browser:</span> <span class="bc-value">' + BC.esc(versionText) + '</span></p>';
+        h += '<p class="bc-line"><span class="bc-label">System:</span> <span class="bc-value">' + BC.esc(d.os) + '</span></p>';
+        h += '<p class="bc-line"><span class="bc-label">Screen:</span> <span class="bc-value">' + BC.esc(d.screen) + '</span></p>';
+        h += '<p class="bc-line"><span class="bc-label">Can run myCroquet:</span> <span class="bc-value">' + yn(d.mycroquet_ok) + '</span></p>';
+        h += '<div class="bc-raw">' + BC.esc(d.user_agent) + '</div>';
+        h += '</div>';
+
+        h += '<div class="bc-verdict ' + verdictClass + '">' + verdictText + '</div>';
+
+        document.getElementById('bc-static').innerHTML = h;
+    };
+
+    BC.data = BC.detect();
+    BC.renderStatic(BC.data);
+    </script>
+
+    <script src="/app.js"></script>
+    <script>
+    // The send button lives here because it needs the validated token record
+    // that app.js loads. If app.js never runs (browser older than ES6), the
+    // static readout above still stands and the email tells her to read it out.
+    window.renderMission = function (tokenRecord) {
+        var respondentName = tokenRecord.respondent_name || 'there';
+        var app = document.getElementById('app');
+
+        var h = '';
+        h += '<button type="button" class="bc-send" id="bc-send">Send this to CroquetClaude</button>';
+        h += '<div class="bc-status" id="bc-status"></div>';
+        h += '<p class="bc-fallback">If the button does not work, that is useful to know too. Just reply to my email and tell me the two lines above: the Browser and the System.</p>';
+        app.innerHTML = h;
+
+        var btn = document.getElementById('bc-send');
+        var status = document.getElementById('bc-status');
+
+        btn.onclick = function () {
+            btn.disabled = true;
+            btn.innerHTML = 'Sending...';
+            status.innerHTML = '';
+
+            // app.js adds navigator.userAgent and submitted_at to every response.
+            window.submitMission(tokenRecord, BC.data, respondentName, null, {
+                thankyouNote: 'I have your browser details. I will look at them and write back to you.'
+            }).then(function (ok) {
+                if (!ok) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Send this to CroquetClaude';
+                    status.innerHTML = '<span class="bc-status-err">That did not send. Please reply to my email with the Browser and System lines above.</span>';
+                }
+                // On success app.js replaces #app with its thank-you screen.
+            })['catch'](function () {
+                btn.disabled = false;
+                btn.innerHTML = 'Send this to CroquetClaude';
+                status.innerHTML = '<span class="bc-status-err">That did not send. Please reply to my email with the Browser and System lines above.</span>';
+            });
+        };
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.initMission();
+    });
+    </script>
+</body>
+</html>
