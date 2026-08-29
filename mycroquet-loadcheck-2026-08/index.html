@@ -163,10 +163,15 @@
     // because browsers deliberately hide the reason from the page. But the
     // presence or absence of an entry splits the two cases that matter:
     //
-    //   no entry at all  -> something on THIS COMPUTER stopped it before it
-    //                       left (security software, or a browser add-on)
-    //   entry, took time -> it left the computer and something on the network
-    //                       answered badly (router, filter, provider)
+    //   fails in ~2ms    -> it never reached the network at all, which is what
+    //                       something ON THIS COMPUTER refusing it looks like
+    //   fails after 20ms+ -> it went out and something answered badly
+    //
+    // MEASURED, not assumed: an aborted request still produces a timing entry,
+    // so entry-presence is NOT the signal (that was the first guess and it was
+    // wrong). Duration is. A locally-aborted fetch measured 2ms against 23-370ms
+    // for healthy loads. The labels below stay deliberately factual rather than
+    // naming a cause, because one threshold on one test machine is not proof.
     //
     // This also tells a real block apart from a stale hashed URL: a 404 still
     // produces a timing entry, because the server did answer.
@@ -199,9 +204,11 @@
             if (r.loaded) {
                 r.stopped_where = 'ok';
             } else if (!hit) {
-                r.stopped_where = 'blocked_before_it_left_this_computer';
+                r.stopped_where = 'no_record_of_the_request';
+            } else if (hit.duration < 20) {
+                r.stopped_where = 'failed_instantly_never_reached_the_network';
             } else {
-                r.stopped_where = 'left_this_computer_then_failed';
+                r.stopped_where = 'failed_after_a_delay';
             }
         }
     };
