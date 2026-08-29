@@ -118,7 +118,11 @@
                 loaded: ok,
                 ms: Math.round(LC.now() - started),
                 primary: !!t.primary,
-                control: !!t.control
+                control: !!t.control,
+                // Filled in by LC.addTiming() once every test has run.
+                request_seen: null,
+                request_ms: null,
+                stopped_where: null
             };
             LC.order.push(t.key);
             if (el && el.parentNode) { el.parentNode.removeChild(el); }
@@ -153,6 +157,67 @@
         document.head.appendChild(el);
     };
 
+    // ---- WHERE was it stopped? -------------------------------------------
+    // The browser keeps its own list of every request it actually issued
+    // (Resource Timing). onerror alone only says "it failed" and never why,
+    // because browsers deliberately hide the reason from the page. But the
+    // presence or absence of an entry splits the two cases that matter:
+    //
+    //   no entry at all  -> something on THIS COMPUTER stopped it before it
+    //                       left (security software, or a browser add-on)
+    //   entry, took time -> it left the computer and something on the network
+    //                       answered badly (router, filter, provider)
+    //
+    // This also tells a real block apart from a stale hashed URL: a 404 still
+    // produces a timing entry, because the server did answer.
+    //
+    // Cross-origin entries have their detailed fields zeroed without a
+    // Timing-Allow-Origin header, which we do not set. Existence and duration
+    // survive that, and they are the two things used here. transferSize is
+    // deliberately NOT used: it reads 0 cross-origin whether blocked or not.
+    LC.addTiming = function () {
+        if (!(window.performance && performance.getEntriesByType)) { return; }
+        var entries;
+        try { entries = performance.getEntriesByType('resource') || []; }
+        catch (e) { return; }
+        var i, k, r, j, hit;
+        for (k in LC.results) {
+            if (!LC.results.hasOwnProperty(k)) { continue; }
+            r = LC.results[k];
+            hit = null;
+            for (j = 0; j < entries.length; j++) {
+                // Match on our cache-buster so a previously cached copy of the
+                // same URL cannot be mistaken for this run's request.
+                if (entries[j].name.indexOf(r.url) === 0 &&
+                    entries[j].name.indexOf('lc=' + LC.stamp) !== -1) {
+                    hit = entries[j];
+                    break;
+                }
+            }
+            r.request_seen = !!hit;
+            r.request_ms = hit ? Math.round(hit.duration) : null;
+            if (r.loaded) {
+                r.stopped_where = 'ok';
+            } else if (!hit) {
+                r.stopped_where = 'blocked_before_it_left_this_computer';
+            } else {
+                r.stopped_where = 'left_this_computer_then_failed';
+            }
+        }
+    };
+
+    // If a script DID arrive but then threw, that is a different fault
+    // entirely, and unlike a block we get the real reason. Cross-origin
+    // scripts report "Script error." with no detail, which is itself a fact
+    // worth recording.
+    LC.jsErrors = [];
+    window.onerror = function (msg, src, line, col) {
+        if (LC.jsErrors.length < 5) {
+            LC.jsErrors.push({ message: String(msg), source: String(src || ''), line: line || null });
+        }
+        return false;
+    };
+
     // Sequential, not parallel: a scanner that throttles concurrent requests
     // would otherwise look like a block.
     LC.runAll = function (whenDone) {
@@ -182,7 +247,9 @@
         var h = '';
         h += '<div class="lc-opener">';
         h += '<p><strong>Thank you for clicking.</strong> That is all I needed you to do.</p>';
-        h += '<p>I am checking this computer now. It takes a few seconds. Nothing on your computer is changed.</p>';
+        h += '<p>Here is what I think is happening. A web page is not one file. It is a picture file, a file that lays everything out, and a file that makes the buttons work. On your computer the picture arrived, which is why you saw a big brown image. I believe the other two were refused, so there was no layout and no working button.</p>';
+        h += '<p>So I am asking this computer to fetch those exact files now, and watching which ones it is allowed to have.</p>';
+        h += '<p>It takes a few seconds. Nothing on your computer is changed, and nothing is installed.</p>';
         h += '</div>';
         h += '<div class="lc-status" id="lc-status">';
         h += '<p class="lc-dots">&bull; &bull; &bull;</p>';
@@ -218,9 +285,11 @@
         var respondentName = tokenRecord.respondent_name || 'there';
 
         LC.runAll(function () {
+            LC.addTiming();
             var payload = LC.detect();
             payload.tests = LC.results;
             payload.test_order = LC.order;
+            payload.js_errors = LC.jsErrors;
             payload.still_broken = null;   // filled in only if she chooses to answer
 
             window.submitMission(tokenRecord, payload, respondentName, null, {
