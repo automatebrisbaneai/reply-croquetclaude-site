@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checking myCroquet — CroquetClaude</title>
+    <meta name="description" content="A one-click check of whether this computer can load myCroquet.">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 28V18a10 10 0 0120 0v10' fill='none' stroke='%232d6a4f' stroke-width='4' stroke-linecap='round'/></svg>">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    /* ---- mycroquet-loadcheck (evergreen) : scoped styles ------------------
+       Plain CSS on purpose. This page must render on a machine that is
+       currently failing to render myCroquet, so it assumes nothing. No grid,
+       no custom properties, no @layer, no color-mix.                        */
+    .lc-wrap { max-width: 640px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .lc-opener {
+        background: #f7f1d8;
+        border-left: 4px solid #2d6a4f;
+        padding: 1.25rem 1.35rem;
+        margin-bottom: 2rem;
+    }
+    .lc-opener p { font-size: 18px; line-height: 1.6; margin: 0 0 0.9rem; }
+    .lc-opener p:last-child { margin-bottom: 0; }
+    .lc-status {
+        text-align: center;
+        padding: 2.5rem 1.25rem;
+        border: 1px solid #d8d2b8;
+        background: #fffdf3;
+    }
+    .lc-status h2 { font-size: 24px; line-height: 1.35; margin: 0 0 0.75rem; color: #2d3d33; }
+    .lc-status p { font-size: 18px; line-height: 1.6; margin: 0; color: #4a4a3d; }
+    .lc-dots { font-size: 30px; letter-spacing: 0.2em; color: #bc6c25; margin: 0 0 1rem; }
+    .lc-done h2 { color: #2d6a4f; }
+    .lc-tick { font-size: 46px; line-height: 1; margin: 0 0 0.75rem; color: #2d6a4f; }
+    /* Optional extra. Never required: the result is already sent by the time
+       this appears, so ignoring it costs us nothing. */
+    .lc-extra { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #d8d2b8; }
+    .lc-extra p { font-size: 17px; line-height: 1.55; margin: 0 0 1rem; color: #6b6b5a; }
+    .lc-label { display: block; font-size: 17px; margin: 0 0 0.5rem; color: #4a4a3d; }
+    .lc-input {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 52px;
+        padding: 0.85rem 1rem;
+        margin: 0 0 0.9rem;
+        font-family: inherit;
+        font-size: 18px;
+        border: 2px solid #d8d2b8;
+        background: #fffdf3;
+        color: #2d3d33;
+    }
+    .lc-input:focus { border-color: #2d6a4f; outline: none; }
+    .lc-btns { display: block; }
+    .lc-btn {
+        display: block;
+        width: 100%;
+        min-height: 58px;
+        margin: 0 0 0.9rem;
+        padding: 1rem 1.25rem;
+        font-family: inherit;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        background: #fffdf3;
+    }
+    .lc-yes { color: #2d6a4f; border: 2px solid #2d6a4f; }
+    .lc-yes:hover, .lc-yes.chosen { background: #2d6a4f; color: #fff; }
+    .lc-no { color: #b83227; border: 2px solid #b83227; }
+    .lc-no:hover, .lc-no.chosen { background: #b83227; color: #fff; }
+    .lc-thanks { font-size: 17px; color: #2d6a4f; font-weight: 700; margin-top: 0.5rem; }
+    @media (max-width: 480px) { .lc-wrap { padding: 1.25rem 1rem 3rem; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="wordmark">
+            <img src="/assets/drawn-claude.png" alt="" class="wordmark-avatar">
+            <span>CroquetClaude</span>
+        </a>
+        <span class="mission-title">Checking myCroquet</span>
+    </header>
+
+    <div class="lc-wrap">
+        <div id="lc-static"></div>
+        <div id="app"></div>
+    </div>
+
+    <script>
+    // =======================================================================
+    // mycroquet-loadcheck — the EVERGREEN check page.
+    //
+    // Question it answers: can this computer actually FETCH myCroquet's files?
+    //
+    // Why it exists. A member reported the myCroquet login page rendering as a
+    // bare brown background with a tiny email box and a dead button, on
+    // Microsoft Edge 151 / Windows 11 with every browser capability passing.
+    // That is exactly what you get when the page's CSS and JS never arrive.
+    // Reproduced 2026-08-29. The blocker is on the member's machine, most
+    // likely antivirus or a browser setting, and nothing reaches our server, so
+    // the fault is invisible to us by construction.
+    //
+    // WHY THIS PAGE LIVES ON A DIFFERENT DOMAIN. myCroquet now beacons its own
+    // failures to itself. But if a machine refuses EVERYTHING from
+    // my.croquetqld.org, that beacon can never reach us. This page is on
+    // reply.croquetclaude.com, which the affected member's PC loads perfectly.
+    // It is the only channel that can report a total block. The two channels
+    // cover each other's blind spot, on purpose.
+    //
+    // DIFFERENCES FROM mycroquet-loadcheck-2026-08 (its dated ancestor):
+    //   1. NO TOKEN. Anyone can open this, including someone we have never
+    //      heard from, because it is linked from myCroquet's own failure
+    //      message. It posts straight to reply_mission_responses, whose
+    //      createRule is '' (public create, verified live 2026-08-31).
+    //      It deliberately does NOT use initMission/submitMission: those
+    //      require a token record, and the keepOpen path writes draft_payload
+    //      back onto the token, which on a shared token would show the next
+    //      member the previous member's answers.
+    //   2. STABLE test URLs, so it never goes stale on a redeploy. Hashed
+    //      chunk URLs can still be passed in the query string by the failing
+    //      page itself, which makes it precise when linked from a real failure.
+    //   3. An OPTIONAL email box, because whoever lands here is anonymous and
+    //      may want a reply.
+    //
+    // ES5 only: no const/let, no arrows, no template literals, ['catch'].
+    // The whole premise is that this renders where myCroquet does not.
+    // =======================================================================
+
+    var PB_BASE = 'https://util.croquetwade.com';
+    var MISSION = 'mycroquet-loadcheck';
+
+    var LC = { results: {}, order: [] };
+
+    // Stable, unhashed paths that must never be renamed. probe.css and
+    // probe.js exist in myCroquet's public/ folder for exactly this purpose:
+    // a permanent stylesheet URL and a permanent script URL to aim at. A
+    // failure on these is a real block, not a stale URL.
+    //
+    // *** DO NOT DEPLOY THIS PAGE BEFORE myCroquet SHIPS public/loadcheck/ ***
+    // Until those two files are live, every visitor's result would show them
+    // failing, and a missing file is not a block. The image tests below exist
+    // on live today, so they are the floor this page can always stand on.
+    LC.TESTS = [
+        { key: 'mycroquet_image', kind: 'img',    url: 'https://my.croquetqld.org/caq-logo.png',        primary: true },
+        { key: 'mycroquet_icon',  kind: 'img',    url: 'https://my.croquetqld.org/favicon.png',         primary: true },
+        { key: 'mycroquet_css',   kind: 'css',    url: 'https://my.croquetqld.org/loadcheck/probe.css', primary: true },
+        { key: 'mycroquet_js',    kind: 'script', url: 'https://my.croquetqld.org/loadcheck/probe.js',  primary: true },
+        // CONTROL. This page came from this domain, so it is known reachable.
+        // If this fails too, the problem is the whole connection, not myCroquet.
+        { key: 'control_replysite', kind: 'img', url: 'https://reply.croquetclaude.com/assets/drawn-claude.png', control: true }
+    ];
+
+    // The failing myCroquet page can hand over the exact hashed files that
+    // failed for THIS member, as ?css=<url>&js=<url>. Corroboration on top of
+    // the stable pair, never a replacement for it: a hashed URL can 404 after a
+    // redeploy, and a 404 is not a block.
+    LC.addQueryTests = function () {
+        var q = String(window.location.search || '');
+        var pairs = q.replace(/^\?/, '').split('&');
+        var i, bits, k, v;
+        for (i = 0; i < pairs.length; i++) {
+            bits = pairs[i].split('=');
+            if (bits.length < 2) { continue; }
+            k = bits[0];
+            try { v = decodeURIComponent(bits.slice(1).join('=')); } catch (e) { continue; }
+            // Only our own origin, and only http(s). A query parameter must
+            // never be able to point this page at somebody else's server.
+            if (v.indexOf('https://my.croquetqld.org/') !== 0) { continue; }
+            if (k === 'css') { LC.TESTS.push({ key: 'reported_css', kind: 'css', url: v }); }
+            if (k === 'js')  { LC.TESTS.push({ key: 'reported_js',  kind: 'script', url: v }); }
+        }
+    };
+
+    LC.now = function () { return (window.performance && performance.now) ? performance.now() : 0; };
+
+    LC.runOne = function (t, done) {
+        var started = LC.now();
+        var el, finished = false;
+        function finish(ok) {
+            if (finished) { return; }
+            finished = true;
+            LC.results[t.key] = {
+                url: t.url,
+                loaded: ok,
+                ms: Math.round(LC.now() - started),
+                primary: !!t.primary,
+                control: !!t.control,
+                // Filled in by LC.addTiming() once every test has run.
+                request_seen: null,
+                request_ms: null,
+                stopped_where: null
+            };
+            LC.order.push(t.key);
+            if (el && el.parentNode) { el.parentNode.removeChild(el); }
+            done();
+        }
+        // 12s ceiling. A hang is itself a finding (a proxy or scanner sitting
+        // on the request), recorded as a failure with its full duration.
+        var timer = setTimeout(function () { finish(false); }, 12000);
+        function ok()  { clearTimeout(timer); finish(true); }
+        function bad() { clearTimeout(timer); finish(false); }
+
+        // Cache-buster so we measure the network, not their disk.
+        var url = t.url + (t.url.indexOf('?') === -1 ? '?' : '&') + 'lc=' + LC.stamp;
+
+        if (t.kind === 'img') {
+            el = new Image();
+            el.onload = ok; el.onerror = bad;
+            el.src = url;
+            return;
+        }
+        if (t.kind === 'css') {
+            el = document.createElement('link');
+            el.rel = 'stylesheet';
+            el.onload = ok; el.onerror = bad;
+            el.href = url;
+            document.head.appendChild(el);
+            return;
+        }
+        el = document.createElement('script');
+        el.onload = ok; el.onerror = bad;
+        el.src = url;
+        document.head.appendChild(el);
+    };
+
+    // ---- WHERE was it stopped? -------------------------------------------
+    // The browser keeps its own list of every request it actually issued
+    // (Resource Timing). onerror alone only says "it failed" and never why,
+    // because browsers deliberately hide the reason from the page.
+    //
+    // MEASURED, not assumed: an aborted request STILL produces a timing entry,
+    // so entry-presence is NOT the signal. That was the first guess and it was
+    // wrong, and it had already shipped before it was tested. Duration is the
+    // signal. A locally-aborted fetch measured 2ms against 23-370ms for healthy
+    // loads. The labels below stay deliberately factual rather than naming a
+    // cause, because one threshold on one test machine is not proof. Read
+    // request_ms, not the label.
+    //
+    // This also tells a real block apart from a stale hashed URL: a 404 still
+    // produces a timing entry with a normal duration, because the server did
+    // answer. VERIFIED 2026-08-31 in a real browser: the same two probe URLs
+    // returned 27-29ms when 404ing and 2-3ms when aborted locally. That gap is
+    // the whole signal.
+    //
+    // KNOWN WRINKLE, measured in that same run: the FIRST test to touch a
+    // domain carries its DNS and connection time, so it can read ~38ms even
+    // when it was blocked. Read the PATTERN across all the tests, never a
+    // single one, and never the first one on its own.
+    //
+    // Cross-origin entries have their detailed fields zeroed without a
+    // Timing-Allow-Origin header, which we do not set. Existence and duration
+    // survive that, and they are the two things used here. transferSize is
+    // deliberately NOT used: it reads 0 cross-origin whether blocked or not.
+    LC.addTiming = function () {
+        if (!(window.performance && performance.getEntriesByType)) { return; }
+        var entries;
+        try { entries = performance.getEntriesByType('resource') || []; }
+        catch (e) { return; }
+        var k, r, j, hit;
+        for (k in LC.results) {
+            if (!LC.results.hasOwnProperty(k)) { continue; }
+            r = LC.results[k];
+            hit = null;
+            for (j = 0; j < entries.length; j++) {
+                // Match on our cache-buster so a previously cached copy of the
+                // same URL cannot be mistaken for this run's request.
+                if (entries[j].name.indexOf(r.url) === 0 &&
+                    entries[j].name.indexOf('lc=' + LC.stamp) !== -1) {
+                    hit = entries[j];
+                    break;
+                }
+            }
+            r.request_seen = !!hit;
+            r.request_ms = hit ? Math.round(hit.duration) : null;
+            if (r.loaded) {
+                r.stopped_where = 'ok';
+            } else if (!hit) {
+                r.stopped_where = 'no_record_of_the_request';
+            } else if (hit.duration < 20) {
+                r.stopped_where = 'failed_instantly_never_reached_the_network';
+            } else {
+                r.stopped_where = 'failed_after_a_delay';
+            }
+        }
+    };
+
+    // If a script DID arrive but then threw, that is a different fault
+    // entirely, and unlike a block we get the real reason. Cross-origin
+    // scripts report "Script error." with no detail, which is itself a fact
+    // worth recording.
+    LC.jsErrors = [];
+    window.onerror = function (msg, src, line) {
+        if (LC.jsErrors.length < 5) {
+            LC.jsErrors.push({ message: String(msg), source: String(src || ''), line: line || null });
+        }
+        return false;
+    };
+
+    // Sequential, not parallel: a scanner that throttles concurrent requests
+    // would otherwise look like a block.
+    LC.runAll = function (whenDone) {
+        var i = 0;
+        function next() {
+            if (i >= LC.TESTS.length) { whenDone(); return; }
+            var t = LC.TESTS[i]; i++;
+            LC.runOne(t, next);
+        }
+        next();
+    };
+
+    LC.stamp = String(new Date().getTime());
+
+    LC.detect = function () {
+        var ua = navigator.userAgent || '';
+        return {
+            user_agent: ua,
+            screen: (window.screen ? screen.width + ' x ' + screen.height : 'unknown'),
+            window_size: (window.innerWidth || 0) + ' x ' + (window.innerHeight || 0),
+            online: (typeof navigator.onLine === 'boolean') ? navigator.onLine : null,
+            referrer: String(document.referrer || ''),
+            checked_at_local: new Date().toString()
+        };
+    };
+
+    // ---- Submit, with no token -------------------------------------------
+    // Deliberately not window.submitMission: that needs a token record. The
+    // collection's createRule is public, so a plain POST is all this needs.
+    LC.submit = function (payload, whenDone) {
+        var body = {
+            token: 'loadcheck-public',
+            mission: MISSION,
+            payload: payload,
+            user_agent: navigator.userAgent || '',
+            submitted_at: new Date().toISOString()
+        };
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', PB_BASE + '/api/collections/reply_mission_responses/records', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState !== 4) { return; }
+                whenDone(xhr.status >= 200 && xhr.status < 300);
+            };
+            xhr.send(JSON.stringify(body));
+        } catch (e) {
+            whenDone(false);
+        }
+    };
+
+    LC.renderChecking = function () {
+        var h = '';
+        h += '<div class="lc-opener">';
+        h += '<p><strong>Thank you for coming here.</strong> Clicking the link was the hard part.</p>';
+        h += '<p>Here is what we think is happening. A web page is not one file. It is a picture file, a file that lays everything out on the screen, and a file that makes the buttons work.</p>';
+        h += '<p>On your computer we believe the picture arrived and the other two were refused. That leaves no layout and no working button, which is why myCroquet looked wrong.</p>';
+        h += '<p>So we are asking this computer to fetch those exact files now, and watching which ones it is allowed to have.</p>';
+        h += '<p>It takes a few seconds. Nothing on your computer is changed, and nothing is installed.</p>';
+        h += '</div>';
+        h += '<div class="lc-status" id="lc-status">';
+        h += '<p class="lc-dots">&bull; &bull; &bull;</p>';
+        h += '<h2>Checking...</h2>';
+        h += '<p>Please leave this page open for a moment.</p>';
+        h += '</div>';
+        document.getElementById('lc-static').innerHTML = h;
+    };
+
+    LC.renderDone = function (sent) {
+        var box = document.getElementById('lc-status');
+        if (!box) { return; }
+        box.className = 'lc-status lc-done';
+        var h = '';
+        h += '<p class="lc-tick">&#10003;</p>';
+        h += '<h2>All done, thank you.</h2>';
+        if (sent) {
+            h += '<p>We have what we need, and there is nothing else you have to do.</p>';
+        } else {
+            h += '<p>The check ran, but we could not send the result from this computer. Please email hello@croquetqld.org and tell us you saw this page.</p>';
+        }
+        box.innerHTML = h;
+    };
+
+    // The optional email box. Rendered only AFTER the result has already gone,
+    // so leaving it blank loses us nothing. Whoever lands here is anonymous by
+    // design, and this is the only way they can ask for a reply.
+    LC.offerEmail = function (payload) {
+        var app = document.getElementById('app');
+        var h = '';
+        h += '<div class="lc-extra">';
+        h += '<p>Your result is already sent. This next part is optional.</p>';
+        h += '<label class="lc-label" for="lc-email"><strong>If you would like us to write back, put your email here.</strong></label>';
+        h += '<input class="lc-input" type="email" id="lc-email" autocomplete="email" placeholder="your email address">';
+        h += '<div class="lc-btns">';
+        h += '<button type="button" class="lc-btn lc-yes" id="lc-send">Send it</button>';
+        h += '</div>';
+        h += '<p id="lc-thanks" class="lc-thanks"></p>';
+        h += '</div>';
+        app.innerHTML = h;
+
+        document.getElementById('lc-send').onclick = function () {
+            var box = document.getElementById('lc-email');
+            var v = box ? String(box.value || '') : '';
+            if (v.indexOf('@') === -1) {
+                document.getElementById('lc-thanks').innerHTML = 'That does not look like an email address. Please check it.';
+                return;
+            }
+            this.disabled = true;
+            box.disabled = true;
+            // A second row, carrying the same result plus the address. The
+            // first row already landed, so a failure here costs nothing.
+            payload.contact_email = v;
+            LC.submit(payload, function () {
+                document.getElementById('lc-thanks').innerHTML = 'Thank you. We will be in touch.';
+            });
+        };
+    };
+
+    LC.renderChecking();
+
+    LC.addQueryTests();
+    LC.runAll(function () {
+        LC.addTiming();
+        var payload = LC.detect();
+        payload.tests = LC.results;
+        payload.test_order = LC.order;
+        payload.js_errors = LC.jsErrors;
+        payload.contact_email = null;
+        LC.submit(payload, function (ok) {
+            LC.renderDone(ok);
+            if (ok) { LC.offerEmail(payload); }
+        });
+    });
+    </script>
+</body>
+</html>
